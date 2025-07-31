@@ -1,11 +1,5 @@
 import type { Chat } from '@/lib/db/schema';
 import {
-  SidebarMenuAction,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from './ui/sidebar';
-import Link from 'next/link';
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -14,7 +8,11 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from './ui/dropdown-menu';
+  SidebarMenuAction,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '@/components/ui';
+import Link from 'next/link';
 import {
   CheckCircleFillIcon,
   GlobeIcon,
@@ -22,7 +20,7 @@ import {
   MoreHorizontalIcon,
   ShareIcon,
   TrashIcon,
-} from './icons';
+} from '../icons';
 import { memo } from 'react';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
 

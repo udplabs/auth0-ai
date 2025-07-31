@@ -2,10 +2,10 @@
 
 import { isToday, isYesterday, subMonths, subWeeks } from 'date-fns';
 import { useParams, useRouter } from 'next/navigation';
-import type { User } from 'next-auth';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { useUser } from '@auth0/nextjs-auth0';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,18 +15,16 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
   useSidebar,
-} from '@/components/ui/sidebar';
+} from '@/components/ui';
 import type { Chat } from '@/lib/db/schema';
 import { fetcher } from '@/lib/utils';
 import { ChatItem } from './sidebar-history-item';
 import useSWRInfinite from 'swr/infinite';
-import { LoaderIcon } from './icons';
+import { LoaderIcon } from '../icons';
 
 type GroupedChats = {
   today: Chat[];
@@ -93,9 +91,12 @@ export function getChatHistoryPaginationKey(
   return `/api/history?ending_before=${firstChatFromPage.id}&limit=${PAGE_SIZE}`;
 }
 
-export function SidebarHistory({ user }: { user: User | undefined }) {
+export function SidebarHistory() {
   const { setOpenMobile } = useSidebar();
   const { id } = useParams();
+  const { user, isLoading: isAuthLoading } = useUser();
+
+  const isAuthenticated = !!user && !isAuthLoading;
 
   const {
     data: paginatedChatHistories,
@@ -148,7 +149,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     }
   };
 
-  if (!user) {
+  if (!isAuthenticated) {
     return (
       <SidebarGroup>
         <SidebarGroupContent>
@@ -174,7 +175,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                 className="rounded-md h-8 flex gap-2 px-2 items-center"
               >
                 <div
-                  className="h-4 rounded-md flex-1 max-w-[--skeleton-width] bg-sidebar-accent-foreground/10"
+                  className="h-4 rounded-md flex-1 max-w-(--skeleton-width) bg-sidebar-accent-foreground/10"
                   style={
                     {
                       '--skeleton-width': `${item}%`,
