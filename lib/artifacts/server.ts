@@ -5,7 +5,7 @@ import { textDocumentHandler } from '@/artifacts/text/server';
 import type { ArtifactKind } from '@/components/artifact';
 import type { Document } from '../db/schema';
 import { saveDocument } from '../db/queries';
-import type { Session } from 'next-auth';
+import type { SessionData as Session } from '@auth0/nextjs-auth0/types';
 import type { UIMessageStreamWriter } from 'ai';
 import type { ChatMessage } from '../types';
 
@@ -52,13 +52,13 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
         session: args.session,
       });
 
-      if (args.session?.user?.id) {
+      if (args.session?.user?.sub) {
         await saveDocument({
           id: args.id,
           title: args.title,
           content: draftContent,
           kind: config.kind,
-          userId: args.session.user.id,
+          userId: args.session.user.sub,
         });
       }
 
@@ -78,7 +78,7 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
           title: args.document.title,
           content: draftContent,
           kind: config.kind,
-          userId: args.session.user.id,
+          userId: args.session.user.sub,
         });
       }
 

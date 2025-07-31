@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Session } from 'next-auth';
+import type { SessionData as Session } from '@auth0/nextjs-auth0/types';
 import { streamObject, tool, type UIMessageStreamWriter } from 'ai';
 import { getDocumentById, saveSuggestions } from '@/lib/db/queries';
 import type { Suggestion } from '@/lib/db/schema';
@@ -69,8 +69,8 @@ export const requestSuggestions = ({
         suggestions.push(suggestion);
       }
 
-      if (session.user?.id) {
-        const userId = session.user.id;
+      if (session.user?.sub) {
+        const userId = session.user.sub;
 
         await saveSuggestions({
           suggestions: suggestions.map((suggestion) => ({

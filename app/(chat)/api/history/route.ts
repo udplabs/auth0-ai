@@ -1,7 +1,7 @@
-import { auth } from '@/app/(auth)/auth';
+import { auth0 } from '@/lib/auth0';
 import type { NextRequest } from 'next/server';
 import { getChatsByUserId } from '@/lib/db/queries';
-import { ChatSDKError } from '@/lib/errors';
+import { APIError } from '@/lib/errors';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -11,20 +11,20 @@ export async function GET(request: NextRequest) {
   const endingBefore = searchParams.get('ending_before');
 
   if (startingAfter && endingBefore) {
-    return new ChatSDKError(
+    return new APIError(
       'bad_request:api',
       'Only one of starting_after or ending_before can be provided.',
     ).toResponse();
   }
 
-  const session = await auth();
+  const { user } = (await auth0.getSession()) || {};
 
-  if (!session?.user) {
-    return new ChatSDKError('unauthorized:chat').toResponse();
+  if (!user) {
+    return new APIError('unauthorized:chat').toResponse();
   }
 
   const chats = await getChatsByUserId({
-    id: session.user.id,
+    id: user.sub,
     limit,
     startingAfter,
     endingBefore,

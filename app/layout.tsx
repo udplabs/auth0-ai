@@ -2,9 +2,12 @@ import { Toaster } from 'sonner';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
+import { DataStreamProvider } from '@/components/data-stream-provider';
+import { AppSidebar } from '@/components/app-sidebar';
+import { SidebarInset, SidebarProvider } from '@/components/ui';
 
 import './globals.css';
-import { SessionProvider } from 'next-auth/react';
+import { cookies } from 'next/headers';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://chat.vercel.ai'),
@@ -53,6 +56,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const isCollapsed = cookieStore.get('sidebar:state')?.value !== 'true';
   return (
     <html
       lang="en"
@@ -78,7 +83,12 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Toaster position="top-center" />
-          <SessionProvider>{children}</SessionProvider>
+          <DataStreamProvider>
+            <SidebarProvider defaultOpen={!isCollapsed}>
+              <AppSidebar />
+              <SidebarInset>{children}</SidebarInset>
+            </SidebarProvider>
+          </DataStreamProvider>
         </ThemeProvider>
       </body>
     </html>

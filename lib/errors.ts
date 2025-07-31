@@ -4,6 +4,7 @@ export type ErrorType =
   | 'forbidden'
   | 'not_found'
   | 'rate_limit'
+  | 'server_error'
   | 'offline';
 
 export type Surface =
@@ -33,7 +34,7 @@ export const visibilityBySurface: Record<Surface, ErrorVisibility> = {
   suggestions: 'response',
 };
 
-export class ChatSDKError extends Error {
+export class APIError extends Error {
   public type: ErrorType;
   public surface: Surface;
   public statusCode: number;
@@ -60,7 +61,8 @@ export class ChatSDKError extends Error {
       console.error({
         code,
         message,
-        cause,
+        cause:
+          typeof cause === 'string' ? cause : JSON.stringify(cause, null, 2),
       });
 
       return Response.json(

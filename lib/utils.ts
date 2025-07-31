@@ -1,13 +1,13 @@
 import type {
-  CoreAssistantMessage,
-  CoreToolMessage,
+  AssistantModelMessage,
+  ToolModelMessage,
   UIMessage,
   UIMessagePart,
 } from 'ai';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import type { DBMessage, Document } from '@/lib/db/schema';
-import { ChatSDKError, type ErrorCode } from './errors';
+import { APIError, type ErrorCode } from './errors';
 import type { ChatMessage, ChatTools, CustomUIDataTypes } from './types';
 import { formatISO } from 'date-fns';
 
@@ -20,7 +20,7 @@ export const fetcher = async (url: string) => {
 
   if (!response.ok) {
     const { code, cause } = await response.json();
-    throw new ChatSDKError(code as ErrorCode, cause);
+    throw new APIError(code as ErrorCode, cause);
   }
 
   return response.json();
@@ -35,13 +35,13 @@ export async function fetchWithErrorHandlers(
 
     if (!response.ok) {
       const { code, cause } = await response.json();
-      throw new ChatSDKError(code as ErrorCode, cause);
+      throw new APIError(code as ErrorCode, cause);
     }
 
     return response;
   } catch (error: unknown) {
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      throw new ChatSDKError('offline:chat');
+      throw new APIError('offline:chat');
     }
 
     throw error;
@@ -63,7 +63,7 @@ export function generateUUID(): string {
   });
 }
 
-type ResponseMessageWithoutId = CoreToolMessage | CoreAssistantMessage;
+type ResponseMessageWithoutId = ToolModelMessage | AssistantModelMessage;
 type ResponseMessage = ResponseMessageWithoutId & { id: string };
 
 export function getMostRecentUserMessage(messages: Array<UIMessage>) {
