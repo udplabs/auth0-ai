@@ -1,11 +1,11 @@
-import { auth } from '@/app/(auth)/auth';
+import { auth0 } from '@/lib/auth0';
 import {
   getChatById,
   getMessagesByChatId,
   getStreamIdsByChatId,
 } from '@/lib/db/queries';
 import type { Chat } from '@/lib/db/schema';
-import { ChatSDKError } from '@/lib/errors';
+import { APIError } from '@/lib/errors';
 import type { ChatMessage } from '@/lib/types';
 import { createUIMessageStream, JsonToSseTransformStream } from 'ai';
 import { getStreamContext } from '../../route';
@@ -25,13 +25,13 @@ export async function GET(
   }
 
   if (!chatId) {
-    return new ChatSDKError('bad_request:api').toResponse();
+    return new APIError('bad_request:api').toResponse();
   }
 
-  const session = await auth();
+  const { user } = (await auth0.getSession()) || {};
 
-  if (!session?.user) {
-    return new ChatSDKError('unauthorized:chat').toResponse();
+  if (!user) {
+    return new APIError('unauthorized:chat').toResponse();
   }
 
   let chat: Chat;
@@ -39,27 +39,27 @@ export async function GET(
   try {
     chat = await getChatById({ id: chatId });
   } catch {
-    return new ChatSDKError('not_found:chat').toResponse();
+    return new APIError('not_found:chat').toResponse();
   }
 
   if (!chat) {
-    return new ChatSDKError('not_found:chat').toResponse();
+    return new APIError('not_found:chat').toResponse();
   }
 
-  if (chat.visibility === 'private' && chat.userId !== session.user.id) {
-    return new ChatSDKError('forbidden:chat').toResponse();
+  if (chat.visibility === 'private' && chat.userId !== user.sub) {
+    return new APIError('forbidden:chat').toResponse();
   }
 
   const streamIds = await getStreamIdsByChatId({ chatId });
 
   if (!streamIds.length) {
-    return new ChatSDKError('not_found:stream').toResponse();
+    return new APIError('not_found:stream').toResponse();
   }
 
   const recentStreamId = streamIds.at(-1);
 
   if (!recentStreamId) {
-    return new ChatSDKError('not_found:stream').toResponse();
+    return new APIError('not_found:stream').toResponse();
   }
 
   const emptyDataStream = createUIMessageStream<ChatMessage>({

@@ -6,13 +6,13 @@ import {
   stepCountIs,
   streamText,
 } from 'ai';
-import { auth, type UserType } from '@/app/(auth)/auth';
+import { auth0 } from '@/lib/auth0';
 import { type RequestHints, systemPrompt } from '@/lib/ai/prompts';
 import {
   createStreamId,
   deleteChatById,
   getChatById,
-  getMessageCountByUserId,
+  // getMessageCountByUserId,
   getMessagesByChatId,
   saveChat,
   saveMessages,
@@ -25,7 +25,7 @@ import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { getWeather } from '@/lib/ai/tools/get-weather';
 import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
-import { entitlementsByUserType } from '@/lib/ai/entitlements';
+// import { entitlementsByUserType } from '@/lib/ai/entitlements';
 import { postRequestBodySchema, type PostRequestBody } from './schema';
 import { geolocation } from '@vercel/functions';
 import {
@@ -33,7 +33,7 @@ import {
   type ResumableStreamContext,
 } from 'resumable-stream';
 import { after } from 'next/server';
-import { ChatSDKError } from '@/lib/errors';
+import { APIError } from '@/lib/errors';
 import type { ChatMessage } from '@/lib/types';
 import type { ChatModel } from '@/lib/ai/models';
 import type { VisibilityType } from '@/components/visibility-selector';
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     const json = await request.json();
     requestBody = postRequestBodySchema.parse(json);
   } catch (_) {
-    return new ChatSDKError('bad_request:api').toResponse();
+    return new APIError('bad_request:api').toResponse();
   }
 
   try {
@@ -85,22 +85,24 @@ export async function POST(request: Request) {
       selectedVisibilityType: VisibilityType;
     } = requestBody;
 
-    const session = await auth();
+    const session = await auth0.getSession();
+    const { user } = session || {};
 
-    if (!session?.user) {
-      return new ChatSDKError('unauthorized:chat').toResponse();
+    if (!session || !user) {
+      return new APIError('unauthorized:chat').toResponse();
     }
 
-    const userType: UserType = session.user.type;
+    // TODO: refactor this to use FGA?
+    // const userType: UserType = user.type;
 
-    const messageCount = await getMessageCountByUserId({
-      id: session.user.id,
-      differenceInHours: 24,
-    });
+    // const messageCount = await getMessageCountByUserId({
+    //   id: session.user.id,
+    //   differenceInHours: 24,
+    // });
 
-    if (messageCount > entitlementsByUserType[userType].maxMessagesPerDay) {
-      return new ChatSDKError('rate_limit:chat').toResponse();
-    }
+    // if (messageCount > entitlementsByUserType[userType].maxMessagesPerDay) {
+    //   return new APIError('rate_limit:chat').toResponse();
+    // }
 
     const chat = await getChatById({ id });
 
@@ -111,13 +113,13 @@ export async function POST(request: Request) {
 
       await saveChat({
         id,
-        userId: session.user.id,
+        userId: user.sub,
         title,
         visibility: selectedVisibilityType,
       });
     } else {
-      if (chat.userId !== session.user.id) {
-        return new ChatSDKError('forbidden:chat').toResponse();
+      if (chat.userId !== user.sub) {
+        return new APIError('forbidden:chat').toResponse();
       }
     }
 
@@ -219,7 +221,7 @@ export async function POST(request: Request) {
       return new Response(stream.pipeThrough(new JsonToSseTransformStream()));
     }
   } catch (error) {
-    if (error instanceof ChatSDKError) {
+    if (error instanceof APIError) {
       return error.toResponse();
     }
   }
@@ -230,19 +232,19 @@ export async function DELETE(request: Request) {
   const id = searchParams.get('id');
 
   if (!id) {
-    return new ChatSDKError('bad_request:api').toResponse();
+    return new APIError('bad_request:api').toResponse();
   }
 
-  const session = await auth();
+  const { user } = (await auth0.getSession()) || {};
 
-  if (!session?.user) {
-    return new ChatSDKError('unauthorized:chat').toResponse();
+  if (!user) {
+    return new APIError('unauthorized:chat').toResponse();
   }
 
   const chat = await getChatById({ id });
 
-  if (chat.userId !== session.user.id) {
-    return new ChatSDKError('forbidden:chat').toResponse();
+  if (chat.userId !== user.sub) {
+    return new APIError('forbidden:chat').toResponse();
   }
 
   const deletedChat = await deleteChatById({ id });

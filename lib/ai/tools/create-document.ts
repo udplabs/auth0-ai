@@ -1,7 +1,7 @@
 import { generateUUID } from '@/lib/utils';
 import { tool, type UIMessageStreamWriter } from 'ai';
 import { z } from 'zod';
-import type { Session } from 'next-auth';
+import type { SessionData as Session } from '@auth0/nextjs-auth0/types';
 import {
   artifactKinds,
   documentHandlersByArtifactKind,
