@@ -1,8 +1,8 @@
 /** @type {import('postcss-load-config').Config} */
 const config = {
   plugins: {
-    tailwindcss: {},
-    'tailwindcss/nesting': {},
+    '@tailwindcss/postcss': {},
+    '@tailwindcss/nesting': {},
   },
 };
 
