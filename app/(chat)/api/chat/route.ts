@@ -7,7 +7,7 @@ import {
   streamText,
 } from 'ai';
 import { auth0 } from '@/lib/auth0';
-import { type RequestHints, systemPrompt } from '@/lib/ai/prompts';
+import { systemPrompt } from '@/lib/ai/prompts';
 import {
   createStreamId,
   deleteChatById,
@@ -19,10 +19,13 @@ import {
 } from '@/lib/db/queries';
 import { convertToUIMessages, generateUUID } from '@/lib/utils';
 import { generateTitleFromUserMessage } from '../../actions';
-import { createDocument } from '@/lib/ai/tools/create-document';
-import { updateDocument } from '@/lib/ai/tools/update-document';
-import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
-import { getWeather } from '@/lib/ai/tools/get-weather';
+import {
+  createDocument,
+  getWeather,
+  requestSuggestions,
+  updateDocument,
+  userInfo,
+} from '@/lib/ai/tools/';
 import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
 // import { entitlementsByUserType } from '@/lib/ai/entitlements';
@@ -34,7 +37,7 @@ import {
 } from 'resumable-stream';
 import { after } from 'next/server';
 import { APIError } from '@/lib/errors';
-import type { ChatMessage } from '@/lib/types';
+
 import type { ChatModel } from '@/lib/ai/models';
 import type { VisibilityType } from '@/components/visibility-selector';
 
@@ -158,7 +161,7 @@ export async function POST(request: Request) {
           system: systemPrompt({ selectedChatModel, requestHints }),
           messages: convertToModelMessages(uiMessages),
           stopWhen: stepCountIs(5),
-          experimental_activeTools:
+          activeTools:
             selectedChatModel === 'chat-model-reasoning'
               ? []
               : [
@@ -166,6 +169,7 @@ export async function POST(request: Request) {
                   'createDocument',
                   'updateDocument',
                   'requestSuggestions',
+                  'userInfo',
                 ],
           experimental_transform: smoothStream({ chunking: 'word' }),
           tools: {
@@ -176,6 +180,7 @@ export async function POST(request: Request) {
               session,
               dataStream,
             }),
+            userInfo,
           },
           experimental_telemetry: {
             isEnabled: isProductionEnvironment,
