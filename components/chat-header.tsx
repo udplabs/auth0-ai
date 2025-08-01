@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useWindowSize } from 'usehooks-ts';
 
 import { ModelSelector } from '@/components/model-selector';
-import { SidebarToggle } from '@/components/app-sidebar/sidebar-toggle';
+
 import { Header } from './header';
 import {
   Button,
@@ -15,7 +15,7 @@ import {
 } from '@/components/ui';
 import { PlusIcon } from './icons';
 import { memo } from 'react';
-import { type VisibilityType, VisibilitySelector } from './visibility-selector';
+import { VisibilitySelector } from './visibility-selector';
 
 function PureChatHeader({
   chatId,
@@ -25,7 +25,7 @@ function PureChatHeader({
 }: {
   chatId: string;
   selectedModelId: string;
-  selectedVisibilityType: VisibilityType;
+  selectedVisibilityType: 'public' | 'private';
   isReadonly: boolean;
 }) {
   const router = useRouter();

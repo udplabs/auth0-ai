@@ -17,10 +17,10 @@ import {
 } from './icons';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
 
-export type VisibilityType = 'private' | 'public';
+export type VisibilityType = 'PRIVATE' | 'PUBLIC';
 
 const visibilities: Array<{
-  id: VisibilityType;
+  id: 'private' | 'public';
   label: string;
   description: string;
   icon: ReactNode;
@@ -45,7 +45,7 @@ export function VisibilitySelector({
   selectedVisibilityType,
 }: {
   chatId: string;
-  selectedVisibilityType: VisibilityType;
+  selectedVisibilityType: 'public' | 'private';
 } & React.ComponentProps<typeof Button>) {
   const [open, setOpen] = useState(false);
 

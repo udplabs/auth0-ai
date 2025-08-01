@@ -1,6 +1,7 @@
 import { put } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { APIError } from '@/lib/errors';
 
 import { auth0 } from '@/lib/auth0';
 
@@ -18,24 +19,23 @@ const FileSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const { user } = (await auth0.getSession()) || {};
-
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  if (request.body === null) {
-    return new Response('Request body is empty', { status: 400 });
-  }
-
   try {
+    const { user } = (await auth0.getSession()) || {};
+
+    if (!user?.sub) {
+      throw new APIError('unauthorized:files');
+    }
+
+    if (request.body === null) {
+      throw new APIError('bad_request:api', 'Request body is required');
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as Blob;
 
     if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+      throw new APIError('bad_request:api');
     }
-
     const validatedFile = FileSchema.safeParse({ file });
 
     if (!validatedFile.success) {
@@ -43,26 +43,31 @@ export async function POST(request: Request) {
         .map((error) => error.message)
         .join(', ');
 
-      return NextResponse.json({ error: errorMessage }, { status: 400 });
+      throw new APIError('server_error:files', errorMessage);
     }
 
     // Get filename from formData since Blob doesn't have name property
     const filename = (formData.get('file') as File).name;
     const fileBuffer = await file.arrayBuffer();
 
-    try {
-      const data = await put(`${filename}`, fileBuffer, {
-        access: 'public',
-      });
+    const data = await put(`${filename}`, fileBuffer, {
+      access: 'public',
+    });
 
-      return NextResponse.json(data);
-    } catch (error) {
-      return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+    return NextResponse.json(data);
+  } catch (error: unknown) {
+    console.error(error);
+    if (error instanceof APIError) {
+      if (error.type === 'unauthorized') {
+        // Don't expose 'unauthorized' errors as they may leak information
+        // about the existence of documents.
+        return new APIError('forbidden:document').toResponse();
+      }
+      return error.toResponse();
     }
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to process request' },
-      { status: 500 },
-    );
+    return new APIError(
+      'server_error:api',
+      (error as Error)?.message,
+    ).toResponse();
   }
 }

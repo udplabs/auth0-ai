@@ -17,7 +17,6 @@ import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 import { MessageReasoning } from './message-reasoning';
 import type { UseChatHelpers } from '@ai-sdk/react';
-import type { ChatMessage } from '@/lib/types';
 import { useDataStream } from './data-stream-provider';
 
 // Type narrowing is handled by TypeScript's control flow analysis
@@ -26,7 +25,6 @@ import { useDataStream } from './data-stream-provider';
 const PurePreviewMessage = ({
   chatId,
   message,
-  vote,
   isLoading,
   setMessages,
   regenerate,
@@ -312,9 +310,7 @@ const PurePreviewMessage = ({
             {!isReadonly && (
               <MessageActions
                 key={`action-${message.id}`}
-                chatId={chatId}
                 message={message}
-                vote={vote}
                 isLoading={isLoading}
               />
             )}

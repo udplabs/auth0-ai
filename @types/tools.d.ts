@@ -6,7 +6,7 @@ import type {
   getUserInfoTool,
 } from '@/lib/ai/tools';
 
-import type { InferUITool } from 'ai';
+import type { InferUITool, UITools } from 'ai';
 
 declare global {
   type WeatherTool = InferUITool<typeof getWeather>;
@@ -15,15 +15,14 @@ declare global {
   type RequestSuggestionsTool = InferUITool<
     ReturnType<typeof requestSuggestions>
   >;
-  type UserInfoTool = InferUITool<
-    typeof import('@/lib/ai/tools/user-info').getUserInfoTool
-  >;
+  type UserInfoTool = InferUITool<ReturnType<typeof getUserInfoTool>>;
 
-  interface ChatTools {
+  interface ChatTools extends UITools {
     getWeather: WeatherTool;
     createDocument: CreateDocumentTool;
     updateDocument: UpdateDocumentTool;
     requestSuggestions: RequestSuggestionsTool;
+    userInfo: UserInfoTool;
   }
 }
 

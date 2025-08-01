@@ -26,8 +26,6 @@ import { sheetArtifact } from '@/artifacts/sheet/client';
 import { textArtifact } from '@/artifacts/text/client';
 import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
-import type { VisibilityType } from './visibility-selector';
-import type { Attachment, ChatMessage } from '@/lib/types';
 
 export const artifactDefinitions = [
   textArtifact,
@@ -81,7 +79,7 @@ function PureArtifact({
   sendMessage: UseChatHelpers<ChatMessage>['sendMessage'];
   regenerate: UseChatHelpers<ChatMessage>['regenerate'];
   isReadonly: boolean;
-  selectedVisibilityType: VisibilityType;
+  selectedVisibilityType: 'public' | 'private';
 }) {
   const { artifact, setArtifact, metadata, setMetadata } = useArtifact();
 

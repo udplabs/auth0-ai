@@ -2,17 +2,39 @@
 
 import { generateText, type UIMessage } from 'ai';
 import { cookies } from 'next/headers';
-import {
-  deleteMessagesByChatIdAfterTimestamp,
-  getMessageById,
-  updateChatVisiblityById,
-} from '@/lib/db/queries';
-import type { VisibilityType } from '@/components/visibility-selector';
+import { after } from 'next/server';
+import { deleteMessagesByChatId } from '@/lib/db';
 import { myProvider } from '@/lib/ai/providers';
+import {
+  createResumableStreamContext,
+  type ResumableStreamContext,
+} from 'resumable-stream';
 
 export async function saveChatModelAsCookie(model: string) {
   const cookieStore = await cookies();
   cookieStore.set('chat-model', model);
+}
+
+export async function getStreamContext(
+  streamContext: ResumableStreamContext | null,
+) {
+  if (!streamContext) {
+    try {
+      return createResumableStreamContext({
+        waitUntil: after,
+      });
+    } catch (error: any) {
+      if (error.message.includes('REDIS_URL')) {
+        console.log(
+          ' > Resumable streams are disabled due to missing REDIS_URL',
+        );
+      } else {
+        console.error(error);
+      }
+    }
+  }
+
+  return streamContext;
 }
 
 export async function generateTitleFromUserMessage({
@@ -33,21 +55,6 @@ export async function generateTitleFromUserMessage({
   return title;
 }
 
-export async function deleteTrailingMessages({ id }: { id: string }) {
-  const [message] = await getMessageById({ id });
-
-  await deleteMessagesByChatIdAfterTimestamp({
-    chatId: message.chatId,
-    timestamp: message.createdAt,
-  });
-}
-
-export async function updateChatVisibility({
-  chatId,
-  visibility,
-}: {
-  chatId: string;
-  visibility: VisibilityType;
-}) {
-  await updateChatVisiblityById({ chatId, visibility });
+export async function deleteTrailingMessages(chatId: string) {
+  await deleteMessagesByChatId(chatId);
 }

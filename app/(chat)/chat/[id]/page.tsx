@@ -1,40 +1,34 @@
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
 import { auth0 } from '@/lib/auth0';
 import { Chat } from '@/components/chat';
-import { getChatById, getMessagesByChatId } from '@/lib/db/queries';
+import { getChatById } from '@/lib/db';
 import { DataStreamHandler } from '@/components/data-stream-handler';
 import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
-import { convertToUIMessages } from '@/lib/utils';
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const { id } = params;
-  const chat = await getChatById({ id });
 
-  if (!chat) {
-    notFound();
-  }
+  const { id } = params;
 
   const session = await auth0.getSession();
   const { user } = session || {};
 
-  if (chat.visibility === 'private') {
-    if (!user) {
-      return notFound();
-    }
-
-    if (user.sub !== chat.userId) {
-      return notFound();
-    }
+  if (!user?.sub) {
+    redirect('/auth/login');
   }
 
-  const messagesFromDb = await getMessagesByChatId({
-    id,
-  });
+  const {
+    messages = [],
+    visibility = 'public',
+    ...chat
+  } = await getChatById(id, user.sub, true);
 
-  const uiMessages = convertToUIMessages(messagesFromDb);
+  if (!chat) {
+    notFound();
+  }
 
   const cookieStore = await cookies();
   const chatModelFromCookie = cookieStore.get('chat-model');
@@ -44,9 +38,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
       <>
         <Chat
           id={chat.id}
-          initialMessages={uiMessages}
+          initialMessages={messages}
           initialChatModel={DEFAULT_CHAT_MODEL}
-          initialVisibilityType={chat.visibility}
+          initialVisibilityType={visibility}
           isReadonly={user?.sub !== chat.userId}
           autoResume={true}
         />
@@ -59,9 +53,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     <>
       <Chat
         id={chat.id}
-        initialMessages={uiMessages}
+        initialMessages={messages}
         initialChatModel={chatModelFromCookie.value}
-        initialVisibilityType={chat.visibility}
+        initialVisibilityType={visibility}
         isReadonly={session?.user?.id !== chat.userId}
         autoResume={true}
       />

@@ -11,6 +11,7 @@ export type Surface =
   | 'chat'
   | 'auth'
   | 'api'
+  | 'files'
   | 'stream'
   | 'database'
   | 'history'
@@ -25,6 +26,7 @@ export type ErrorVisibility = 'response' | 'log' | 'none';
 export const visibilityBySurface: Record<Surface, ErrorVisibility> = {
   database: 'log',
   chat: 'response',
+  files: 'response',
   auth: 'response',
   stream: 'response',
   api: 'response',
@@ -38,14 +40,16 @@ export class APIError extends Error {
   public type: ErrorType;
   public surface: Surface;
   public statusCode: number;
+  public details?: any;
 
-  constructor(errorCode: ErrorCode, cause?: string) {
+  constructor(errorCode: ErrorCode, cause?: string, details?: any) {
     super();
 
     const [type, surface] = errorCode.split(':');
 
     this.type = type as ErrorType;
     this.cause = cause;
+    this.details = details;
     this.surface = surface as Surface;
     this.message = getMessageByErrorCode(errorCode);
     this.statusCode = getStatusCodeByType(this.type);
@@ -55,7 +59,7 @@ export class APIError extends Error {
     const code: ErrorCode = `${this.type}:${this.surface}`;
     const visibility = visibilityBySurface[this.surface];
 
-    const { message, cause, statusCode } = this;
+    const { message, cause, statusCode, details } = this;
 
     if (visibility === 'log') {
       console.error({
@@ -66,7 +70,11 @@ export class APIError extends Error {
       });
 
       return Response.json(
-        { code: '', message: 'Something went wrong. Please try again later.' },
+        {
+          code: '',
+          message: 'Something went wrong. Please try again later.',
+          details,
+        },
         { status: statusCode },
       );
     }
@@ -94,21 +102,22 @@ export function getMessageByErrorCode(errorCode: ErrorCode): string {
     case 'not_found:chat':
       return 'The requested chat was not found. Please check the chat ID and try again.';
     case 'forbidden:chat':
-      return 'This chat belongs to another user. Please check the chat ID and try again.';
+      return 'Unable to access this chat at this time. Please check the chat ID and try again.';
     case 'unauthorized:chat':
-      return 'You need to sign in to view this chat. Please sign in and try again.';
+      return 'You need to sign in to chat. Please sign in and try again.';
     case 'offline:chat':
       return "We're having trouble sending your message. Please check your internet connection and try again.";
 
     case 'not_found:document':
       return 'The requested document was not found. Please check the document ID and try again.';
     case 'forbidden:document':
-      return 'This document belongs to another user. Please check the document ID and try again.';
+      return 'Unable to access this document at this time.';
     case 'unauthorized:document':
-      return 'You need to sign in to view this document. Please sign in and try again.';
+      return 'You need to sign in to interact with documents. Please sign in and try again.';
     case 'bad_request:document':
       return 'The request to create or update the document was invalid. Please check your input and try again.';
-
+    case 'unauthorized:api':
+      return 'You need to sign in to interact with files. Please sign in and try again.';
     default:
       return 'Something went wrong. Please try again later.';
   }

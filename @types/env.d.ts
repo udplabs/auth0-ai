@@ -108,5 +108,22 @@ namespace NodeJS {
      * @readonly
      */
     readonly FGA_CLIENT_SECRET: string;
+    /**
+     * The database connection URL for Prisma
+     *
+     * @see https://www.prisma.io/docs/concepts/database-connectors/postgresql
+     *
+     * @default `file:./dev.db` for development, or your production database URL
+     * @readonly
+     */
+    readonly DATABASE_URL: string;
+    /**
+     * The OpenAI API key for accessing OpenAI services
+     *
+     * Get this from your OpenAI account dashboard: https://platform.openai.com/account/api-keys
+     *
+     * @readonly
+     */
+    readonly OPENAI_API_KEY: string;
   }
 }

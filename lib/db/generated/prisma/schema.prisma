@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Chat {
+  id            String         @id @default(ulid())
+  user_id       String
+  title         String?
+  visibility    ChatVisibility @default(PUBLIC)
+  messages      Message[]
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+  stream        Stream?
+  message_count Int            @default(0)
+}
+
+enum ChatVisibility {
+  PRIVATE
+  PUBLIC
+}
+
+model AttachmentDocument {
+  id          String       @id @default(ulid())
+  user_id     String
+  title       String
+  content     String?
+  kind        DocumentKind
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+  suggestions Suggestion[]
+}
+
+enum DocumentKind {
+  TEXT
+  CODE
+  IMAGE
+  SHEET
+}
+
+model Stream {
+  id      String @id @default(ulid())
+  chat_id String @unique
+  chat    Chat   @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Suggestion {
+  id                  String             @id @default(ulid())
+  document_id         String
+  document            AttachmentDocument @relation(fields: [document_id], references: [id], onDelete: Cascade)
+  user_id             String
+  original_text       String
+  suggested_text      String
+  description         String?
+  is_resolved         Boolean            @default(false)
+  document_created_at DateTime           @default(now())
+  created_at          DateTime           @default(now())
+  updated_at          DateTime           @updatedAt
+}
+
+model Message {
+  id          String    @id @default(ulid())
+  chat_id     String
+  user_id     String
+  chat        Chat      @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+  role        String
+  parts       Json
+  metadata    Json?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  attachments Json?
+  vote        VoteType?
+}
+
+enum VoteType {
+  UP
+  DOWN
+}

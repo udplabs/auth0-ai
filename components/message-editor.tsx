@@ -11,7 +11,6 @@ import {
 import { Textarea } from './ui/textarea';
 import { deleteTrailingMessages } from '@/app/(chat)/actions';
 import type { UseChatHelpers } from '@ai-sdk/react';
-import type { ChatMessage } from '@/lib/types';
 import { getTextFromMessage } from '@/lib/utils';
 
 export type MessageEditorProps = {
@@ -80,9 +79,7 @@ export function MessageEditor({
           onClick={async () => {
             setIsSubmitting(true);
 
-            await deleteTrailingMessages({
-              id: message.id,
-            });
+            await deleteTrailingMessages(message.chatId);
 
             setMessages((messages) => {
               const index = messages.findIndex((m) => m.id === message.id);

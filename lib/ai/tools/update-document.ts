@@ -1,7 +1,7 @@
 import { tool, type UIMessageStreamWriter } from 'ai';
 import type { SessionData as Session } from '@auth0/nextjs-auth0/types';
 import { z } from 'zod';
-import { getDocumentById } from '@/lib/db/queries';
+import { getDocumentById } from '@/lib/db/queries_drizzle';
 import { documentHandlersByArtifactKind } from '@/lib/artifacts/server';
 
 interface UpdateDocumentProps {

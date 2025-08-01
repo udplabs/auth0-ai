@@ -1,15 +1,12 @@
 import type {
   AssistantModelMessage,
   ToolModelMessage,
-  UIMessage,
   UIMessagePart,
 } from 'ai';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import type { DBMessage, Document } from '@/lib/db/schema';
+import type { Message, AttachmentDocument } from '@/lib/db/generated/prisma';
 import { APIError, type ErrorCode } from './errors';
-import type { ChatMessage, ChatTools, CustomUIDataTypes } from './types';
-import { formatISO } from 'date-fns';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -66,19 +63,19 @@ export function generateUUID(): string {
 type ResponseMessageWithoutId = ToolModelMessage | AssistantModelMessage;
 type ResponseMessage = ResponseMessageWithoutId & { id: string };
 
-export function getMostRecentUserMessage(messages: Array<UIMessage>) {
+export function getMostRecentUserMessage(messages: Array<ChatMessage>) {
   const userMessages = messages.filter((message) => message.role === 'user');
   return userMessages.at(-1);
 }
 
 export function getDocumentTimestampByIndex(
-  documents: Array<Document>,
+  documents: Array<AttachmentDocument>,
   index: number,
 ) {
   if (!documents) return new Date();
   if (index > documents.length) return new Date();
 
-  return documents[index].createdAt;
+  return documents[index].created_at;
 }
 
 export function getTrailingMessageId({
@@ -97,15 +94,23 @@ export function sanitizeText(text: string) {
   return text.replace('<has_function_call>', '');
 }
 
-export function convertToUIMessages(messages: DBMessage[]): ChatMessage[] {
-  return messages.map((message) => ({
-    id: message.id,
-    role: message.role as 'user' | 'assistant' | 'system',
-    parts: message.parts as UIMessagePart<CustomUIDataTypes, ChatTools>[],
-    metadata: {
-      createdAt: formatISO(message.createdAt),
-    },
-  }));
+export function convertToUIMessages(
+  chatId: string,
+  messages: Message[],
+): ChatMessage[] {
+  return messages.map(({ metadata, parts, role, ...message }) => {
+    const { created_at: createdAt, updated_at: updatedAt } =
+      JSON.parse(JSON.stringify(metadata || {})) || {};
+
+    return {
+      role: role as 'user' | 'assistant' | 'system',
+      parts: parts as UIMessagePart<CustomUIDataTypes, ChatTools>[],
+      createdAt,
+      updatedAt,
+      chatId,
+      ...message,
+    };
+  });
 }
 
 export function getTextFromMessage(message: ChatMessage): string {

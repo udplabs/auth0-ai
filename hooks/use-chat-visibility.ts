@@ -3,20 +3,21 @@
 import { useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { unstable_serialize } from 'swr/infinite';
-import { updateChatVisibility } from '@/app/(chat)/actions';
+import { updateChatVisibilityById } from '@/lib/db';
 import {
   getChatHistoryPaginationKey,
   type ChatHistory,
 } from '@/components/app-sidebar/sidebar-history';
-import type { VisibilityType } from '@/components/visibility-selector';
+import { useUser } from '@auth0/nextjs-auth0';
 
 export function useChatVisibility({
   chatId,
   initialVisibilityType,
 }: {
   chatId: string;
-  initialVisibilityType: VisibilityType;
+  initialVisibilityType: 'public' | 'private';
 }) {
+  const { user } = useUser();
   const { mutate, cache } = useSWRConfig();
   const history: ChatHistory = cache.get('/api/history')?.data;
 
@@ -28,21 +29,19 @@ export function useChatVisibility({
     },
   );
 
-  const visibilityType = useMemo(() => {
+  const visibilityType = useMemo<'public' | 'private'>(() => {
     if (!history) return localVisibility;
     const chat = history.chats.find((chat) => chat.id === chatId);
     if (!chat) return 'private';
     return chat.visibility;
   }, [history, chatId, localVisibility]);
 
-  const setVisibilityType = (updatedVisibilityType: VisibilityType) => {
+  const setVisibilityType = (updatedVisibilityType: 'public' | 'private') => {
     setLocalVisibility(updatedVisibilityType);
     mutate(unstable_serialize(getChatHistoryPaginationKey));
 
-    updateChatVisibility({
-      chatId: chatId,
-      visibility: updatedVisibilityType,
-    });
+    user?.sub &&
+      updateChatVisibilityById(chatId, user.sub, updatedVisibilityType);
   };
 
   return { visibilityType, setVisibilityType };

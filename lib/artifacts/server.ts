@@ -4,7 +4,7 @@ import { sheetDocumentHandler } from '@/artifacts/sheet/server';
 import { textDocumentHandler } from '@/artifacts/text/server';
 import type { ArtifactKind } from '@/components/artifact';
 import type { Document } from '../db/schema';
-import { saveDocument } from '../db/queries';
+import { saveDocument } from '../db/queries_drizzle';
 import type { SessionData as Session } from '@auth0/nextjs-auth0/types';
 import type { UIMessageStreamWriter } from 'ai';
 import type { ChatMessage } from '../types';

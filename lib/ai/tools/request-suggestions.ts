@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { SessionData as Session } from '@auth0/nextjs-auth0/types';
 import { streamObject, tool, type UIMessageStreamWriter } from 'ai';
-import { getDocumentById, saveSuggestions } from '@/lib/db/queries';
+import { getDocumentById, saveSuggestions } from '@/lib/db/queries_drizzle';
 import type { Suggestion } from '@/lib/db/schema';
 import { generateUUID } from '@/lib/utils';
 import { myProvider } from '../providers';
