@@ -2,6 +2,7 @@
 'use server';
 
 import { auth0 } from '@/lib/auth0/client';
+import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function linkAccount(formData: FormData): Promise<void> {
@@ -24,6 +25,8 @@ export async function linkAccount(formData: FormData): Promise<void> {
 		// connection_scope: 'openid email profile',
 		returnTo: '/profile',
 	});
+
+	revalidateTag(`${session?.user?.sub}:user`);
 
 	redirect(`/auth/login?${params.toString()}`);
 }

@@ -1,0 +1,28 @@
+import { getChat } from '@/app/(chat)/api/actions';
+import { getUser } from '@/lib/auth0/client';
+import { APIError } from '@/lib/errors';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+
+export async function GET(
+	_: NextRequest,
+	{ params }: { params: Promise<ApiPathParams> }
+) {
+	try {
+		const user = await getUser();
+		const { id } = await params;
+
+		if (!id) {
+			throw new APIError('bad_request:api', 'Chat ID is required');
+		}
+
+		const data = await getChat({ id, userId: user.sub, includeMessages: true });
+
+		return NextResponse.json({ data });
+	} catch (error: unknown) {
+		console.log(error);
+		error instanceof APIError
+			? error.toResponse()
+			: new APIError(error).toResponse();
+	}
+}

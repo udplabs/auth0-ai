@@ -1,181 +1,323 @@
 import {
-  convertToModelMessages,
-  createUIMessageStream,
-  JsonToSseTransformStream,
-  smoothStream,
-  stepCountIs,
-  streamText,
+	generateTitleFromUserMessage,
+	getErrorMessage,
+} from '@/app/(chat)/api/actions';
+import { getTools } from '@/lib/ai/get-tools';
+import { systemPrompt } from '@/lib/ai/prompts/system-prompt';
+import { myProvider } from '@/lib/ai/providers';
+import { getUser } from '@/lib/auth0/client';
+import { getChatById, saveChat } from '@/lib/db/queries/chat';
+import { saveMessages, updateMessage } from '@/lib/db/queries/message';
+import { createStreamId } from '@/lib/db/queries/stream';
+import { setAIContext } from '@auth0/ai-vercel';
+import {
+	InterruptionPrefix,
+	errorSerializer,
+	withInterruptions,
+} from '@auth0/ai-vercel/interrupts';
+import { geolocation } from '@vercel/functions';
+import {
+	JsonToSseTransformStream,
+	convertToModelMessages,
+	createUIMessageStream,
+	hasToolCall,
+	isToolUIPart,
+	smoothStream,
+	stepCountIs,
+	streamText,
+	tool,
+	type TextStreamPart,
+	type ToolSet,
 } from 'ai';
 import { ulid } from 'ulid';
-import { auth0 } from '@/lib/auth0';
-import { systemPrompt } from '@/lib/ai/prompts';
-import {
-  createStreamId,
-  // getMessageCountByUserId,
-  upsertChat,
-  saveMessages,
-} from '@/lib/db';
-import {
-  createDocument,
-  getWeather,
-  requestSuggestions,
-  updateDocument,
-  userInfo,
-} from '@/lib/ai/tools/';
-import { isProductionEnvironment } from '@/lib/constants';
-import { myProvider } from '@/lib/ai/providers';
-// import { entitlementsByUserType } from '@/lib/ai/entitlements';
 import { postRequestBodySchema } from '../../schema';
-import { geolocation } from '@vercel/functions';
-import { getStreamContext } from '@/app/(chat)/actions';
-import type { ResumableStreamContext } from 'resumable-stream';
 
 import { APIError } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 
-// import type { ChatModel } from '@/lib/ai/models';
-import { ZodError } from 'zod';
-
-// export const maxDuration = 60;
+import { Auth0Interrupt } from '@auth0/ai/interrupts';
+import { after } from 'next/server';
+import {
+	createResumableStreamContext,
+	type ResumableStreamContext,
+} from 'resumable-stream';
+import { ZodError, z } from 'zod';
 
 let globalStreamContext: ResumableStreamContext | null = null;
 
+/**
+ * Setup an instance of Redis if you would like to use resumable streams. See .env for details.
+ *
+ * Running locally will NOT use resumable streams (unless you run Redis locally).
+ */
+export function getStreamContext() {
+	if (!globalStreamContext) {
+		try {
+			globalStreamContext = createResumableStreamContext({
+				waitUntil: after,
+			});
+		} catch (error: any) {
+			if (error.message.includes('REDIS_URL')) {
+				console.warn(
+					' > Resumable streams are disabled due to missing REDIS_URL'
+				);
+			} else {
+				console.error(error);
+			}
+		}
+	}
+
+	return globalStreamContext;
+}
+
 interface PostRequestBody {
-  id?: string;
-  message: ChatMessage;
-  selectedChatModel: 'chat-model' | 'chat-model-reasoning';
-  selectedVisibilityType: 'public' | 'private';
+	id?: string;
+	message: Chat.UIMessage;
+	selectedChatModel: 'chat-model' | 'chat-model-reasoning';
 }
 
 export async function POST(
-  request: TypedNextRequest<PostRequestBody>,
-  context: { params: { id: string } },
+	request: TypedNextRequest<PostRequestBody>,
+	{ params }: { params: Promise<ApiPathParams> }
 ) {
-  try {
-    const {
-      id = context.params?.id,
-      message,
-      selectedChatModel,
-      selectedVisibilityType,
-    } = postRequestBodySchema.parse(await request.json()) as PostRequestBody;
+	try {
+		const body = await request.json();
 
-    const session = await auth0.getSession();
-    const { user } = session || {};
+		const {
+			id = (await params)?.id,
+			message,
+			selectedChatModel,
+		} = postRequestBodySchema.parse(body) as PostRequestBody;
 
-    if (!session || !user) {
-      throw new APIError('unauthorized:chat');
-    }
+		const user = await getUser();
+		const isCompletion =
+			message.role === 'assistant' &&
+			message.parts.some((p) => isToolUIPart(p));
 
-    // TODO: refactor this to use FGA?
-    // const userType: UserType = user.type;
+		let dbChat = await getChatById(id, user.sub, true);
+		const uiMessage = {
+			...message,
+			metadata: { ...message?.metadata, userId: user.sub, chatId: id },
+		};
 
-    // const messageCount = await getMessageCountByUserId({
-    //   id: session.user.id,
-    //   differenceInHours: 24,
-    // });
+		if (!dbChat) {
+			// Chat does not exist. Create it!
+			dbChat = await saveChat({
+				id,
+				userId: user.sub,
+				messages: [uiMessage],
+				title: await generateTitleFromUserMessage(message),
+			});
+		} else if (isCompletion) {
+			// Update the existing message
+			// Otherwise db will throw an error
+			// (the message already exists!)
+			await updateMessage(message);
+		} else {
+			// Add incoming message to DB
+			await saveMessages([uiMessage]);
+		}
 
-    // if (messageCount > entitlementsByUserType[userType].maxMessagesPerDay) {
-    //   return new APIError('rate_limit:chat').toResponse();
-    // }
+		const { messages = [], ...chat } = dbChat;
 
-    const { messages = [], ...chat } = await upsertChat({
-      chatId: id,
-      userId: user.sub,
-      visibility: selectedVisibilityType,
-      message,
-      includeMessages: true,
-    });
+		const uiMessages = [...messages, uiMessage];
 
-    if (chat.userId !== user.sub) {
-      throw new APIError('forbidden:chat');
-    }
+		const requestHints: Chat.RequestHints = {
+			geolocation: geolocation(request),
+		};
 
-    const { longitude, latitude, city, country } = geolocation(request);
+		const { id: streamId } = await createStreamId(chat.id);
 
-    const requestHints: RequestHints = {
-      longitude,
-      latitude,
-      city,
-      country,
-    };
+		setAIContext({ threadID: streamId });
 
-    const { id: streamId } = await createStreamId(chat.id);
+		const tools = getTools();
 
-    const stream = createUIMessageStream<ChatMessage>({
-      execute: ({ writer: dataStream }) => {
-        const result = streamText({
-          model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel, requestHints }),
-          messages: convertToModelMessages(messages),
-          stopWhen: stepCountIs(5),
-          activeTools:
-            selectedChatModel === 'chat-model-reasoning'
-              ? []
-              : [
-                  'getWeather',
-                  'createDocument',
-                  'updateDocument',
-                  'requestSuggestions',
-                  'userInfo',
-                ],
-          experimental_transform: smoothStream({ chunking: 'word' }),
-          tools: {
-            getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
-            requestSuggestions: requestSuggestions({
-              session,
-              dataStream,
-            }),
-            userInfo,
-          },
-          experimental_telemetry: {
-            isEnabled: isProductionEnvironment,
-            functionId: 'stream-text',
-          },
-        });
+		const modelMessages = convertToModelMessages(uiMessages);
 
-        result.consumeStream();
+		const transformAuth0Error = <TOOLS extends ToolSet>(
+			chunk: TextStreamPart<TOOLS>
+		) => {
+			if (chunk?.type === 'tool-error') {
+				console.log('=== TRANSFORM ===');
+				console.log(chunk);
+				const { toolName, error } = chunk;
+				if (
+					toolName === 'getExternalAccounts' &&
+					error instanceof Auth0Interrupt
+				) {
+					const json = {
+						...error.toJSON(),
+						toolCall: { id: chunk.toolCallId },
+					};
 
-        dataStream.merge(
-          result.toUIMessageStream({
-            sendReasoning: true,
-          }),
-        );
-      },
-      generateId: ulid,
-      onFinish: async ({ messages }) => {
-        await saveMessages(chat.id, user.sub, messages);
-      },
-      //TODO make this better
-      onError: () => {
-        return 'Oops, an error occurred!';
-      },
-    });
+					console.log('transforming...');
+					const message = `${error?.name}:${JSON.stringify(json)}`;
+					console.log(message);
+					const output = {
+						...chunk,
+						error: {
+							...json,
+							message,
+						},
+					};
+					console.log(output);
+					return output;
+				}
+			}
+			return chunk;
+		};
 
-    globalStreamContext = getStreamContext(globalStreamContext);
+		const authRequiredTransform = <TOOLS extends ToolSet>() =>
+			new TransformStream<TextStreamPart<TOOLS>, TextStreamPart<TOOLS>>({
+				transform(chunk, controller) {
+					controller.enqueue(transformAuth0Error(chunk));
+				},
+			});
 
-    if (globalStreamContext) {
-      return new NextResponse(
-        await globalStreamContext.resumableStream(streamId, () =>
-          stream.pipeThrough(new JsonToSseTransformStream()),
-        ),
-      );
-    } else {
-      return new NextResponse(
-        stream.pipeThrough(new JsonToSseTransformStream()),
-      );
-    }
-  } catch (error) {
-    if (error instanceof ZodError) {
-      return new APIError(
-        'bad_request:api',
-        error?.message,
-        error.flatten(),
-      ).toResponse();
-    }
-    if (error instanceof APIError) {
-      return error.toResponse();
-    }
-  }
+		const stream = createUIMessageStream<Chat.UIMessage>({
+			execute: withInterruptions<Chat.UIMessage>(
+				async ({ writer: dataStream }) => {
+					const result = streamText({
+						model: myProvider.languageModel(selectedChatModel),
+						system: systemPrompt({ selectedChatModel, requestHints }),
+						messages: modelMessages,
+						stopWhen: (ctx) => {
+							console.log('=== stopWhen ===');
+							// Stop if the last message from the assistant has content
+							// (this handles the case where the model may generate multiple steps/tools)
+							const last = ctx.steps.at(-1);
+							console.log(last?.content);
+							if (!last) return false;
+
+							// v5 aggregates results; support both properties for backward compatibility
+							const results =
+								last?.toolResults ?? last?.dynamicToolResults ?? [];
+							const lastResult = results.at(-1);
+
+							const toolError = last.content.find(
+								(c) => c.type === 'tool-error'
+							);
+
+							const isInterrupt =
+								toolError &&
+								typeof toolError.error === 'object' &&
+								(toolError.error as any).code === 'FEDERATED_CONNECTION_ERROR';
+
+							if (isInterrupt) {
+								console.log('=== IS INTERRUPT ===');
+								throw (toolError?.error as any)?.message;
+							}
+
+							const hasOwnUI = lastResult?.output?.hasOwnUI;
+
+							// If the most recent result has indicated generative UI, force AI to shut up.
+							return hasOwnUI || stepCountIs(5);
+						},
+						experimental_transform: [
+							smoothStream({
+								chunking: 'word',
+								delayInMs: 20,
+							}),
+							authRequiredTransform,
+						],
+						tools,
+					});
+
+					result.consumeStream();
+
+					// const [_, tap] = result.fullStream.tee();
+
+					// For debugging: log structured stream parts safely.
+					// (async () => {
+					// 	const reader = tap.getReader();
+					// 	try {
+					// 		while (true) {
+					// 			const { value, done } = await reader.read();
+					// 			if (done) break;
+					// 			console.debug('stream part:', value);
+					// 		}
+					// 	} finally {
+					// 		reader.releaseLock();
+					// 	}
+					// })();
+
+					dataStream.merge(
+						result.toUIMessageStream({
+							// Vercel SDK bug? Seems not to work w/ OpenAI. :(
+							sendReasoning: false,
+							originalMessages: uiMessages,
+						})
+					);
+				},
+				{
+					messages: uiMessages,
+					tools,
+				}
+			),
+			generateId: ulid,
+
+			onFinish: async ({ messages }) => {
+				console.log('onFinish... saving', messages.length, 'messages...');
+				console.log('=== messages ===');
+				console.log(messages);
+				await saveMessages(
+					messages.map((m) => ({
+						...m,
+						metadata: { ...m?.metadata, userId: user.sub, chatId: chat.id },
+					}))
+				);
+			},
+			//TODO make this better
+			onError: (error) => {
+				console.log('=== onError ===');
+				console.log(error);
+
+				if ((error as any)?.error instanceof Auth0Interrupt) {
+					console.log(`it's an interrupt!`);
+				}
+
+				if (error instanceof Error) {
+					console.log('returning error.message...');
+					return error.message;
+				}
+
+				if (typeof error === 'string') {
+					console.log('error === string');
+					return error;
+				}
+
+				// Handle other types safely
+				return String(error);
+			},
+		});
+
+		const streamContext = getStreamContext();
+
+		if (streamContext) {
+			console.log('returning resumable stream...');
+			return new NextResponse(
+				await streamContext.resumableStream(streamId, () =>
+					stream.pipeThrough(new JsonToSseTransformStream())
+				)
+			);
+		} else {
+			return new NextResponse(
+				stream.pipeThrough(new JsonToSseTransformStream())
+			);
+		}
+	} catch (error) {
+		console.log('=== POST error ===');
+		console.log(error);
+		if (error instanceof ZodError) {
+			return new APIError(
+				'bad_request:api',
+				error?.message,
+				error.format()
+			).toResponse();
+		}
+		if (error instanceof APIError) {
+			return error.toResponse();
+		}
+		return new APIError(error).toResponse();
+	}
 }

@@ -1,47 +1,71 @@
 'use client';
 
-import Link from 'next/link';
-
-import { ModeToggle } from '@/components/mode-toggle';
-import { SidebarToggle } from '@/components/app-sidebar';
-import { Button } from '@/components/ui';
-import { VercelIcon } from './icons';
 import { memo } from 'react';
 
+import { SidebarToggle } from '@/components/app-sidebar/sidebar-toggle';
+import { ModeToggle } from '@/components/mode-toggle';
+import { NewChatButton } from '@/components/new-chat-button';
+import { Button } from '@/components/ui/button';
+import { useSidebar } from '@/components/ui/sidebar';
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { VercelButton } from '@/components/vercel-button';
+import { PiggyBankIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useWindowSize } from 'usehooks-ts';
+
 export interface HeaderProps extends React.PropsWithChildren {
-  hideSecondaryActions?: boolean;
+	hideSecondaryActions?: boolean;
 }
 
 function PureHeader({ children, hideSecondaryActions = false }: HeaderProps) {
-  return (
-    <header className="flex sticky w-full top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2">
-      <SidebarToggle />
-      {children}
-      {!hideSecondaryActions && (
-        <div className="flex flex-1 items-center order-4 md:ml-auto gap-2 justify-end">
-          <ModeToggle className="order-1 md:order-2" variant="dropdown" />
+	const router = useRouter();
+	const { open } = useSidebar();
+	const { width: windowWidth } = useWindowSize();
 
-          <Button
-            className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-50 dark:text-zinc-900 hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-2 md:order-1 "
-            asChild
-          >
-            <Link
-              href={`https://vercel.com/new/clone?repository-url=https://github.com/vercel/ai-chatbot&env=AUTH_SECRET&envDescription=Learn more about how to get the API Keys for the application&envLink=https://github.com/vercel/ai-chatbot/blob/main/.env.example&demo-title=AI Chatbot&demo-description=An Open-Source AI Chatbot Template Built With Next.js and the AI SDK by Vercel.&demo-url=https://chat.vercel.ai&products=[{"type":"integration","protocol":"ai","productSlug":"grok","integrationSlug":"xai"},{"type":"integration","protocol":"storage","productSlug":"neon","integrationSlug":"neon"},{"type":"integration","protocol":"storage","productSlug":"upstash-kv","integrationSlug":"upstash"},{"type":"blob"}]`}
-              target="_noblank"
-            >
-              <VercelIcon size={16} />
-              Deploy with Vercel
-            </Link>
-          </Button>
-        </div>
-      )}
-    </header>
-  );
+	return (
+		<header className='bg-background sticky top-0 flex w-full items-center gap-2 px-2 py-1.5 md:px-2'>
+			<SidebarToggle />
+			{(!open || windowWidth < 768) && (
+				<>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant='outline'
+								className='order-2 ml-auto px-2 md:order-1 md:ml-0 md:h-fit md:px-2'
+								onClick={() => {}}
+							>
+								<PiggyBankIcon />
+								<span className='md:sr-only'>Account Dashboard</span>
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>Account Dashboard</TooltipContent>
+					</Tooltip>
+					<NewChatButton
+						variant='outline'
+						className='order-2 ml-auto px-2 md:order-1 md:ml-0 md:h-fit md:px-2'
+					/>
+				</>
+			)}
+			{children}
+			{!hideSecondaryActions && (
+				<div className='order-4 flex flex-1 items-center justify-end gap-2 md:ml-auto'>
+					<ModeToggle
+						className='order-1 md:order-2'
+						variant='dropdown'
+					/>
+					<VercelButton className='order-2 md:order-1' />
+				</div>
+			)}
+		</header>
+	);
 }
 
-export const Header = memo(PureHeader, (prevProps, nextProps) => {
-  return (
-    prevProps.children === nextProps.children &&
-    prevProps.hideSecondaryActions === nextProps.hideSecondaryActions
-  );
+export const Header = memo(PureHeader, (prev, next) => {
+	if (prev.hideSecondaryActions !== next.hideSecondaryActions) return false;
+	if (prev.children !== next.children) return false;
+	return true;
 });

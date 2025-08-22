@@ -12,78 +12,252 @@ datasource db {
 }
 
 model Chat {
-    id            String         @id @default(ulid())
-    user_id       String
-    title         String?
-    visibility    ChatVisibility @default(PUBLIC)
-    messages      Message[]
-    created_at    DateTime       @default(now())
-    updated_at    DateTime       @updatedAt
-    stream        Stream?
-    message_count Int            @default(0)
-}
+    id        String    @id @default(ulid())
+    userId    String
+    title     String?
+    messages  Message[]
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    streams   Stream[]
 
-enum ChatVisibility {
-    PRIVATE
-    PUBLIC
-}
-
-model AttachmentDocument {
-    id          String       @id @default(ulid())
-    user_id     String
-    title       String
-    content     String?
-    kind        DocumentKind
-    created_at  DateTime     @default(now())
-    updated_at  DateTime     @updatedAt
-    suggestions Suggestion[]
-}
-
-enum DocumentKind {
-    TEXT
-    CODE
-    IMAGE
-    SHEET
+    @@index([userId])
 }
 
 model Stream {
-    id      String @id @default(ulid())
-    chat_id String @unique
-    chat    Chat   @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+    id     String @id @default(ulid())
+    chatId String
+    chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
-}
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-model Suggestion {
-    id                  String             @id @default(ulid())
-    document_id         String
-    document            AttachmentDocument @relation(fields: [document_id], references: [id], onDelete: Cascade)
-    user_id             String
-    original_text       String
-    suggested_text      String
-    description         String?
-    is_resolved         Boolean            @default(false)
-    document_created_at DateTime           @default(now())
-    created_at          DateTime           @default(now())
-    updated_at          DateTime           @updatedAt
+    @@index([chatId])
 }
 
 model Message {
     id          String    @id @default(ulid())
-    chat_id     String
-    user_id     String
-    chat        Chat      @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+    chatId      String
+    userId      String
+    chat        Chat      @relation(fields: [chatId], references: [id], onDelete: Cascade)
     role        String
     parts       Json
     metadata    Json?
-    created_at  DateTime  @default(now())
-    updated_at  DateTime  @updatedAt
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
     attachments Json?
     vote        VoteType?
+
+    @@index([chatId])
+    @@index([userId])
 }
 
 enum VoteType {
-    UP
-    DOWN
+    up
+    down
+}
+
+// Financial Account models
+model Account {
+    id                     String    @id @default(ulid())
+    customerId             String // The unique identifier for the customer that owns this account
+    isExternal             Boolean?  @default(false)
+    externalConnectionId   String?
+    externalConnectionName String?
+    balance                Float
+    currencyCode           String?   @default("USD")
+    currencyName           String?   @default("US Dollar")
+    currencySymbol         String?   @default("$")
+    currencyNumericCode    Float?    @default(840)
+    displayName            String?
+    name                   String
+    number                 String
+    openedDate             DateTime
+    closedDate             DateTime?
+    routingNumber          String
+    type                   String
+    subType                String? // e.g., "checking", "savings", "credit card", "loan", "investment"
+    status                 String?   @default("active") // e.g., "active", "closed", "suspended"
+
+    // Loan-specific fields (nullable for non-loan accounts)
+    balanceDue        Float?
+    currentPrincipal  Float?
+    dueDate           DateTime?
+    interestRate      Float?
+    lastPaymentDate   DateTime?
+    nextPaymentDate   DateTime?
+    originalPrincipal Float?
+    paymentAmount     Float?
+    paymentDate       Int? // Day of month (1-31)
+    term              Int? // Months
+
+    // Credit-specific fields (nullable for non-credit accounts)
+    cardNumber           String?
+    creditLimit          Float?
+    minimumPaymentAmount Float?
+    statementBalance     Float?
+
+    // Deposit/Investment-specific fields (nullable for other accounts)
+    availableBalance Float?
+    dividendRate     Float?
+    interestYTD      Float?
+    cashBalance      Float? // Investment accounts only
+
+    // Relations
+    transactions Transaction[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([type])
+    @@index([status])
+    @@index([number])
+    @@index([customerId])
+    @@index([externalConnectionId])
+}
+
+model Transaction {
+    id                     String          @id @default(ulid())
+    accountId              String
+    customerId             String
+    isExternal             Boolean?        @default(false)
+    externalConnectionId   String?
+    externalConnectionName String?
+    payee                  String
+    rawPayee               String
+    description            String
+    memo                   String?
+    amount                 Float
+    date                   DateTime
+    type                   TransactionType
+    categoryId             String?
+    categoryName           String
+    budgetCategoryId       String?
+    budgetCategory         String?
+    budgetSubcategory      String?
+    tags                   Json? // Array of strings
+    currencyCode           String?         @default("USD")
+    currencyName           String?         @default("United States Dollar")
+    currencySymbol         String?         @default("$")
+    currencyNumericCode    Float?          @default(840)
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    account Account? @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+    @@index([accountId])
+    @@index([customerId])
+    @@index([date])
+    @@index([type])
+    @@index([categoryName])
+    @@index([budgetCategory])
+    @@index([budgetSubcategory])
+    @@index([externalConnectionId])
+}
+
+enum TransactionType {
+    credit
+    debit
+}
+
+model Document {
+    id          String   @id @default(ulid())
+    pageContent String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    embedding   Json
+    metadata    Json
+}
+
+// SAMPLE DATA
+
+model SampleAccount {
+    id                  String    @id @default(ulid())
+    customerId          String // The unique identifier for the customer that owns this account
+    balance             Float
+    currencyCode        String?   @default("USD")
+    currencyName        String?   @default("US Dollar")
+    currencySymbol      String?   @default("$")
+    currencyNumericCode Float?    @default(840)
+    displayName         String?
+    name                String
+    number              String
+    openedDate          DateTime
+    closedDate          DateTime?
+    routingNumber       String
+    type                String
+    subType             String? // e.g., "checking", "savings", "credit card", "loan", "investment"
+    status              String?   @default("active") // e.g., "active", "closed", "suspended"
+
+    // Loan-specific fields (nullable for non-loan accounts)
+    balanceDue        Float?
+    currentPrincipal  Float?
+    dueDate           DateTime?
+    interestRate      Float?
+    lastPaymentDate   DateTime?
+    nextPaymentDate   DateTime?
+    originalPrincipal Float?
+    paymentAmount     Float?
+    paymentDate       Int? // Day of month (1-31)
+    term              Int? // Months
+
+    // Credit-specific fields (nullable for non-credit accounts)
+    cardNumber           String?
+    creditLimit          Float?
+    minimumPaymentAmount Float?
+    statementBalance     Float?
+
+    // Deposit/Investment-specific fields (nullable for other accounts)
+    availableBalance Float?
+    dividendRate     Float?
+    interestYTD      Float?
+    cashBalance      Float? // Investment accounts only
+
+    // Relations
+    transactions SampleTransaction[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([customerId])
+}
+
+model SampleTransaction {
+    id                  String          @id @default(ulid())
+    accountId           String
+    customerId          String
+    payee               String
+    rawPayee            String
+    description         String
+    memo                String?
+    amount              Float
+    date                DateTime
+    type                TransactionType
+    categoryId          String?
+    categoryName        String
+    budgetCategoryId    String?
+    budgetCategory      String?
+    budgetSubcategory   String?
+    tags                Json? // Array of strings
+    currencyCode        String?         @default("USD")
+    currencyName        String?         @default("United States Dollar")
+    currencySymbol      String?         @default("$")
+    currencyNumericCode Float?          @default(840)
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    account SampleAccount? @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+    @@index([accountId])
+    @@index([customerId])
+}
+
+model SampleDocument {
+    id          String   @id @default(ulid())
+    pageContent String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    embedding   Json
+    metadata    Json
 }

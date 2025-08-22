@@ -1,51 +1,42 @@
-import { Suspense } from 'react';
-import {
-  Authenticators,
-  DebugCard,
-  LinkedAccounts,
-  UserProfileCard,
-} from '@/components/user-profile';
 import { Header } from '@/components/header';
-import { auth0, getUser } from '@/lib/auth0';
+import { Authenticators } from '@/components/user-profile/authenticators/authenticators';
+import { DebugCard } from '@/components/user-profile/debug-card';
+import { LinkedAccounts } from '@/components/user-profile/linked-accounts';
+import { UserProfileCard } from '@/components/user-profile/user-profile-card';
+import { auth0 } from '@/lib/auth0/client';
 
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Profile',
+	title: 'Profile',
 };
 
 export default async function ProfilePage() {
-  const { tokenSet, user } = (await auth0.getSession()) || {};
+	const { tokenSet, user } = (await auth0.getSession()) || {};
 
-  if (!user) {
-    return <div>User not found</div>;
-  }
+	if (!user?.sub) {
+		return <div>User not found</div>;
+	}
 
-  return (
-    <div className="flex flex-col min-w-0 h-dvh bg-background">
-      <Header>
-        <span className="font-bold">Profile</span>
-      </Header>
+	return (
+		<div className='bg-background flex h-dvh min-w-0 flex-col'>
+			<Header>
+				<span className='font-bold'>Profile</span>
+			</Header>
 
-      <div className="flex flex-col min-w-0 h-dvh bg-background mx-auto w-full md:max-w-3xl gap-6 p-4 md:p-6">
-        <Suspense
-          fallback={
-            <UserProfileCard skeleton user={Promise.resolve(undefined)} />
-          }
-        >
-          {/* User profile info */}
-          <UserProfileCard user={getUser({ userId: user?.sub })} />
-        </Suspense>
+			<div className='bg-background mx-auto flex h-dvh w-full min-w-0 flex-col gap-6 p-4 md:max-w-3xl md:p-6'>
+				{/* User profile info */}
+				<UserProfileCard />
 
-        {/* Linked accounts */}
-        <LinkedAccounts />
+				{/* Linked accounts */}
+				<LinkedAccounts />
 
-        {/* Authenticators */}
-        <Authenticators />
+				{/* Authenticators */}
+				<Authenticators />
 
-        {/* Debug / full tokens */}
-        <DebugCard {...{ tokenSet }} />
-      </div>
-    </div>
-  );
+				{/* Debug / full tokens */}
+				<DebugCard {...{ tokenSet }} />
+			</div>
+		</div>
+	);
 }

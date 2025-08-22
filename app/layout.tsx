@@ -1,34 +1,35 @@
-import { Toaster } from 'sonner';
+import { AppSidebar } from '@/components/app-sidebar/app-sidebar';
+import { FAB } from '@/components/fab';
+import { SWRProvider } from '@/components/providers/swr-provider';
+import { ThemeProvider } from '@/components/providers/theme-provider';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import { ThemeProvider } from '@/components/theme-provider';
-import { DataStreamProvider } from '@/components/data-stream-provider';
-import { AppSidebar } from '@/components/app-sidebar';
-import { SidebarInset, SidebarProvider } from '@/components/ui';
+import { Toaster } from 'sonner';
 
-import './globals.css';
 import { cookies } from 'next/headers';
+import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://chat.vercel.ai'),
-  title: 'Next.js Chatbot Template',
-  description: 'Next.js chatbot template using the AI SDK.',
+	metadataBase: new URL('https://chat.vercel.ai'),
+	title: 'Next.js Chatbot Template',
+	description: 'Next.js chatbot template using the AI SDK.',
 };
 
 export const viewport = {
-  maximumScale: 1, // Disable auto-zoom on mobile Safari
+	maximumScale: 1, // Disable auto-zoom on mobile Safari
 };
 
 const geist = Geist({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-geist',
+	subsets: ['latin'],
+	display: 'swap',
+	variable: '--font-geist',
 });
 
 const geistMono = Geist_Mono({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-geist-mono',
+	subsets: ['latin'],
+	display: 'swap',
+	variable: '--font-geist-mono',
 });
 
 const LIGHT_THEME_COLOR = 'hsl(0 0% 100%)';
@@ -52,45 +53,52 @@ const THEME_COLOR_SCRIPT = `\
 })();`;
 
 export default async function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const isCollapsed = cookieStore.get('sidebar:state')?.value !== 'true';
-  return (
-    <html
-      lang="en"
-      // `next-themes` injects an extra classname to the body element to avoid
-      // visual flicker before hydration. Hence the `suppressHydrationWarning`
-      // prop is necessary to avoid the React hydration mismatch warning.
-      // https://github.com/pacocoursey/next-themes?tab=readme-ov-file#with-app
-      suppressHydrationWarning
-      className={`${geist.variable} ${geistMono.variable}`}
-    >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: THEME_COLOR_SCRIPT,
-          }}
-        />
-      </head>
-      <body className="antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Toaster position="top-center" />
-          <DataStreamProvider>
-            <SidebarProvider defaultOpen={!isCollapsed}>
-              <AppSidebar />
-              <SidebarInset>{children}</SidebarInset>
-            </SidebarProvider>
-          </DataStreamProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+	const cookieStore = await cookies();
+	const isCollapsed = cookieStore.get('sidebar:state')?.value !== 'true';
+
+	return (
+		<html
+			lang='en'
+			// `next-themes` injects an extra classname to the body element to avoid
+			// visual flicker before hydration. Hence the `suppressHydrationWarning`
+			// prop is necessary to avoid the React hydration mismatch warning.
+			// https://github.com/pacocoursey/next-themes?tab=readme-ov-file#with-app
+			suppressHydrationWarning
+			className={`${geist.variable} ${geistMono.variable}`}
+		>
+			<head>
+				<script
+					dangerouslySetInnerHTML={{
+						__html: THEME_COLOR_SCRIPT,
+					}}
+				/>
+			</head>
+			<body className='antialiased'>
+				<ThemeProvider
+					attribute='class'
+					defaultTheme='system'
+					enableSystem
+					disableTransitionOnChange
+				>
+					<SWRProvider>
+						<Toaster
+							position='top-right'
+							richColors
+						/>
+						<SidebarProvider defaultOpen={!isCollapsed}>
+							<AppSidebar />
+							<SidebarInset>{children}</SidebarInset>
+							<div className='fixed right-6 bottom-5 z-50'>
+								<FAB />
+							</div>
+						</SidebarProvider>
+					</SWRProvider>
+				</ThemeProvider>
+			</body>
+		</html>
+	);
 }

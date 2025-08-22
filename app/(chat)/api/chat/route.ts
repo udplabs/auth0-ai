@@ -1,44 +1,40 @@
-import { auth0 } from '@/lib/auth0';
-import { type NextRequest, NextResponse } from 'next/server';
-import { listChatsByUserId } from '@/lib/db';
+import { getUser } from '@/lib/auth0/client';
 import { APIError } from '@/lib/errors';
+import { getSearchParams } from '@/lib/utils/get-search-params';
+import { type NextRequest, NextResponse } from 'next/server';
+import { getChatHistory } from '../actions';
+
+interface GetChatsParams extends ApiQueryParams {
+	grouped?: 'true' | 'false';
+}
 export async function GET(request: NextRequest) {
-  try {
-    const { user } = (await auth0.getSession()) || {};
+	try {
+		console.log('fetching chat history...');
+		const user = await getUser();
 
-    if (!user) {
-      throw new APIError('unauthorized:chat');
-    }
+		const {
+			page,
+			page_size: pageSize,
+			grouped,
+		} = getSearchParams<GetChatsParams>(request, [
+			'page',
+			'page_size',
+			'grouped',
+		]);
 
-    const searchParams = request.nextUrl?.searchParams;
-    const startingAfter = searchParams?.get('starting_after') || undefined;
-    const endingBefore = searchParams?.get('ending_before') || undefined;
-    const page = Number.parseInt(searchParams?.get('page') || '1');
-    const pageSize = Number.parseInt(searchParams?.get('page_size') || '20');
+		const data = await getChatHistory({
+			userId: user.sub,
+			page,
+			pageSize,
+			grouped,
+		});
 
-    if (startingAfter && endingBefore) {
-      throw new APIError(
-        'bad_request:api',
-        'Only one of starting_after or ending_before can be provided.',
-      );
-    }
-
-    const result = await listChatsByUserId(user.sub, {
-      page,
-      pageSize,
-      startingAfter,
-      endingBefore,
-    });
-
-    return NextResponse.json(result);
-  } catch (error: unknown) {
-    if (error instanceof APIError) {
-      return error.toResponse();
-    }
-    console.error(error);
-    return new APIError(
-      'server_error:api',
-      (error as Error)?.message,
-    ).toResponse();
-  }
+		return NextResponse.json(data);
+	} catch (error: unknown) {
+		if (error instanceof APIError) {
+			return error.toResponse();
+		}
+		console.error(error);
+		return new APIError(error).toResponse();
+	}
 }

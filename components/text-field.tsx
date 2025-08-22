@@ -1,46 +1,42 @@
-import {
-  Input,
-  type InputProps,
-  Label,
-  type LabelProps,
-  Skeleton,
-} from '@/components/ui';
+import { Input, type InputProps } from '@/components/ui/input';
+import { Label, LabelProps } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { Skeleton } from './ui/skeleton';
 
 export const TextField = ({
-  label,
-  LabelProps,
-  skeleton = false,
-  ...props
+	label,
+	LabelProps,
+	loading = false,
+	...props
 }: TextFieldProps) => {
-  return (
-    <div className="flex flex-col gap-2">
-      {label && (
-        <Label
-          {...{
-            ...LabelProps,
-            className: cn('font-light', LabelProps?.className),
-          }}
-        >
-          {label}
-        </Label>
-      )}
-      {skeleton ? (
-        <Skeleton className="w-full h-10" />
-      ) : (
-        <Input
-          {...{
-            ...props,
-            className: cn('disabled:opacity-100', props?.className),
-          }}
-        />
-      )}
-    </div>
-  );
+	return (
+		<div className='flex flex-col gap-2'>
+			{label && (
+				<Label
+					{...{
+						...LabelProps,
+						className: cn('font-light', LabelProps?.className),
+					}}
+				>
+					{label}
+				</Label>
+			)}
+			{loading ? (
+				<Skeleton className='h-10 w-full' />
+			) : (
+				<Input
+					{...{
+						...props,
+						className: cn('disabled:opacity-100', props?.className),
+					}}
+				/>
+			)}
+		</div>
+	);
 };
 
 export interface TextFieldProps extends InputProps {
-  label?: string;
-  LabelProps?: LabelProps;
-  skeleton?: boolean;
+	label?: string;
+	LabelProps?: LabelProps;
+	loading?: boolean;
 }

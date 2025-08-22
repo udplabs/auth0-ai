@@ -1,56 +1,42 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2Icon } from 'lucide-react';
 // import { useAuthenticators } from '@/lib/hooks';
+import { Loader } from '@/components/ui/loader';
+import { useAuthenticators } from '@/hooks/use-authenticators';
 import { Authenticator } from './authenticator-card';
 
-// TODO: refactor this whole thing. Temporary
-
-interface HookResponse<T, P = void> {
-  isFetching: boolean;
-  isMutating?: boolean;
-  data: T;
-  error?: Error | null;
-  mutate: (params: P) => Promise<void>;
-}
-
-interface AuthenticatorsResponse {
-  enrolled: Factor[];
-  available: Factor[];
-}
-
 export const Authenticators = () => {
-  const {
-    data: { enrolled = [] },
-    isFetching,
-    mutate: deleteAuthenticator,
-    isMutating,
-  } = { data: {} } as HookResponse<AuthenticatorsResponse, string>;
+	const {
+		data = [],
+		isValidating,
+		// mutate: deleteAuthenticator,
+	} = useAuthenticators();
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Authenticators</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {isFetching ? (
-          <Loader2Icon />
-        ) : enrolled.length === 0 ? (
-          <p className="pb-4 text-base font-medium">
-            You do not currently have any authenticators.
-          </p>
-        ) : (
-          enrolled.map((a) => (
-            <Authenticator
-              key={`${a.type}-${a.id}-2`}
-              data={a}
-              loading={isMutating}
-              onDelete={deleteAuthenticator}
-            />
-          ))
-        )}
-      </CardContent>
-    </Card>
-  );
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>Authenticators</CardTitle>
+			</CardHeader>
+			<CardContent className='flex flex-col gap-4'>
+				{isValidating ? (
+					<Loader size='lg' />
+				) : data.length === 0 ? (
+					<p className='pb-4 text-base font-medium'>
+						You do not currently have any authenticators.
+					</p>
+				) : (
+					data.map((a) => (
+						<Authenticator
+							key={`${a.type}-${a.id}-2`}
+							data={a}
+							loading={isValidating}
+							// onDelete={deleteAuthenticator}
+						/>
+					))
+				)}
+			</CardContent>
+		</Card>
+	);
 };

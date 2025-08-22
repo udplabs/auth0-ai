@@ -1,280 +1,185 @@
-import type { Chat, Message } from '../generated/prisma';
-import { prisma } from '../client';
-import { generateTitleFromUserMessage } from '@/app/(chat)/actions';
-import { convertToDBMessage, deleteMessagesByChatId } from './message';
-import { deleteStreamById } from './stream';
+import { type Chat as DBChat, Prisma } from '@/lib/db/generated/prisma';
 import { APIError } from '@/lib/errors';
-import { convertToUIMessages } from '@/lib/utils';
+import { convertToDB, convertToUI } from '@/lib/utils/db-converter';
+import { groupItemsByDate } from '@/lib/utils/group-items-by-date';
+import { prisma } from '../client';
+import { deleteMessagesByChatId } from './message';
+import { deleteStreams } from './stream';
 
-type ChatWithMessages = Chat & { messages?: Message[] };
-
-interface ListChatsByUserIdOptions extends PaginatedOptions {
-  startingAfter?: string | null;
-  endingBefore?: string | null;
+interface ListChatsParams extends PaginatedOptions {
+	grouped?: boolean;
+}
+interface ListGroupedChatsParams extends PaginatedOptions {
+	grouped: boolean;
 }
 
-interface ListChatsByUserIdResult extends PaginatedResults {
-  chats: UIChat[];
-}
+export async function saveChat(input: Chat.CreateChatInput) {
+	console.log('input:', input);
+	const { messages = [], ...chat } = input;
 
-interface UpsertDBChat extends Partial<Omit<Chat, 'id' | 'messages'>> {
-  chat_id: string;
-  user_id: string;
-  title: string | null;
-  visibility: 'PUBLIC' | 'PRIVATE';
-  message_count: number;
-}
+	const dbChat = await prisma.chat.create({
+		data: {
+			...convertToDB<Chat.CreateChatInput, Prisma.ChatCreateInput>(chat),
+			messages: {
+				create: convertToDB<
+					Chat.UIMessage[],
+					Prisma.MessageUncheckedCreateInput[]
+				>(messages, ['chatId']),
+			},
+		},
+		include: { messages: true },
+	});
 
-interface UpsertUIChat extends Partial<Omit<UIChat, 'id'>> {
-  chatId: string;
-  userId: string;
-}
-
-interface UpsertChatParams extends UpsertUIChat {
-  message?: ChatMessage;
-}
-
-interface UpsertChatParamsWithoutMessages extends UpsertChatParams {
-  includeMessages: false;
-}
-
-interface UpsertChatParamsWithMessages extends UpsertChatParams {
-  includeMessages: true;
-}
-
-export async function upsertChat(
-  params: UpsertChatParamsWithoutMessages,
-): Promise<UIChat>;
-export async function upsertChat(
-  options: UpsertChatParamsWithMessages,
-): Promise<UIChat>;
-
-export async function upsertChat({
-  chatId,
-  userId,
-  message,
-  includeMessages = false,
-  ...chat
-}:
-  | UpsertChatParamsWithoutMessages
-  | UpsertChatParamsWithMessages): Promise<UIChat> {
-  const messageData = message && convertToDBMessage(chatId, userId, message);
-  const {
-    visibility,
-    title,
-    message_count = message ? 1 : 0,
-    ...chatData
-  } = convertToDBChat({ chatId, userId, ...chat });
-
-  const result = await prisma.chat.upsert({
-    where: { id: chatId },
-    update: {
-      visibility,
-      ...(messageData && { messages: { create: messageData } }),
-      message_count: { increment: message ? 1 : 0 },
-    },
-    create: {
-      ...chatData,
-      visibility,
-      title:
-        title ||
-        (message &&
-          (await generateTitleFromUserMessage({
-            message: message as ChatMessage,
-          }))),
-      ...(messageData && { messages: { create: messageData } }),
-      message_count,
-    },
-    include: includeMessages
-      ? {
-          messages: { orderBy: { created_at: 'asc' } },
-        }
-      : undefined,
-  });
-
-  return convertToUIChat(result);
+	return convertToUI<DBChat, Chat.UIChat>(dbChat);
 }
 
 /* ===== Overloads for getChatById ===== */
 export async function getChatById(
-  chat_id: string,
-  user_id: string,
-): Promise<UIChat>;
+	id: string,
+	user_id: string
+): Promise<Chat.UIChat | undefined>;
 export async function getChatById(
-  chat_id: string,
-  user_id: string,
-  includeMessages: true,
-): Promise<UIChat>;
+	id: string,
+	user_id: string,
+	includeMessages?: boolean
+): Promise<Chat.UIChat | undefined>;
 export async function getChatById(
-  chat_id: string,
-  user_id: string,
-  includeMessages: true,
-  includeStream: true,
-): Promise<UIChat>;
+	id: string,
+	user_id: string,
+	includeMessages: true
+): Promise<Chat.UIChat | undefined>;
 export async function getChatById(
-  chat_id: string,
-  user_id: string,
-  includeMessages: false,
-  includeStream: true,
-): Promise<UIChat>;
+	id: string,
+	user_id: string,
+	includeMessages: true,
+	includeStream: true
+): Promise<Chat.UIChat | undefined>;
+export async function getChatById(
+	id: string,
+	user_id: string,
+	includeMessages: false,
+	includeStream: true
+): Promise<Chat.UIChat | undefined>;
 /* ===== */
 
 export async function getChatById(
-  chat_id: string,
-  user_id: string,
-  includeMessages = false,
-  includeStream = false,
-): Promise<UIChat> {
-  const chat = await prisma.chat.findUnique({
-    where: { id: chat_id },
-    include: { messages: includeMessages, stream: includeStream },
-  });
+	chatId: string,
+	userId: string,
+	includeMessages = false,
+	includeStreams = false
+): Promise<Chat.UIChat | undefined> {
+	// Handle case where chatId is an array (from query params)
+	const id = Array.isArray(chatId) ? chatId[0] : chatId;
 
-  if (!chat || chat === null) {
-    throw new APIError('not_found:chat', `Chat with id ${chat_id} not found.`);
-  }
+	const chat = await prisma.chat.findUnique({
+		where: { id },
+		include: { messages: includeMessages, streams: includeStreams },
+	});
 
-  if (chat?.user_id !== user_id) {
-    throw new APIError(
-      'unauthorized:api',
-      'You do not have access to this chat.',
-    );
-  }
+	if (chat !== null) {
+		if (chat?.userId !== userId) {
+			throw new APIError(
+				'unauthorized:api',
+				'You do not have access to this chat.'
+			);
+		}
 
-  return convertToUIChat(chat);
+		return convertToUI<DBChat, Chat.UIChat>(chat);
+	}
 }
 
+export async function getChatByMessageId(messageId: string, userId: string) {
+	const message = await prisma.message.findUnique({
+		where: { id: messageId, userId },
+		include: { chat: true },
+	});
+
+	if (!message) {
+		throw new APIError(
+			'not_found:chat',
+			`Unable to retrieve chat at this time. Please try again later.`
+		);
+	}
+
+	return convertToUI<DBChat, Chat.UIChat>(message.chat);
+}
 export async function listChatsByUserId(
-  user_id: string,
-  options?: ListChatsByUserIdOptions,
-): Promise<ListChatsByUserIdResult> {
-  const {
-    page = 1,
-    pageSize = 20,
-    startingAfter,
-    endingBefore,
-  } = options || {};
+	userId: string,
+	options?: ListGroupedChatsParams
+): Promise<Chat.GroupedItems<Chat.UIChat>>;
+export async function listChatsByUserId(
+	userId: string,
+	options?: ListChatsParams
+): Promise<Chat.ListChatsByUserIdResult>;
+export async function listChatsByUserId(
+	userId: string,
+	options?: ListChatsParams | ListGroupedChatsParams
+): Promise<Chat.ListChatsByUserIdResult | Chat.GroupedItems<Chat.UIChat>> {
+	const { page = 1, pageSize = 20, grouped = false } = options || {};
 
-  const skip = (page - 1) * pageSize;
+	const skip = (page - 1) * pageSize;
 
-  const AND = [];
+	const [chats, total] = await Promise.all([
+		prisma.chat.findMany({
+			where: {
+				userId,
+			},
+			orderBy: { updatedAt: 'desc' },
+			skip,
+			take: pageSize,
+		}),
+		prisma.chat.count({
+			where: {
+				userId,
+			},
+		}),
+	]);
 
-  if (startingAfter) {
-    AND.push({ created_at: { gte: startingAfter } });
-  } else if (endingBefore) {
-    AND.push({ created_at: { lte: endingBefore } });
-  }
+	const uiChats = chats.map(convertToUI<DBChat, Chat.UIChat>);
 
-  const where = AND.length > 0 ? { AND: [{ user_id }, ...AND] } : { user_id };
+	if (grouped) {
+		return groupItemsByDate(uiChats);
+	}
 
-  const [chats, total] = await Promise.all([
-    prisma.chat.findMany({
-      where,
-      orderBy: { updated_at: 'desc' },
-      skip,
-      take: pageSize,
-    }),
-    prisma.chat.count({
-      where,
-    }),
-  ]);
-
-  return {
-    chats: chats.map(convertToUIChat),
-    total,
-    page,
-    pageSize,
-    totalPages: Math.ceil(total / pageSize),
-  };
+	return {
+		chats: uiChats,
+		total,
+		page,
+		pageSize,
+		totalPages: Math.ceil(total / pageSize),
+	};
 }
 /**
  * Deletes a chat and all it's relations by its ID.
  */
 export async function deleteChatById(
-  chat_id: string,
-  user_id: string,
+	chatId: string,
+	userId: string
 ): Promise<void> {
-  const {
-    messages = [],
-    stream,
-    ...chat
-  } = await getChatById(chat_id, user_id, true, true);
+	const _chat = await getChatById(chatId, userId, true, true);
 
-  if (chat.userId !== user_id) {
-    throw new APIError(
-      'unauthorized:chat',
-      'You do not have permission to delete this chat.',
-    );
-  }
+	if (!_chat) {
+		throw new APIError('not_found:chat');
+	}
 
-  if (stream) {
-    await deleteStreamById(stream.id);
-  }
+	const { messages = [], streams = [], ...chat } = _chat;
 
-  if (messages.length) {
-    await deleteMessagesByChatId(chat_id);
-  }
+	if (chat.userId !== userId) {
+		throw new APIError(
+			'unauthorized:chat',
+			'You do not have permission to delete this chat.'
+		);
+	}
 
-  await prisma.chat.delete({
-    where: { id: chat_id, user_id },
-  });
-}
+	if (streams.length > 0) {
+		await deleteStreams(streams);
+	}
 
-export async function updateChatVisibilityById(
-  chat_id: string,
-  user_id: string,
-  visibility: 'private' | 'public',
-): Promise<UIChat> {
-  const chat = await prisma.chat.update({
-    where: { id: chat_id, user_id },
-    data: { visibility: visibility.toUpperCase() as 'PUBLIC' | 'PRIVATE' },
-  });
+	if (messages.length) {
+		await deleteMessagesByChatId(chatId);
+	}
 
-  return convertToUIChat(chat);
-}
-
-export function convertToDBChat({
-  createdAt,
-  updatedAt,
-  userId: user_id,
-  messageCount: message_count = 0,
-  visibility,
-  title,
-  chatId: chat_id,
-  ...chat
-}: UpsertUIChat): UpsertDBChat {
-  return {
-    created_at: createdAt ? new Date(createdAt) : undefined,
-    updated_at: updatedAt ? new Date(updatedAt) : undefined,
-    visibility: (visibility?.toUpperCase() as 'PUBLIC' | 'PRIVATE') || 'PUBLIC',
-    title: title || null,
-    user_id,
-    chat_id,
-    message_count,
-    ...chat,
-  };
-}
-
-export function convertToUIChat({
-  created_at,
-  updated_at,
-  visibility,
-  message_count: messageCount,
-  title,
-  user_id: userId,
-  messages,
-  ...chat
-}: ChatWithMessages): UIChat {
-  return {
-    ...chat,
-    createdAt: created_at.toISOString(),
-    updatedAt: updated_at.toISOString(),
-    visibility: visibility.toLowerCase() as 'public' | 'private',
-    messageCount,
-    userId,
-    title: title || undefined,
-    ...(messages
-      ? { messages: convertToUIMessages(chat.id, messages) }
-      : undefined),
-  };
+	await prisma.chat.delete({
+		where: { id: chatId, userId },
+	});
 }

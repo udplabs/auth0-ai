@@ -1,40 +1,26 @@
-import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 
-import { auth0, getAuthenticators } from '@/lib/auth0/';
+import { getUser } from '@/lib/auth0/client';
+import { getAuthenticators } from '@/lib/auth0/get-authenticators';
 import { APIError } from '@/lib/errors';
 
 // Get user authenticators
-export async function GET(
-  _: NextRequest,
-  { params }: { params: Promise<ApiParams> },
-) {
-  try {
-    const { cached = false } = await params;
+export async function GET() {
+	try {
+		const user = await getUser();
+		const userId = user.sub;
 
-    const { user } = (await auth0.getSession()) || {};
+		const data = await getAuthenticators({ userId });
 
-    if (!user) {
-      throw new APIError('unauthorized:auth').toResponse();
-    }
-    const userId = user.sub;
-    const key = `user:${userId}:authenticators`;
-
-    if (cached) {
-      revalidateTag(key);
-    }
-
-    const data = await getAuthenticators({ userId, key });
-
-    return NextResponse.json({ data });
-  } catch (error) {
-    console.log('API error:', error);
-    if (error instanceof APIError) {
-      return error.toResponse();
-    }
-    return new APIError(
-      'server_error:api',
-      error instanceof Error ? error.message : String(error),
-    ).toResponse();
-  }
+		return NextResponse.json(data);
+	} catch (error) {
+		console.log('API error:', error);
+		if (error instanceof APIError) {
+			return error.toResponse();
+		}
+		return new APIError(
+			'server_error:api',
+			error instanceof Error ? error.message : String(error)
+		).toResponse();
+	}
 }

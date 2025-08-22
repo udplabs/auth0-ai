@@ -1,1 +1,3 @@
-export { POST, DELETE } from './handlers';
+export { DELETE } from './handlers/delete';
+export { GET } from './handlers/get';
+export { POST } from './handlers/post';

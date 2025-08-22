@@ -1,85 +1,70 @@
-import type { Message } from '../generated/prisma';
+import type { Message, Prisma } from '../generated/prisma';
 
-import { prisma } from '../client';
 import { APIError } from '@/lib/errors';
-import { convertToUIMessages } from '@/lib/utils';
+import { convertToDB, convertToUI } from '@/lib/utils/db-converter';
+import { prisma } from '../client';
 
-export async function getMessagesByChatId(chat_id: string): Promise<Message[]> {
-  return await prisma.message.findMany({
-    where: { chat_id },
-    orderBy: { created_at: 'asc' },
-  });
+export async function getMessagesByChatId(
+	chatId: string
+): Promise<Chat.UIMessage[]> {
+	return convertToUI<Message[], Chat.UIMessage[]>(
+		await prisma.message.findMany({
+			where: { chatId },
+			orderBy: { createdAt: 'asc' },
+		})
+	);
 }
 
-export async function getMessageById(message_id: string): Promise<ChatMessage> {
-  const message = await prisma.message.findUniqueOrThrow({
-    where: { id: message_id },
-  });
+export async function getMessageById(id: string): Promise<Chat.UIMessage> {
+	const message = await prisma.message.findUniqueOrThrow({
+		where: { id },
+	});
 
-  const [uiMessage] = convertToUIMessages(message.chat_id, [message]);
-
-  return uiMessage;
+	return convertToUI<Message, Chat.UIMessage>(message);
 }
 
 export async function voteMessage(
-  user_id: string,
-  id: string,
-  vote: 'UP' | 'DOWN' | null,
-): Promise<void> {
-  const { count } = await prisma.message.updateMany({
-    where: { id, user_id },
-    data: {
-      vote,
-    },
-  });
+	userId: string,
+	id: string,
+	vote: 'up' | 'down' | null
+): Promise<Chat.UIMessage> {
+	const { count } = await prisma.message.updateMany({
+		where: { id, userId },
+		data: {
+			vote,
+		},
+	});
 
-  if (count === 0) {
-    throw new APIError(
-      'unauthorized:api',
-      'Message not found or you do not have permission to vote on it.',
-    );
-  }
+	if (count === 0) {
+		throw new APIError(
+			'unauthorized:api',
+			'Message not found or you do not have permission to vote on it.'
+		);
+	}
+
+	return await getMessageById(id);
 }
 
-export async function getMessageCountByUserId(
-  user_id: string,
-): Promise<number> {
-  const result = await prisma.chat.aggregate({
-    _sum: { message_count: true },
-    where: { user_id },
-  });
-  return result._sum.message_count || 0;
+export async function updateMessage(
+	message: Chat.UIMessage
+): Promise<Chat.UIMessage> {
+	const result = await prisma.message.update({
+		where: { id: message.id },
+		data: convertToDB(message),
+	});
+
+	return convertToUI<Message, Chat.UIMessage>(result);
+}
+export async function saveMessages(messages: Chat.UIMessage[]): Promise<void> {
+	await prisma.message.createMany({
+		data: convertToDB<Chat.UIMessage[], Prisma.MessageUncheckedCreateInput>(
+			messages
+		),
+	});
 }
 
-export async function saveMessages(
-  chat_id: string,
-  user_id: string,
-  messages: ChatMessage[],
-): Promise<void> {
-  await prisma.message.createMany({
-    data: messages.map((message) =>
-      convertToDBMessage(chat_id, user_id, message),
-    ),
-  });
-}
-
-export async function deleteMessagesByChatId(chat_id: string): Promise<void> {
-  await prisma.message.deleteMany({
-    where: { chat_id },
-  });
-}
-
-export function convertToDBMessage(
-  chat_id: string,
-  user_id: string,
-  { id, metadata, parts, role }: ChatMessage,
-) {
-  return {
-    id,
-    chat_id,
-    user_id,
-    role,
-    parts: JSON.stringify(parts || []),
-    metadata: JSON.stringify(metadata || {}),
-  };
+export async function deleteMessagesByChatId(chatId: string): Promise<void> {
+	await prisma.message.deleteMany({
+		where: { chatId },
+	});
 }

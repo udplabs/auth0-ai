@@ -1,0 +1,791 @@
+diff --git a/dist/esm/Auth0AI.js b/dist/esm/Auth0AI.js
+index 7d3a694f836a81f15e54b8de52bb4f8cbd2d7595..9317f4ba6e5d029ccba8b8f2b550f5b6a00442f6 100644
+--- a/dist/esm/Auth0AI.js
++++ b/dist/esm/Auth0AI.js
+@@ -23,8 +23,10 @@ export class Auth0AI {
+             store,
+             ...params,
+         });
++        console.log('initializing authorizer...');
+         const authorizer = fc.authorizer();
+         if (tool) {
++            console.log('calling authorizer w/ tool...')
+             return authorizer(tool);
+         }
+         return authorizer;
+diff --git a/dist/esm/interrupts/errorSerializer.js b/dist/esm/interrupts/errorSerializer.js
+index 6709df03fd59f4d1d4fd4e34ca2d5c011cc5ed1a..98f90bb00c71f7646920f8cbb1e86c64750f0696 100644
+--- a/dist/esm/interrupts/errorSerializer.js
++++ b/dist/esm/interrupts/errorSerializer.js
+@@ -1,36 +1,109 @@
+-import { ToolExecutionError } from "ai";
+-import { Auth0Interrupt } from "@auth0/ai/interrupts";
+-export const InterruptionPrefix = "AUTH0_AI_INTERRUPTION:";
++import { Auth0Interrupt } from '@auth0/ai/interrupts';
++import { ToolExecutionError } from './invokeTools';
++export const InterruptionPrefix = 'AUTH0_AI_INTERRUPT:';
+ /**
+  *
+- * vercel-ai expects the error to be serialized as string in DataStreams.
++ * vercel-ai expect the error to be serialized as string in DataStreams.
++ * v4 supported ToolExecutionError but v5 DOES NOT.
++ * Re-implemented ToolExecutionError (deprecated in v5) in order to keep this working.
+  *
+- * This function serializes the error to an string with the special prefix 'AUTH0_AI_INTERRUPTION:'.
++ * @danny-fuhriman_atko
++ *
++ * This function serializes the error to an string with the special prefix 'AUTH0_AI_INTERRUPTION:' so the client (useChat) can recognize it and then parse the content.
++ *
++ * If vercel-ai supported error messages with output, we wouldn't have to do this!
+  *
+  * @param errHandler - error handler
++ * @param {Object} error - The value 'thrown'. This _should_ be in the shape of a message chunk.
+  * @returns
+  */
+ export const errorSerializer = (errHandler) => {
+-    return (error) => {
+-        if (!(error instanceof ToolExecutionError) ||
+-            !(error.cause instanceof Auth0Interrupt)) {
+-            if (errHandler) {
+-                return errHandler(error);
+-            }
+-            else {
+-                return "An error occurred.";
+-            }
+-        }
+-        const serializableError = {
+-            ...error.cause.toJSON(),
+-            toolCall: {
+-                id: error.toolCallId,
+-                args: error.toolArgs,
+-                name: error.toolName,
+-            },
+-        };
+-        const result = `${InterruptionPrefix}${JSON.stringify(serializableError)}`;
+-        return result;
+-    };
++	return (error) => {
++		console.log('errorSerializer called');
++		console.log(error);
++
++		if (alreadySerialized(error)) {
++			console.log('error already serialized. skipping...');
++			return typeof error === 'string' ? error : error?.message;
++		}
++
++		const innerError = error && error?.error ? error.error : error;
++		console.log(innerError);
++
++		// v5 dropped support for ToolExecutionError
++		// this is for backward compatibility
++		const isToolExec = innerError instanceof ToolExecutionError;
++		const cause = isToolExec ? innerError?.cause : innerError;
++		// =====
++
++		if (isToolExec || isAuth0Interrupt(cause)) {
++			console.log('serializing...');
++			const serializableError = {
++				...safeJson(cause),
++				toolCall: {
++					id: error?.toolCallId,
++					args: error?.toolArgs,
++					name: error?.toolName,
++				},
++			};
++
++			return `${InterruptionPrefix}${JSON.stringify(serializableError)}`;
++		}
++
++		return errHandler ? errHandler(error) : 'An error occured.';
++	};
+ };
++
++// Helper functions
++function alreadySerialized(e) {
++	return (
++		(typeof e === 'string' && e.startsWith(InterruptionPrefix)) ||
++		(e &&
++			typeof e === 'object' &&
++			typeof e?.message === 'string' &&
++			e.message.startsWith(InterruptionPrefix))
++	);
++}
++
++function safeJson(e) {
++	try {
++		if (e && e?.toJSON && typeof e.toJSON === 'function') {
++			console.log('toJSON...');
++			return e.toJSON();
++		}
++	} catch {
++		console.log('e.toJSON does not exist... serialize manually');
++	}
++
++	const base = {
++		name: e?.name,
++		message: e?.message,
++		code: e?.code,
++		behavior: e?.behavior,
++		connection: e?.connection,
++		scopes: e?.scopes,
++		requiredScopes: e?.requiredScopes,
++	};
++
++	const cause = e && typeof e === 'object' ? e.cause : undefined;
++
++	if (cause && typeof cause === 'object') {
++		base.cause = {
++			name: cause?.name,
++			message: cause?.message,
++			code: cause?.code,
++		};
++	}
++	return base;
++}
++
++function isAuth0Interrupt(e) {
++	return (
++		!!e &&
++		typeof e === 'object' &&
++		(e instanceof Auth0Interrupt ||
++			(e?.name === InterruptionPrefix &&
++				e?.code === 'FEDERATED_CONNECTION_ERROR'))
++	);
++}
+ //# sourceMappingURL=errorSerializer.js.map
+diff --git a/dist/esm/interrupts/invokeTools.js b/dist/esm/interrupts/invokeTools.js
+index dc1800866f1a6744c150a074a71c21772194b3aa..f50a14bc18040b0d81df50c849798bf77a2537ad 100644
+--- a/dist/esm/interrupts/invokeTools.js
++++ b/dist/esm/interrupts/invokeTools.js
+@@ -1,30 +1,29 @@
+-import { ToolExecutionError, } from "ai";
+-/**
+- * Invoke tools that are in a result state.
+- *
+- * This will invoke the tools after a human interaction.
+- *
+- * @param {ContinueParams} param0 - The parameters to continue the tools.
+- *
+- * @returns
+- */
+-export const invokeTools = async ({ messages, tools, onToolResult, }) => {
+-    if (messages.length === 0) {
+-        return;
+-    }
+-    if (messages.some((m) => "parts" in m)) {
+-        return invokeToolsMessages({
+-            messages: messages,
+-            tools,
+-            onToolResult,
+-        });
+-    }
+-    return invokeToolsCoreMessage({
+-        messages: messages,
+-        tools,
+-        onToolResult,
+-    });
++import { AISDKError } from '@ai-sdk/provider';
++import { getToolName, isToolUIPart } from 'ai';
++// import { ToolExecutionError, } from "ai";
++// Vercel v5 deprecated this functionality which has
++// caused a headache getting the SDK to work.
++// Instead of rewriting the SDK today... we kick the can
++// @danny-fuhriman_atko
++export const ToolExecutionError = class extends AISDKError {
++	constructor({
++		toolArgs,
++		toolName,
++		toolCallId,
++		cause,
++		message = `Error executing tool ${toolName}: ${getErrorMessage2(cause)}`,
++	}) {
++		super({ name: name10, message, cause });
++
++		this.toolArgs = toolArgs;
++		this.toolName = toolName;
++		this.toolCallId = toolCallId;
++	}
++	static isInstance(error) {
++		return AISDKError.hasMarker(error, `vercel.ai.error.AI_ToolExecutionError`);
++	}
+ };
++
+ /**
+  * Invoke tools that are in a result state.
+  *
+@@ -34,55 +33,18 @@ export const invokeTools = async ({ messages, tools, onToolResult, }) => {
+  *
+  * @returns
+  */
+-const invokeToolsMessages = async ({ messages, tools, onToolResult, }) => {
+-    var _a;
+-    const lastMessage = messages[messages.length - 1];
+-    const lastPart = (lastMessage === null || lastMessage === void 0 ? void 0 : lastMessage.parts) && (lastMessage === null || lastMessage === void 0 ? void 0 : lastMessage.parts[lastMessage.parts.length - 1]);
+-    if (!lastPart || lastPart.type !== "tool-invocation") {
+-        return;
+-    }
+-    const lastToolInvocation = lastPart.toolInvocation;
+-    if (!lastToolInvocation) {
+-        return;
+-    }
+-    if (lastMessage &&
+-        lastToolInvocation &&
+-        lastToolInvocation.state === "result" &&
+-        ((_a = lastToolInvocation.result) === null || _a === void 0 ? void 0 : _a.continueInterruption)) {
+-        const tool = tools[lastToolInvocation.toolName];
+-        if (!tool) {
+-            console.warn(`Last message contains a tool invocation in state result but the tool ${lastToolInvocation.toolName} is not found in the tools object`);
+-        }
+-        try {
+-            const result = await tool.execute(lastToolInvocation.args, {
+-                toolCallId: lastToolInvocation.toolCallId,
+-                messages: [],
+-            });
+-            lastPart.toolInvocation = {
+-                ...lastToolInvocation,
+-                state: "result",
+-                result,
+-            };
+-        }
+-        catch (err) {
+-            lastPart.toolInvocation = {
+-                ...lastToolInvocation,
+-                state: "call",
+-            };
+-            if (onToolResult) {
+-                await onToolResult(lastMessage);
+-            }
+-            throw new ToolExecutionError({
+-                toolCallId: lastToolInvocation.toolCallId,
+-                toolName: lastToolInvocation.toolName,
+-                toolArgs: lastToolInvocation.args,
+-                cause: err,
+-            });
+-        }
+-        if (onToolResult) {
+-            await onToolResult(lastMessage);
+-        }
+-    }
++export const invokeTools = async ({ messages, tools, onToolResult }) => {
++	if (messages.length === 0) {
++		return;
++	}
++	if (messages.some((m) => 'parts' in m)) {
++		return invokeToolsMessages({
++			messages: messages,
++			tools,
++			onToolResult,
++		});
++	}
++	return;
+ };
+ /**
+  * Invoke tools that are in a result state.
+@@ -93,43 +55,73 @@ const invokeToolsMessages = async ({ messages, tools, onToolResult, }) => {
+  *
+  * @returns
+  */
+-const invokeToolsCoreMessage = async ({ messages, tools, onToolResult, }) => {
+-    const lastMessage = messages[messages.length - 1];
+-    const content = lastMessage.content || [];
+-    const lastContent = content[content.length - 1];
+-    if (lastMessage.role !== "assistant" || lastContent.type !== "tool-call") {
+-        return;
+-    }
+-    const tool = tools[lastContent.toolName];
+-    if (!tool) {
+-        console.warn(`Last message contains a tool invocation in state result but the tool ${lastContent.toolName} is not found in the tools object`);
+-    }
+-    try {
+-        const result = await tool.execute(lastContent.args, {
+-            toolCallId: lastContent.toolCallId,
+-            messages: [],
+-        });
+-        if (onToolResult) {
+-            await onToolResult({
+-                role: "tool",
+-                content: [
+-                    {
+-                        type: "tool-result",
+-                        toolCallId: lastContent.toolCallId,
+-                        toolName: lastContent.toolName,
+-                        result,
+-                    },
+-                ],
+-            });
+-        }
+-    }
+-    catch (err) {
+-        throw new ToolExecutionError({
+-            toolCallId: lastContent.toolCallId,
+-            toolName: lastContent.toolName,
+-            toolArgs: lastContent.args,
+-            cause: err,
+-        });
+-    }
++const invokeToolsMessages = async ({ messages, tools, onToolResult }) => {
++	const lastMessage = messages[messages.length - 1];
++	let lastPart =
++		lastMessage?.parts && lastMessage.parts[lastMessage.parts.length - 1];
++
++	if (!lastPart || !isToolUIPart(lastPart)) {
++		return;
++	}
++
++	const toolName = getToolName(lastPart);
++	const tool = tools[toolName];
++	const toolCallId = lastPart?.toolCallId;
++
++	if (
++		lastPart.state === 'output-available' &&
++		lastPart?.output?.continueInterruption === true
++	) {
++		if (!tool) {
++			console.warn(
++				`Last message contains a tool invocation with output data but the tool ${toolName} is not found in the tools object`
++			);
++			return;
++		}
++		try {
++			const output = await tool.execute(lastPart?.output, {
++				toolCallId,
++				messages: [],
++			});
++
++			lastPart = {
++				...lastPart,
++				state: 'output-available',
++				output,
++			};
++
++			lastMessage.parts[lastMessage.parts.length - 1] = lastPart;
++
++			if (onToolResult) {
++				await onToolResult({
++					type: 'tool-output-available',
++					toolName,
++					toolCallId,
++					output,
++				});
++			}
++		} catch (err) {
++			console.log('invokeTool caught error');
++			console.log(err);
++
++			lastPart = {
++				...lastPart,
++				state: 'input-available',
++			};
++
++			lastMessage.parts[lastMessage.parts.length - 1] = lastPart;
++
++			if (onToolResult) {
++				await onToolResult({
++					type: 'tool-input-error',
++					toolName,
++					toolCallId
++				});
++			}
++
++			throw err;
++		}
++		return;
++	}
+ };
+ //# sourceMappingURL=invokeTools.js.map
+diff --git a/dist/esm/interrupts/util.js b/dist/esm/interrupts/util.js
+index 20d33e3bfdb9a4a988a5b329ad16165993542d01..187c18ce795635e5e9c0130c592962f2c85db7ac 100644
+--- a/dist/esm/interrupts/util.js
++++ b/dist/esm/interrupts/util.js
+@@ -1,6 +1,8 @@
+-import { ToolExecutionError } from "ai";
++// import { ToolExecutionError } from "ai";
+ import { Auth0Interrupt } from "@auth0/ai/interrupts";
+ export const toolCallFromError = (error) => {
++    console.log('=== TOOL CALL FROM ERROR ===')
++    console.log(error);
+     return {
+         role: "assistant",
+         content: [
+@@ -22,9 +24,12 @@ export const toolCallFromError = (error) => {
+  * @returns - The messages with the tool call appended or the current messages if the error is not a tool execution error.
+  */
+ export const appendToolCall = (currentMessages, error) => {
+-    if (!(error instanceof ToolExecutionError)) {
+-        return currentMessages;
+-    }
++    console.log('appendToolCall caught error');
++    console.log(currentMessages);
++    console.log(error);
++    // if (!(error instanceof ToolExecutionError)) {
++    //     return currentMessages;
++    // }
+     if (!(error.cause instanceof Auth0Interrupt)) {
+         return currentMessages;
+     }
+diff --git a/dist/esm/interrupts/with-interruptions.d.ts b/dist/esm/interrupts/with-interruptions.d.ts
+index 0d9256b292b5358a34bdfee5252f3da90fc7113d..6d2d51de264fc6cfe74e475fc357762678821a11 100644
+--- a/dist/esm/interrupts/with-interruptions.d.ts
++++ b/dist/esm/interrupts/with-interruptions.d.ts
+@@ -1,10 +1,10 @@
+-import { DataStreamWriter, Message, Tool } from "ai";
+-type ExecuteFN = (dataStream: DataStreamWriter) => Promise<void> | void;
+-export declare function withInterruptions(fn: ExecuteFN, config: {
+-    messages: Message[];
++import { UIMessageStreamWriter, UIMessage, Tool } from "ai";
++type ExecuteFN<UI_MESSAGE extends UIMessage = UIMessage> = (options: { writer: UIMessageStreamWriter<UI_MESSAGE> }) => Promise<void> | void;
++export declare function withInterruptions<UI_MESSAGE extends UIMessage = UIMessage>(fn: ExecuteFN<UI_MESSAGE>, config: {
++    messages: UI_MESSAGE[];
+     tools: {
+         [key: string]: Tool;
+     };
+-}): (dataStream: DataStreamWriter) => Promise<void>;
++}): (options: { writer: UIMessageStreamWriter<UI_MESSAGE> }) => Promise<void>;
+ export {};
+ //# sourceMappingURL=with-interruptions.d.ts.map
+\ No newline at end of file
+diff --git a/dist/esm/interrupts/with-interruptions.js b/dist/esm/interrupts/with-interruptions.js
+index f6b8de678252c55ebba122889074648ff81cb5cf..bd272880e96964444fa7325ba6d3f5954e347bba 100644
+--- a/dist/esm/interrupts/with-interruptions.js
++++ b/dist/esm/interrupts/with-interruptions.js
+@@ -1,11 +1,22 @@
+-import { invokeTools } from "./invokeTools";
++import { invokeTools } from './invokeTools';
++
+ export function withInterruptions(fn, config) {
+-    return async (dataStream) => {
+-        await invokeTools({
+-            messages: config.messages,
+-            tools: config.tools,
+-        });
+-        await fn(dataStream);
+-    };
++	return async ({ writer }) => {
++		const onToolResult = (message) => {
++			console.log('=== ON TOOL RESULT ===');
++			console.log(message);
++			writer.write({
++				...message,
++			});
++		};
++		await invokeTools(
++			{
++				messages: config.messages,
++				tools: config.tools,
++			},
++			onToolResult
++		);
++		await fn({ writer });
++	};
+ }
+ //# sourceMappingURL=with-interruptions.js.map
+diff --git a/dist/esm/react/index.d.ts b/dist/esm/react/index.d.ts
+index 0856b6f9ee7f4890714a4cf68e40bd4782340e38..cc26c9aaa7ae55724438226bf2cfd0b5d8912bfc 100644
+--- a/dist/esm/react/index.d.ts
++++ b/dist/esm/react/index.d.ts
+@@ -1,3 +1,3 @@
+-export { useInterruptions } from "./interrupts";
++export { useChatWithInterruptions } from "./interrupts";
+ export type { Auth0InterruptionUI } from "./interrupts";
+ //# sourceMappingURL=index.d.ts.map
+\ No newline at end of file
+diff --git a/dist/esm/react/index.js b/dist/esm/react/index.js
+index be3cd0991468f1b0116f5291bf2fbd98a8ad8752..1f94f3c149f10eda136f1ff22da3e8014459601f 100644
+--- a/dist/esm/react/index.js
++++ b/dist/esm/react/index.js
+@@ -1,2 +1,2 @@
+-export { useInterruptions } from "./interrupts";
++export { useChatWithInterruptions } from "./interrupts";
+ //# sourceMappingURL=index.js.map
+\ No newline at end of file
+diff --git a/dist/esm/react/interrupts.d.ts b/dist/esm/react/interrupts.d.ts
+index 9d62ee8d918d3aa30c69eb5525996cad00d59bd1..49f626414ce714b1bc111611c5dcdcb4d4cd1d99 100644
+--- a/dist/esm/react/interrupts.d.ts
++++ b/dist/esm/react/interrupts.d.ts
+@@ -1,21 +1,19 @@
+-import { useChat } from "@ai-sdk/react";
+-type UseChatReturnType = ReturnType<typeof useChat>;
+-type UseChatWithInterruptionsReturnType = ReturnType<typeof useChat> & {
+-    toolInterrupt: Auth0InterruptionUI | null;
+-};
+-type ErrorHandler = (userErrorHandler: (error: Error) => void) => (error: Error) => void;
++import { UseChatOptions, UseChatHelpers } from "@ai-sdk/react";
++import { UIMessage } from "ai";
++
+ export type Auth0InterruptionUI = {
+     name: string;
+     code: string;
+     bahavior: string;
+-    tool: {
++    tool?: {
+         id: string;
+         name: string;
+         args: any;
+     };
+-    resume: () => void;
++    resume: (result?: any) => Promise<void>;
+     [key: string]: any;
+ };
+-export declare const useInterruptions: (useChatCreator: (errorHandler: ErrorHandler) => UseChatReturnType) => UseChatWithInterruptionsReturnType;
+-export {};
++export declare const useChatWithInterruptions: <UI_MESSAGE extends UIMessage = UIMessage>(options: UseChatOptions<UI_MESSAGE>) => UseChatHelpers<UI_MESSAGE> & {
++    toolInterrupt: Auth0InterruptionUI | null;
++};
+ //# sourceMappingURL=interrupts.d.ts.map
+\ No newline at end of file
+diff --git a/dist/esm/react/interrupts.js b/dist/esm/react/interrupts.js
+index eeddb16a5ca7132c59b159f2d0da6da3ccc1b7c4..e545f1778357441a50efff6cb417b81bce3a5ee7 100644
+--- a/dist/esm/react/interrupts.js
++++ b/dist/esm/react/interrupts.js
+@@ -1,60 +1,150 @@
+-import { useState } from "react";
+-import { InterruptionPrefix } from "#interrupts";
+-export const useInterruptions = (useChatCreator) => {
+-    const [toolInterrupt, setToolInterrupt] = useState(null);
+-    const errorHandler = (userErrorHandler) => {
+-        return (error) => {
+-            if (!error.message.startsWith(InterruptionPrefix)) {
+-                if (userErrorHandler) {
+-                    userErrorHandler(error);
+-                }
+-                return;
+-            }
+-            const parsedError = JSON.parse(error.message.replace(InterruptionPrefix, ""));
+-            const { id } = parsedError.toolCall;
+-            setToolInterrupt({
+-                ...parsedError,
+-                resume: (result) => {
+-                    setToolInterrupt(null);
+-                    if ((parsedError === null || parsedError === void 0 ? void 0 : parsedError.behavior) === "reload") {
+-                        reload();
+-                    }
+-                    else {
+-                        addToolResult({
+-                            toolCallId: id,
+-                            result: { continueInterruption: true, ...result },
+-                        });
+-                    }
+-                },
+-            });
+-        };
+-    };
+-    const { addToolResult, reload, ...chat } = useChatCreator(errorHandler);
+-    let messages = chat.messages;
+-    if (toolInterrupt) {
+-        messages = messages.map((message) => {
+-            var _a;
+-            return ({
+-                ...message,
+-                parts: (_a = message.parts) === null || _a === void 0 ? void 0 : _a.map((part) => part.type === "tool-invocation" &&
+-                    part.toolInvocation.toolCallId === toolInterrupt.toolCallId
+-                    ? {
+-                        ...part,
+-                        toolInvocation: {
+-                            ...part.toolInvocation,
+-                            state: "call",
+-                        },
+-                    }
+-                    : part),
+-            });
+-        });
+-    }
+-    return {
+-        ...chat,
+-        messages,
+-        reload,
+-        addToolResult,
+-        toolInterrupt,
+-    };
++import { useChat } from '@ai-sdk/react';
++import { isToolUIPart, lastAssistantMessageIsCompleteWithToolCalls } from 'ai';
++import { useEffect, useRef, useState } from 'react';
++
++export const InterruptionPrefix = 'AUTH0_AI_INTERRUPT:';
++
++export const useChatWithInterruptions = (useChatOptions) => {
++	const [toolInterrupt, setToolInterrupt] = useState(null);
++
++	const errorHandler = (userErrorHandler) => {
++		return (error) => {
++			console.log(' === ERROR HANDLER ===');
++			console.log(error);
++
++			if (error instanceof Error) {
++				console.log('i am an error');
++			}
++
++			const msg = error instanceof Error ? error.message : String(error);
++			const isInterrupt =
++				typeof msg === 'string' && msg.startsWith(InterruptionPrefix);
++
++			if (!isInterrupt) {
++				console.log('not an interrupt, skipping...');
++				if (userErrorHandler) userErrorHandler(error);
++
++				return;
++			}
++			const parsedError = JSON.parse(msg.replace(InterruptionPrefix, ''));
++			console.log('=== PARSED ERROR ===');
++			console.log(JSON.stringify(parsedError, null, 2));
++			const { id } = parsedError.toolCall;
++			setToolInterrupt({
++				...parsedError,
++				resume: async (result) => {
++					console.log('=== RESUME INTERRUPT ===');
++					console.log(result);
++					setToolInterrupt(null);
++					if (
++						(parsedError === null || parsedError === void 0
++							? void 0
++							: parsedError.behavior) === 'reload'
++					) {
++						reload();
++					} else {
++						console.log('adding tool result...');
++						await addToolResult({
++							toolCallId: id,
++							// changed from `result` to `output` in v5
++							// result: { continueInterruption: true, ...result },
++							output: { continueInterruption: true, ...result },
++						});
++					}
++				},
++			});
++		};
++	};
++
++	const options = {
++		...useChatOptions,
++		// sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
++		onError: errorHandler(useChatOptions?.onError),
++	};
++
++	const { addToolResult, reload, ...chat } = useChat(options);
++
++	const patchedIdsRef = useRef(new Set());
++
++	useEffect(() => {
++		if (!toolInterrupt) return;
++
++		console.log('has toolInterrupt');
++		console.log(toolInterrupt);
++
++		const toolCallId = toolInterrupt.toolCall?.id || toolInterrupt?.toolCallId;
++
++		if (!toolCallId) return;
++
++		// Already patched for this interrupt id
++		if (patchedIdsRef.current.has(toolCallId)) return;
++
++		let didChange = false;
++
++		chat.setMessages((current) => {
++			if (!Array.isArray(current) || current.length === 0) return current;
++
++			const next = [...current];
++
++			// find last assistant message
++			const lastIndex = next.findLastIndex((m) => m.role === 'assistant');
++
++			if (lastIndex < 0) return current;
++
++			const lastMessage = next[lastIndex];
++
++			// patch only the matching toolCallId
++			const toolErrorIndex = lastMessage.parts.findIndex(
++				(p) =>
++					isToolUIPart(p) &&
++					p.state === 'output-error' &&
++					p.toolCallId === toolCallId
++			);
++
++			if (toolErrorIndex < 0) return current;
++
++			const errorPart = lastMessage.parts[toolErrorIndex];
++
++			const { type, toolCallId: _toolCallId, input, output } = errorPart;
++
++			const patchedPart = {
++				type,
++				toolCallId: _toolCallId,
++				input,
++				output,
++				state: 'input-available',
++			};
++
++			const patchedParts = [...lastMessage.parts];
++
++			// Replace with patched part;
++			patchedParts[toolErrorIndex] = patchedPart;
++
++			// Update messages w/ modified message
++			// Remove reasoning items
++			// Otherwise OpenAI throws a fit
++			next[lastIndex] = {
++				...lastMessage,
++				parts: patchedParts.filter((p) => p.type !== 'reasoning'),
++			};
++			console.group('=== PATCHED MESSAGES ===');
++			console.log(JSON.stringify(next, null, 2));
++			console.groupEnd();
++
++			didChange = true;
++			return next;
++		});
++
++		if (didChange) {
++			patchedIdsRef.current.add(toolCallId);
++		}
++	}, [toolInterrupt, chat]);
++
++	return {
++		...chat,
++		reload,
++		addToolResult,
++		toolInterrupt,
++	};
+ };
+ //# sourceMappingURL=interrupts.js.map
+diff --git a/dist/esm/util/ToolContext.js b/dist/esm/util/ToolContext.js
+index 16a143da528b55d6616194709a80683f44e27ade..ca1a2b1b26567dc60eeb231e3ea8f1cc76590e99 100644
+--- a/dist/esm/util/ToolContext.js
++++ b/dist/esm/util/ToolContext.js
+@@ -1,15 +1,32 @@
+ import crypto from "crypto";
+ import { stableHash } from "stable-hash";
+-import { zodToJsonSchema } from "zod-to-json-schema";
+ import { getAIContext } from "../context";
+-//Vercel AI tools don't have a name,
+-// so we use the description plus parameters
+-// name to fabricate an id
++
++
++// Vercel AI tools are not required to have a name or ID,
++// We fallback to hashing the description;
+ const getToolID = (tool) => {
+-    const params = zodToJsonSchema(tool.parameters);
+-    const sh = stableHash({ description: tool.description, parameters: params });
++
++    // v5 has `id` and `name` properties but they are only REQUIRED for `provider-defined` tools.
++    // Check for them first, then fallback to hashing mechanism.
++    const id = typeof tool?.id === 'string' ? tool.id.trim() : '';
++
++    if (id) return id;
++
++    const name = typeof tool?.name === 'string' ? tool.name.trim() : '';
++
++    if (name) return name;
++
++    // If no id or name, use description and parameters to create a hash
++    // to ensure uniqueness.
++    // This is a fallback for tools that don't have a name or id.
++    console.log('No id or name found, using description to create a hash...');
++
++    const sh = stableHash({ description: tool?.description ?? ''});
+     return crypto.createHash("MD5").update(sh).digest("hex");
++
+ };
++
+ export const ToolContext = (tool) => {
+     return (_params, ctx) => {
+         const { threadID } = getAIContext();
