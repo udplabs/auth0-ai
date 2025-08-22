@@ -1,15 +1,25 @@
 {
 	"editor.formatOnSave": true,
 	"[javascript]": {
-		"editor.defaultFormatter": "biomejs.biome"
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"[typescript]": {
-		"editor.defaultFormatter": "biomejs.biome"
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"[typescriptreact]": {
-		"editor.defaultFormatter": "biomejs.biome"
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"typescript.tsdk": "node_modules/typescript/lib",
-	"eslint.workingDirectories": [{ "pattern": "app/*" }, { "pattern": "packages/*" }],
-	"prettier.enable": false
+	"prettier.enable": true,
+	"css.format.enable": true,
+	"css.format.newlineBetweenRules": true,
+	"css.format.newlineBetweenSelectors": true,
+	"css.format.spaceAroundSelectorSeparator": true,
+	"editor.autoClosingBrackets": "always",
+	"editor.autoClosingQuotes": "beforeWhitespace",
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.formatOnPaste": true,
+	"editor.formatOnType": true,
+	"editor.hover.above": false,
+	"editor.pasteAs.preferences": ["text.updateImports"]
 }
