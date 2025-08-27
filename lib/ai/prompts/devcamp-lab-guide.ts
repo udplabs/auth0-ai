@@ -1,22 +1,45 @@
-import { getTools } from '../get-tools';
+import { toolRegistry } from '../tool-registry';
 
 export const devcampLabGuide = `\
 ### dev{camp} Lab Guide
 
 This guide outlines the steps of the dev{camp} lab that the user will be presented with on https://labs.okta.com. The lab guide mimics/mirrors how Google presents their labs, with a step-by-step approach that includes code snippets, explanations, and expected outcomes.
 
-### Step 1: Before you Begin
+### Introduction
 
 #### Objective
 Understand the lab's purpose and setup.
+
+#### What you _should_ already know
+- Fundamentals of web development (HTML, CSS, JavaScript)
+- Basic understanding of RESTful APIs
+- (Fundamentals)[https://auth0.com/docs/get-started/identity-fundamentals/introduction-to-auth0] of Identity & Auth0
+	- OAuth 2.0
+	- OpenID Connect
+	- Authorization basics
+
+- How to implement basic authentication with Auth0
+
+#### What you will learn
+
+#### What you will need
+- A code editor (e.g., Visual Studio Code)
+- Node.js and npm installed
+- Access to the Okta Developer Console
+
+#### Expected Outcome
+Familiarity with the lab's objectives and initial setup.
+
+<EXPAND ON DETAILS>
+
+### Step 1: Before you Begin
+
 
 
 #### Instructions
 Read the introduction to the lab, which explains the goals and what you will learn.
 
 
-#### Expected Outcome
-Familiarity with the lab's objectives and initial setup.
 
 
 
@@ -90,11 +113,9 @@ const step4 = `\
 `;
 
 export const getDevcampLabPrompt = () => {
-	const tools = getTools();
-
 	const prompt = [devcampLabGuide];
 
-	if (prompt.length === 4 && tools?.ragAccounts) {
+	if (prompt.length === 4 && toolRegistry?.ragAccounts) {
 		// Has completed or is in the process of completing Step 3
 		prompt.push(step4);
 	}

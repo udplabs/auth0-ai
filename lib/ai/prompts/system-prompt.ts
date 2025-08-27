@@ -5,39 +5,56 @@ import { financialAnalysisPrompt } from './financial-analysis-prompt';
 import { getGeolocationPrompt } from './geolocation-prompt';
 import { rootPrompt } from './root-prompt';
 import { toolGuide } from './tool-guide';
+import { getUserPrompt } from './user-prompt';
 
-export const systemPrompt = ({
-	selectedChatModel,
+import { getStepPrompts } from '@/lib/db/queries/settings';
+
+export async function getSystemPrompts({
 	requestHints,
 }: {
-	selectedChatModel: string;
 	requestHints: Chat.RequestHints;
-}) => {
-	const requestPrompt = getRequestPromptFromHints(requestHints);
+}) {
+	const requestPrompt = await getRequestPromptFromHints(requestHints);
 
 	const prompts = [
 		rootPrompt,
+		requestPrompt,
 		toolGuide,
 		devcampContext,
 		devcampUseCases,
 		devcampLabGuide,
 		financialAnalysisPrompt,
-		requestPrompt,
 	];
 
-	if (selectedChatModel === 'chat-model-reasoning') {
-		prompts.unshift(
-			`You are a reasoning AI assistant that thinks step by step before answering.`
-		);
-	}
 	return prompts.flat().join('\n\n');
-};
+}
 
-export function getRequestPromptFromHints({ geolocation }: Chat.RequestHints) {
+export async function getRequestPromptFromHints({
+	geolocation,
+	userId,
+	settings,
+}: Chat.RequestHints) {
 	const prompts = [];
+
+	if (userId) {
+		prompts.push(await getUserPrompt(userId));
+	}
 
 	if (geolocation) {
 		prompts.push(getGeolocationPrompt(geolocation));
+	}
+
+	if (settings) {
+		const { currentLabStep, nextLabStep } = settings;
+		const labStep =
+			nextLabStep && currentLabStep != nextLabStep
+				? nextLabStep
+				: currentLabStep;
+
+		// fetch lab step prompt
+		const content = await getStepPrompts(labStep);
+
+		prompts.push(...content);
 	}
 
 	return prompts;

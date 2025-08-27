@@ -1,13 +1,14 @@
 namespace NodeJS {
 	interface ProcessEnv {
 		/**
-		 * The Auth0 domain for your tenant, e.g. `https://your-tenant.auth0.com`
+		 * The Auth0 domain for your tenant.
 		 *
+		 * @example `your-tenant.auth0.com`
 		 * @see https://auth0.com/docs/get-started/auth0-overview/create-tenants
 		 * @see https://github.com/auth0/nextjs-auth0/tree/main?tab=readme-ov-file#2-add-the-environment-variables
 		 * @readonly
 		 */
-		readonly AUTH0_ISSUER_DOMAIN: string;
+		readonly AUTH0_DOMAIN: string;
 		/**
 		 * The Auth0 Management API domain for your tenant, e.g. `your-tenant.auth0.com`
 		 *
@@ -21,7 +22,7 @@ namespace NodeJS {
 		 * @see https://github.com/auth0/nextjs-auth0/tree/main?tab=readme-ov-file#2-add-the-environment-variables
 		 * @readonly
 		 */
-		readonly AUTH0_MANAGEMENT_API_DOMAIN: string;
+		readonly AUTH0_MANAGEMENT_API_DOMAIN?: string;
 		/**
 		 * The Auth0 Management API scopes for your application
 		 *
@@ -29,7 +30,27 @@ namespace NodeJS {
 		 * @see https://auth0.github.io/node-auth0/index.html#md:configure-the-sdk
 		 * @readonly
 		 */
-		readonly AUTH0_MANAGEMENT_API_SCOPES: string;
+		readonly AUTH0_MANAGEMENT_API_SCOPES?: string;
+		/**
+		 * The Auth0 Client ID for accessing the Auth0 management API (if different from `AUTH0_CLIENT_ID`).
+		 *
+		 * Found in Auth0 Dashboard > Applications > [Your App] > Settings > Basic Information
+		 *
+		 * @see https://auth0.com/docs/get-started/applications/application-settings
+		 * @see https://github.com/auth0/nextjs-auth0/tree/main?tab=readme-ov-file#2-add-the-environment-variables
+		 * @readonly
+		 */
+		readonly AUTH0_MANAGEMENT_API_CLIENT_ID?: string;
+		/**
+		 * The Auth0 Client Secret for accessing the Auth0 management API (if different from `AUTH0_CLIENT_SECRET`)
+		 *
+		 * Found in Auth0 Dashboard > Applications > [Your App] > Settings > Basic Information
+		 *
+		 * @see https://auth0.com/docs/get-started/applications/application-settings
+		 * @see https://github.com/auth0/nextjs-auth0/tree/main?tab=readme-ov-file#2-add-the-environment-variables
+		 * @readonly
+		 */
+		readonly AUTH0_MANAGEMENT_API_CLIENT_SECRET?: string;
 		/**
 		 * The Auth0 Client ID for your application
 		 *

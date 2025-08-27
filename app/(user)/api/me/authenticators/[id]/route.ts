@@ -1,8 +1,7 @@
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 
-import { getUser } from '@/lib/auth0/client';
-import ManagementClient from '@/lib/auth0/management-client';
+import { getUser, ManagementClient } from '@/lib/auth0';
 import { APIError } from '@/lib/errors';
 
 // Delete user authenticator
@@ -27,7 +26,7 @@ export async function DELETE(
 			authentication_method_id,
 		});
 
-		revalidateTag(`${userId}:user:authenticators`);
+		revalidateTag('authenticators');
 
 		return NextResponse.json({}, { status: 204 });
 	} catch (error) {

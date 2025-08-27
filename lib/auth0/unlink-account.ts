@@ -1,7 +1,7 @@
 // src/lib/auth0/unlink-account.ts
 'use server';
 
-import { getUser } from '@/lib/auth0/client';
+import { getUser } from '@/lib/auth0';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -53,7 +53,7 @@ export async function unlinkAccount(formData: FormData): Promise<void> {
 		throw new Error('Unlink failed');
 	}
 
-	revalidateTag(`user:${primaryUserId}:user`);
+	revalidateTag(`${primaryUserId}:profile`);
 
 	// Optional: redirect or revalidate
 	redirect('/profile'); // or no-op if using client refresh

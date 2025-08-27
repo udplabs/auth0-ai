@@ -526,3 +526,13 @@ export const Document = z.object({
 export const DocumentWithScoreSchema = Document.extend({
 	score: z.number(),
 });
+
+export const SettingsSchema = z.object({
+	id: z.string().describe('The userId of the user the settings belong to.'),
+	currentLabStep: z.string(),
+	labMeta: z.string().optional(),
+	preferences: z.string().optional(),
+	firstMessage: z.boolean().optional().default(true),
+	createdAt: z.string(),
+	updatedAt: z.string(),
+});

@@ -1,11 +1,9 @@
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ulid } from 'ulid';
 
-import { Chat, type ChatProps } from '@/components/chat/chat';
-import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
-import { getUser } from '@/lib/auth0/client';
-import { getChatById } from '@/lib/db//queries/chat';
+import { Chat, ChatProvider } from '@/components/features/chat';
+import { getUser } from '@/lib/auth0';
+import { getChatById } from '@/lib/db/queries/chat';
 import { APIError } from '@/lib/errors';
 
 export default async function Page({
@@ -27,29 +25,23 @@ export default async function Page({
 	const user = await getUser(false);
 
 	if (!user?.sub) {
-		console.log('no user session, redirecting to login...');
-		redirect('/auth/login');
+		console.log('no user session');
+		console.log('initiating ephemeral chat...');
 	}
 
-	const cookieStore = await cookies();
-	const chatModelFromCookie = cookieStore.get('chat-model');
-
-	const chatProps: ChatProps = {
-		id,
-		userId: user.sub,
-		initialMessages: [],
-		initialChatModel: chatModelFromCookie?.value || DEFAULT_CHAT_MODEL,
-		autoResume: true,
-	};
+	const initialMessages: Chat.UIMessage[] = [];
 
 	if (!isNewChat) {
 		try {
-			const dbChats = await getChatById(id, user.sub, true);
+			const dbChats = await getChatById(id, {
+				userId: user?.sub,
+				includeMessages: true,
+			});
 
 			if (dbChats) {
 				const { messages = [] } = dbChats;
 
-				chatProps.initialMessages = messages;
+				initialMessages.push(...messages);
 			}
 		} catch (error: unknown) {
 			if (error instanceof APIError) {
@@ -63,5 +55,16 @@ export default async function Page({
 		}
 	}
 
-	return <Chat {...chatProps} />;
+	return (
+		<ChatProvider
+			{...{
+				chatId: id,
+				chatOptions: {
+					...(initialMessages.length > 0 ? { messages: initialMessages } : {}),
+				},
+			}}
+		>
+			<Chat />
+		</ChatProvider>
+	);
 }

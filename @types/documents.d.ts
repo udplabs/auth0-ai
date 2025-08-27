@@ -3,6 +3,8 @@ declare global {
 		interface Document {
 			id: string;
 			pageContent: string;
+			createdAt: string;
+			updatedAt: string;
 			metadata: Documents.Metadata;
 		}
 		interface DocumentWithScore extends Documents.Document {
@@ -17,10 +19,14 @@ declare global {
 			accountType?: string;
 			customerId?: string;
 			modelId?: string;
-			createdAt?: string;
-			updatedAt?: string;
 		}
 		type Embedding = number[];
+
+		interface CreateDocumentInput extends Documents.Document {
+			createdAt?: string;
+			updatedAt?: string;
+			embedding?: Documents.Embedding;
+		}
 	}
 }
 export {};

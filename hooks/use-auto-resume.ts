@@ -1,19 +1,21 @@
 'use client';
 
-import type { UseChatHelpers } from '@ai-sdk/react';
+import type { UIMessage, UseChatHelpers } from '@ai-sdk/react';
 import { useEffect } from 'react';
 
-export interface UseAutoResumeParams {
+export interface UseAutoResumeParams<
+	UI_MESSAGE extends UIMessage = Chat.UIMessage,
+> {
 	autoResume: boolean;
-	initialMessages: Chat.UIMessage[];
-	resumeStream: UseChatHelpers<Chat.UIMessage>['resumeStream'];
+	initialMessages?: UI_MESSAGE[];
+	resumeStream: UseChatHelpers<UI_MESSAGE>['resumeStream'];
 }
 
-export function useAutoResume({
+export function useAutoResume<UI_MESSAGE extends UIMessage = Chat.UIMessage>({
 	autoResume,
-	initialMessages,
+	initialMessages = [],
 	resumeStream,
-}: UseAutoResumeParams) {
+}: UseAutoResumeParams<UI_MESSAGE>) {
 	useEffect(() => {
 		if (!autoResume) return;
 

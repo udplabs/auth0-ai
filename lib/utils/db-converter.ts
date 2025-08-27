@@ -1,5 +1,4 @@
-import { Prisma } from '@/lib/db/generated/prisma';
-import { APIError } from '../errors';
+import { APIError } from '@/lib/errors';
 
 const dateFields = [
 	'openedDate',
@@ -86,29 +85,34 @@ export function convertToUI<DB = any, UI = any>(dbItem: DB): UI {
 
 		for (const item of items) {
 			const uiItem: any = {};
-			const hasMetadata = !!item?.metadata;
-			const isMessage = !!item?.role; // crude check for messages
+			const hasMetadata = !!(item as any)?.metadata;
+			const isMessage = !!(item as any)?.role; // crude check for messages
 
-			for (const [key, value] of Object.entries(item)) {
+			// Ensure metadata object exists if we'll ever write to it
+			if (isMessage || hasMetadata) {
+				uiItem.metadata = uiItem.metadata ?? {};
+			}
+
+			for (const [key, value] of Object.entries(item as any)) {
 				// We don't want to overwrite any newly added metadata
 				if (key === 'metadata') {
 					uiItem['metadata'] = {
 						...(value as object),
 						...uiItem['metadata'],
 					};
+					continue;
 				}
 
 				// Prisma has a bug and cannot take strings.
-				// THe UI prefers strings.
+				// The UI prefers strings.
 				if (value instanceof Date) {
 					const newValue = value.toISOString();
 
-					if (hasMetadata) {
-						// These are expected in metadata
-						if (key === 'createdAt' || key === 'updatedAt') {
-							uiItem.metadata[key] = newValue;
-							continue;
-						}
+					// If a message, always place createdAt/updatedAt under metadata, and ensure it exists
+					if (isMessage && (key === 'createdAt' || key === 'updatedAt')) {
+						uiItem['metadata'] = uiItem['metadata'] ?? {};
+						uiItem['metadata'][key] = newValue;
+						continue;
 					}
 
 					uiItem[key] = newValue;
@@ -122,24 +126,20 @@ export function convertToUI<DB = any, UI = any>(dbItem: DB): UI {
 				}
 
 				// Convert known arrays of related items
-				if (subTypes.includes(key) && value === undefined) {
-					uiItem[key] = convertToUI(item);
+				if (subTypes.includes(key) && value !== undefined) {
+					uiItem[key] = convertToUI(value);
 					continue;
 				}
 
 				if (isMessage && !['role', 'parts', 'id', 'metadata'].includes(key)) {
-					// Messages have a lot of metadata fields that come from the DB directly
-					// We want to move those to the metadata object without overwriting already converted metadata.
-					uiItem['metadata'] = {
-						...(uiItem['metadata'] || {}),
-						[key]: value,
-					};
+					// Move DB fields for messages into metadata without overwriting existing metadata
+					uiItem['metadata'] = uiItem['metadata'] ?? {};
+					uiItem['metadata'][key] = value;
 					continue;
 				}
 
 				// Direct assignment for all other types
 				uiItem[key] = value;
-				continue;
 			}
 			result.push(uiItem);
 		}
@@ -149,12 +149,11 @@ export function convertToUI<DB = any, UI = any>(dbItem: DB): UI {
 		}
 		return result as UI;
 	} catch (error: unknown) {
-		console.log('convertToDB error');
+		console.log('convertToUI error');
 		console.log(error);
 		if (error instanceof APIError) {
 			throw error;
 		}
-
 		throw new APIError('unknown:database', error);
 	}
 }

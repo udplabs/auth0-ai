@@ -1,12 +1,14 @@
-import { getStreamContext } from '@/app/(chat)/api/chat/[id]/handlers/post';
-import { getUser } from '@/lib/auth0/client';
-import { getChatById } from '@/lib/db/queries/chat';
-import { getMessagesByChatId } from '@/lib/db/queries/message';
-import { getStreamIdsByChatId } from '@/lib/db/queries/stream';
+import { getUser } from '@/lib/auth0';
+import {
+	getChatById,
+	getMessagesByChatId,
+	getStreamIdsByChatId,
+} from '@/lib/db/queries/chat';
 import { APIError } from '@/lib/errors';
 import { createUIMessageStream, JsonToSseTransformStream } from 'ai';
 import { differenceInSeconds } from 'date-fns';
 import { NextResponse } from 'next/server';
+import { getStreamContext } from '../handlers/post';
 
 /**
  * This route is automatically called by useChat to handle resumable streams.

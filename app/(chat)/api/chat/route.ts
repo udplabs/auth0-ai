@@ -1,8 +1,8 @@
-import { getUser } from '@/lib/auth0/client';
+import { getChatHistory } from '@/lib/api/chat/get-chat';
+import { getUser } from '@/lib/auth0';
 import { APIError } from '@/lib/errors';
 import { getSearchParams } from '@/lib/utils/get-search-params';
 import { type NextRequest, NextResponse } from 'next/server';
-import { getChatHistory } from '../actions';
 
 interface GetChatsParams extends ApiQueryParams {
 	grouped?: 'true' | 'false';

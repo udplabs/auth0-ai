@@ -5,22 +5,25 @@
 	"scripts": {
 		"dev": "next dev --turbo",
 		"debug": "next dev",
-		"build": "next build",
+		"build": "prisma generate && next build",
 		"start": "next start",
 		"lint": "next lint",
-		"db:generate": "prisma generate",
-		"db:migrate": "prisma migrate dev",
-		"db:studio": "prisma studio",
-		"db:push": "prisma db push",
-		"db:pull": "prisma db pull",
+		"db:generate": "pnpm db:generate:prisma && pnpm db:generate:neon",
+		"db:generate:prisma": "prisma generate --schema ./lib/db/prisma --no-engine",
+		"db:generate:neon": "prisma generate --schema ./lib/db/neon --no-engine",
+		"db:migrate": "pnpm db:migrate:prisma && pnpm db:migrate:neon",
+		"db:migrate:prisma": "prisma migrate dev --schema ./lib/db/prisma",
+		"db:migrate:neon": "prisma migrate dev --schema ./lib/db/neon",
+		"db:studio": "pnpm db:studio:prisma && pnpm db:studio:neon",
+		"db:studio:prisma": "prisma studio --schema ./lib/db/prisma --port 5555",
+		"db:studio:neon": "prisma studio --schema ./lib/db/neon --port 5556",
 		"db:schema:validate": "prisma validate",
-		"db:migrate:create": "prisma migrate dev --create-only",
 		"test": "export PLAYWRIGHT=True && pnpm exec playwright test"
 	},
 	"dependencies": {
-		"@ai-sdk/openai": "2.0.11",
+		"@ai-sdk/openai": "2.0.19",
 		"@ai-sdk/provider": "2.0.0",
-		"@ai-sdk/react": "2.0.11",
+		"@ai-sdk/react": "2.0.22",
 		"@auth0/ai": "^3.4.1",
 		"@auth0/ai-vercel": "^3.5.0",
 		"@auth0/nextjs-auth0": "^4.8.0",
@@ -33,8 +36,11 @@
 		"@fortawesome/fontawesome-svg-core": "^7.0.0",
 		"@fortawesome/react-fontawesome": "^0.2.3",
 		"@icons-pack/react-simple-icons": "^13.7.0",
+		"@neondatabase/serverless": "^1.0.1",
 		"@openfga/sdk": "^0.9.0",
+		"@prisma/adapter-neon": "^6.14.0",
 		"@prisma/client": "^6.13.0",
+		"@prisma/extension-accelerate": "^2.0.2",
 		"@radix-ui/react-alert-dialog": "^1.1.2",
 		"@radix-ui/react-avatar": "^1.1.10",
 		"@radix-ui/react-collapsible": "^1.1.11",
@@ -56,7 +62,7 @@
 		"@vercel/analytics": "^1.3.1",
 		"@vercel/functions": "^2.0.0",
 		"@vercel/postgres": "^0.10.0",
-		"ai": "5.0.11",
+		"ai": "5.0.22",
 		"assert": "^2.1.0",
 		"auth0": "^4.27.0",
 		"class-variance-authority": "^0.7.1",
@@ -93,7 +99,6 @@
 		"react-device-detect": "^2.2.3",
 		"react-dom": "^19.1.1",
 		"react-icons": "^5.5.0",
-		"react-markdown": "^9.1.0",
 		"react-qrcode-logo": "^3.0.0",
 		"react-resizable-panels": "^2.1.7",
 		"react-syntax-highlighter": "^15.6.1",
@@ -101,12 +106,14 @@
 		"rehype-katex": "^7.0.1",
 		"remark-breaks": "^4.0.0",
 		"remark-gfm": "^4.0.1",
+		"remark-github-alerts": "^0.1.1",
 		"remark-math": "^6.0.0",
 		"resumable-stream": "^2.0.0",
 		"rxjs": "^7.8.2",
 		"server-only": "^0.0.1",
 		"shiki": "^3.9.2",
 		"sonner": "^1.5.0",
+		"streamdown": "^1.0.12",
 		"swr": "^2.3.4",
 		"tailwind-merge": "^2.5.2",
 		"tailwindcss-animate": "^1.0.7",
@@ -114,6 +121,7 @@
 		"ulid": "^3.0.1",
 		"use-stick-to-bottom": "^1.1.1",
 		"usehooks-ts": "^3.1.0",
+		"ws": "^8.18.3",
 		"zod": "^4.0.17"
 	},
 	"devDependencies": {
@@ -128,6 +136,7 @@
 		"@types/react": "^18",
 		"@types/react-dom": "^18",
 		"@types/react-syntax-highlighter": "^15.5.13",
+		"@types/ws": "^8.18.1",
 		"@typescript-eslint/parser": "^8.38.0",
 		"eslint": "^9.32.0",
 		"eslint-config-next": "15.4.5",
@@ -142,13 +151,14 @@
 		"prettier-plugin-organize-imports": "^4.2.0",
 		"prettier-plugin-tailwindcss": "^0.6.14",
 		"tailwindcss": "^4.1.11",
+		"ts-node": "^10.9.2",
 		"tsx": "^4.19.1",
 		"typescript": "^5.6.3",
 		"typescript-eslint": "^8.38.0"
 	},
 	"overrides": {
-		"ai": "5.0.11",
-		"@ai-sdk/react": "2.0.11",
+		"ai": "5.0.22",
+		"@ai-sdk/react": "2.0.22",
 		"@auth0-ai/vercel": {
 			"ai": "4.3.19"
 		}
@@ -156,18 +166,15 @@
 	"pnpm": {
 		"overrides": {
 			"@auth0-ai/vercel>ai": "4.3.19",
-			"ai": "5.0.11",
-			"@ai-sdk/react": "2.0.11"
+			"ai": "5.0.22",
+			"@ai-sdk/react": "2.0.22"
 		},
 		"patchedDependencies": {
 			"@auth0/ai-vercel": "patches/@auth0__ai-vercel.patch"
 		}
 	},
 	"resolutions": {
-		"ai": "5.0.11",
-		"@ai-sdk/react": "2.0.11"
-	},
-	"prisma": {
-		"schema": "lib/db/schema.prisma"
+		"ai": "5.0.22",
+		"@ai-sdk/react": "2.0.22"
 	}
 }

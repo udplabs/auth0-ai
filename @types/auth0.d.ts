@@ -1,4 +1,13 @@
-import type { GetUsers200ResponseOneOfInner } from 'auth0';
+import type {
+	GetUsers200ResponseOneOfInner,
+	GetUsers200ResponseOneOfInnerAppMetadata,
+} from 'auth0';
+
+declare module '@auth0/nextjs-auth0' {
+	interface GetUsers200ResponseOneOfInnerAppMetadata {
+		has_accounts?: boolean;
+	}
+}
 
 declare global {
 	interface Factor {
@@ -24,7 +33,9 @@ declare global {
 		| 'passkey'
 		| 'password';
 
-	type UserProfile = GetUsers200ResponseOneOfInner;
+	interface UserProfile extends GetUsers200ResponseOneOfInner {
+		custom_metadata?: Partial<Omit<Settings, 'createdAt' | 'updatedAt' | 'id'>>;
+	}
 }
 
 export {};

@@ -1,3 +1,4 @@
+import { toolRegistry } from '@/lib/ai/tool-registry';
 import type {
 	Chat as DBChat,
 	Prisma,
@@ -5,12 +6,18 @@ import type {
 	Suggestion,
 } from '@/lib/db/generated/prisma';
 
-import type { UIMessage as AIMessage, ToolUIPart, UIDataTypes } from 'ai';
+import type {
+	UIMessage as AIMessage,
+	InferUITool,
+	ToolUIPart,
+	UIDataTypes,
+} from 'ai';
 
 declare global {
 	namespace Chat {
 		interface UIChat extends DBChat {
 			title?: string;
+			userId?: string;
 			createdAt: string;
 			updatedAt: string;
 			messages?: Chat.UIMessage[];
@@ -20,34 +27,36 @@ declare global {
 		type DataPart = { type: 'append-message'; message: string };
 		type ToolPart = ToolUIPart<Chat.Tools.AvailableTools>;
 
+		// If you update this, update ./app/(chat)/api/chat/schema.ts
 		interface MessageMetadata {
 			createdAt?: string;
 			updatedAt?: string;
 			isUpVoted?: boolean;
 			isDownVoted?: boolean;
 			chatId: string;
-			userId: string;
+			userId?: string;
 		}
 
 		type UIMessage = AIMessage<
 			Chat.MessageMetadata,
 			CustomUIDataTypes,
-			Chat.Tools.AvailableTools
+			InferUITools<typeof toolRegistry>
 		>;
 
 		interface CustomUIDataTypes extends UIDataTypes {
-			// codeDelta: string;
 			appendMessage: string;
 			connectionPicker: ExternalConnection[];
 			redirect: string;
-			// id: string;
-			// title: string;
-			// clear: null;
-			// finish: null;
+			notification: string;
+			accounts: Accounts.Account[];
+			titleText: string;
+			titleTextStart: '...';
+			titleTextEnd: '';
 		}
 		interface RequestHints {
+			userId?: string;
 			geolocation: UIGeolocation;
-			hasAccountData?: boolean;
+			settings?: UISettings;
 		}
 		interface ListChatsByUserIdResult extends PaginatedResults {
 			chats: Chat.UIChat[];

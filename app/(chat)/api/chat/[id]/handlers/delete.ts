@@ -1,6 +1,6 @@
-import { chatKey } from '@/app/(chat)/api/actions';
-import { getUser } from '@/lib/auth0/client';
-import { deleteChatById } from '@/lib/db/queries/chat';
+import { chatKey } from '@/lib/api/chat/get-chat';
+import { getUser } from '@/lib/auth0';
+import { deleteChatById } from '@/lib/db/queries/chat/mutate-chats';
 import { APIError } from '@/lib/errors';
 import { revalidateTag } from 'next/cache';
 
@@ -23,7 +23,7 @@ export async function DELETE(
 
 		await deleteChatById(id, user.sub);
 
-		revalidateTag(await chatKey({ userId: user.sub }));
+		revalidateTag(chatKey({ userId: user.sub }));
 
 		return Response.json(null, { status: 201 });
 	} catch (error: unknown) {

@@ -4,7 +4,7 @@ import { useSidebar } from '@/components/ui/sidebar';
 import { useCallback, useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Loader } from '@/components/ui/loader';
+import { Loader } from '@/components/ui/prompt-kit/loader';
 
 export default function PopupClosePage() {
 	const { open, setOpen } = useSidebar();

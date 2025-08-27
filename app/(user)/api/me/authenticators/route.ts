@@ -1,7 +1,7 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-import { getUser } from '@/lib/auth0/client';
-import { getAuthenticators } from '@/lib/auth0/get-authenticators';
+import { getAuthenticators } from '@/lib/api/user';
+import { getUser } from '@/lib/auth0';
 import { APIError } from '@/lib/errors';
 
 // Get user authenticators

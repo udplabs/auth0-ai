@@ -7,10 +7,10 @@ const GROUPING_THRESHOLDS = {
 	lastMonth: subMonths(new Date(), 1),
 };
 
-export function groupItemsByDate<T extends UIChat | ChatMessage = UIChat>(
-	items: T[]
-): GroupedItems<T> {
-	return items.reduce<GroupedItems<T>>(
+export function groupItemsByDate<
+	T extends Chat.UIChat | Chat.UIMessage = Chat.UIChat,
+>(items: T[]): Chat.GroupedItems<T> {
+	return items.reduce<Chat.GroupedItems<T>>(
 		(groups, item) => {
 			const itemDate = getSortDate(item);
 
@@ -34,11 +34,11 @@ export function groupItemsByDate<T extends UIChat | ChatMessage = UIChat>(
 			lastWeek: [],
 			lastMonth: [],
 			older: [],
-		} as GroupedItems<T>
+		} as Chat.GroupedItems<T>
 	);
 }
 
-function getSortDate(item: UIChat | ChatMessage) {
+function getSortDate(item: Chat.UIChat | Chat.UIMessage) {
 	if ('createdAt' in item) {
 		return new Date(item.updatedAt ?? item.createdAt);
 	}

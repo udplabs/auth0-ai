@@ -4,14 +4,17 @@ import { z } from 'zod';
 export const userInfo = tool<object, Chat.Tools.Response<UserProfile>>({
 	description: 'Get information about the current logged in user.',
 	inputSchema: z.object({}),
+	name: 'userInfo',
 	execute: async () => {
 		try {
-			const { getUser: getSessionUser } = await import('@/lib/auth0/client');
-			const { getUser } = await import('@/lib/auth0/get-user');
+			const { getUser } = await import('@/lib/auth0');
 
-			const user = await getSessionUser();
+			const user = await getUser();
 
-			const data = await getUser({ userId: user.sub });
+			// Wait to import until needed
+			const { getUserProfile } = await import('@/lib/api/user');
+
+			const data = await getUserProfile({ userId: user.sub });
 
 			return {
 				status: 'success',

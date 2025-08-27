@@ -1,7 +1,8 @@
-import { generateMockEmbeddings } from '@/lib/db/mock/mock-accounts';
 import { LocalVectorStore } from '@/lib/ai/rag/vector-store';
+import { generateMockEmbeddings } from '@/lib/db/mock/mock-accounts';
 import { APIError } from '@/lib/errors';
 
+// DELETE ME! THIS IS FOR DANNY
 export async function GET() {
 	try {
 		await generateMockEmbeddings();
@@ -12,10 +13,11 @@ export async function GET() {
 			return error.toResponse();
 		}
 
-		return new APIError(error);
+		return new APIError(error).toResponse();
 	}
 }
 
+// DELETE ME! THIS IS FOR DANNY
 export async function DELETE() {
 	try {
 		LocalVectorStore.reset();
@@ -26,6 +28,6 @@ export async function DELETE() {
 			return error.toResponse();
 		}
 
-		return new APIError(error);
+		return new APIError(error).toResponse();
 	}
 }

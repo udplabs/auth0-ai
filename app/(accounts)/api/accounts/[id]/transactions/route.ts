@@ -1,5 +1,5 @@
-import { getTransactions } from '@/app/(accounts)/actions';
-import { getUser } from '@/lib/auth0/client';
+import { getTransactions } from '@/lib/api/accounts';
+import { getUser } from '@/lib/auth0';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export async function GET(

@@ -1,5 +1,5 @@
-import { getUser } from '@/lib/auth0/client';
-import { voteMessage } from '@/lib/db/queries/message';
+import { getUser } from '@/lib/auth0';
+import { voteMessage } from '@/lib/db/queries/chat/mutate-messages';
 import { APIError } from '@/lib/errors';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -16,10 +16,10 @@ export async function PATCH(
 			throw new APIError('bad_request:vote', 'Message Id is required.');
 		}
 
-		const { vote = 'UP' } =
-			((await request.json()) as { vote: 'UP' | 'DOWN' }) || {};
+		const { vote = 'up' } =
+			((await request.json()) as { vote: 'up' | 'down' }) || {};
 
-		const data = await voteMessage(user.sub, id, vote);
+		const data = await voteMessage(id, vote, { userId: user.sub });
 
 		return NextResponse.json({ data });
 	} catch (error: unknown) {
