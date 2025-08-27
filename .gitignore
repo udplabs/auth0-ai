@@ -48,3 +48,6 @@ yarn-error.log*
 
 # Secrets
 *.secret
+
+# generated code
+lib/generated/**
