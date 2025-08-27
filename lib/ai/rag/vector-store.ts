@@ -1,9 +1,8 @@
-import { myProvider } from '@/lib/ai/providers';
-import { getAllAccounts } from '@/lib/db/queries/accounts';
+import { getAllTransactions } from '@/lib/db/queries/accounts';
 import { getDocuments } from '@/lib/db/queries/documents';
-import { getAllTransactions } from '@/lib/db/queries/transactions';
+import { openai } from '@ai-sdk/openai';
 import { cosineSimilarity, embed } from 'ai';
-import { createAccountEmbeddings, createDocuments } from '../embedding';
+import { createDocumentsWithEmbeddings } from './create-documents';
 
 export class LocalVectorStore {
 	private static db: Documents.DocumentWithEmbedding[] = [];
@@ -52,21 +51,11 @@ export class LocalVectorStore {
 		// Store has not yet been initialized.
 		// Attempt to initialize the entire DB
 
-		const existingAccountIds = existingDocuments.flatMap(
-			(doc) => doc.metadata?.accountId || []
-		);
 		const existingTransactionIds = existingDocuments.flatMap(
 			(doc) => doc.metadata?.transactionId || []
 		);
 
-		// 1) Fetch accounts from DB that do not yet have embeddings
-		const accountsWithoutEmbedding = await getAllAccounts({
-			NOT: { id: { in: existingAccountIds } },
-		});
-
-		console.log('accounts missing embedding:', accountsWithoutEmbedding.length);
-
-		// 2) Fetch transactions from DB that do not yet have embeddings
+		// 1) Fetch transactions from DB that do not yet have embeddings
 		const transactionsWithoutEmbedding = await getAllTransactions({
 			NOT: { id: { in: existingTransactionIds } },
 		});
@@ -75,24 +64,14 @@ export class LocalVectorStore {
 			transactionsWithoutEmbedding.length
 		);
 
-		if (
-			accountsWithoutEmbedding.length > 0 ||
-			transactionsWithoutEmbedding.length > 0
-		) {
-			console.log('Creating documents for new accounts and transactions...');
-			const docs = await createDocuments(
-				accountsWithoutEmbedding,
+		if (transactionsWithoutEmbedding.length > 0) {
+			console.log('Creating documents for new transactions...');
+			const docs = await createDocumentsWithEmbeddings(
 				transactionsWithoutEmbedding
 			);
 
 			if (docs.length > 0) {
-				console.log('creating embeddings for new documents:', docs.length);
-
-				const result = await createAccountEmbeddings(docs);
-
-				await LocalVectorStore.insert(result);
-			} else {
-				console.log('No new documents to create embeddings for.');
+				await LocalVectorStore.insert(docs);
 			}
 		}
 
@@ -122,7 +101,7 @@ export class LocalVectorStore {
 	}
 
 	static async search(query: string, limit = 999) {
-		const model = myProvider.textEmbeddingModel('accounts-model');
+		const model = openai.textEmbedding('text-embedding-3-small');
 		const { embedding: q } = await embed({
 			model,
 			value: query,

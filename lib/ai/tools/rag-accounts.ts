@@ -18,16 +18,12 @@ export const ragAccounts = tool<
 	execute: async ({ query }) => {
 		console.log('ragAccounts tool called with query:', query);
 
-		const { getUser } = await import('@/lib/auth0/client');
-		const { APIError } = await import('@/lib/errors');
-		const { FGAFilter } = await import('@auth0/ai');
-		const { LocalVectorStore } = await import('@/lib/ai/rag/vector-store');
+		const { getUser } = await import('@/lib/auth0');
 
 		const user = await getUser();
-		// Ensure user is authenticated
-		if (!user?.sub) {
-			throw new APIError('unauthorized:auth');
-		}
+
+		// Wait to import until needed.
+		const { FGAFilter } = await import('@auth0/ai');
 
 		const fgaRetriever = FGAFilter.create<Documents.DocumentWithScore>({
 			buildQuery: (doc) => ({
@@ -36,6 +32,9 @@ export const ragAccounts = tool<
 				relation: 'can_view_transactions',
 			}),
 		});
+
+		// Wait to import until needed.
+		const { LocalVectorStore } = await import('@/lib/ai/rag/vector-store');
 
 		if (
 			LocalVectorStore.initialized === false ||
