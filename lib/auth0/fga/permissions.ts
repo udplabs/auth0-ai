@@ -1,6 +1,6 @@
 import { getFgaClient } from './client';
 
-const fga = getFgaClient();
+const fga = await getFgaClient();
 
 interface AccountPermissionsCheckResult {
 	[key: string]: Permissions;
@@ -12,16 +12,16 @@ interface Permissions {
 	canTransfer?: boolean;
 }
 
+// if (!fga) checks are for this sample app only to handle pre-configured state.
+// don't try this at home kids.
 export async function createOwnerPermissions(
 	userId: string,
 	accountIds: string[]
 ) {
-	console.log(
-		'Creating owner permissions for user:',
-		userId,
-		'for accounts:',
-		accountIds
-	);
+	if (!fga) throw new Error('FGA Client not initialized!');
+
+	console.log('=== CREATE OWNER PERMISSIONS ===');
+	console.log('userId:', userId, '| accountIds:', accountIds);
 	const permissions = accountIds.map((accountId) => ({
 		user: `user:${userId}`,
 		relation: 'owner',
@@ -41,6 +41,8 @@ export async function canTransferFunds(
 	accountId: string,
 	transaction_amount: number
 ) {
+	if (!fga) throw new Error('FGA Client not initialized!');
+
 	const response = await fga.check({
 		user: `user:${userId}`,
 		relation: 'can_transfer',
@@ -55,8 +57,13 @@ export async function canTransferFunds(
 
 export async function getAccountPermissions(
 	userId: string,
-	accounts: string[]
+	accountIds: string[]
 ) {
+	if (!fga) throw new Error('FGA Client not initialized!');
+
+	console.log('=== GET ACCOUNT PERMISSIONS ===');
+	console.log('userId:', userId, '| accountIds:', accountIds);
+
 	const user = `user:${userId}`;
 	const permissions = [
 		'can_view',
@@ -68,7 +75,7 @@ export async function getAccountPermissions(
 	const accountPermissions: AccountPermissionsCheckResult = {};
 
 	const { result } = await fga.batchCheck({
-		checks: accounts.flatMap((accountId) => {
+		checks: accountIds.flatMap((accountId) => {
 			// Initialize the result with false values
 			accountPermissions[accountId] = {
 				canTransfer: false,
@@ -93,6 +100,9 @@ export async function getAccountPermissions(
 			accountPermissions[accountId][relation] = true;
 		}
 	});
+
+	console.log('=== ACCOUNT PERMISSIONS ===');
+	console.log(accountPermissions);
 
 	return accountPermissions;
 }

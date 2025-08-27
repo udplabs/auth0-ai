@@ -1,13 +1,8 @@
-import dotenv from 'dotenv';
-
-// 🔥 Load environment variables at module level if not loaded yet
-if (!process.env.FGA_API_URL) {
-	dotenv.config({ path: '.env.local' });
-}
+'use server';
 
 import { CredentialsMethod, OpenFgaClient } from '@openfga/sdk';
 
-export function getFgaClient() {
+export async function create() {
 	return new OpenFgaClient({
 		apiUrl: process.env.FGA_API_URL ?? 'https://api.us1.fga.dev',
 		storeId: process.env.FGA_STORE_ID,
@@ -24,12 +19,15 @@ export function getFgaClient() {
 	});
 }
 
-// 🚀 Singleton lazy client
-let _fgaInstance: ReturnType<typeof getFgaClient> | null = null;
+let instance: OpenFgaClient | null = null;
 
-export const fga = (() => {
-	if (!_fgaInstance) {
-		_fgaInstance = getFgaClient();
+export async function getFgaClient(): Promise<OpenFgaClient | null> {
+	if (process.env.FGA_STORE_ID && !instance) {
+		instance = await create();
+	} else {
+		console.warn(
+			'Unable to initialize FGA Client! Double check your configuration.'
+		);
 	}
-	return _fgaInstance;
-})();
+	return instance;
+}
