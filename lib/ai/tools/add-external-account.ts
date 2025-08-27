@@ -33,7 +33,7 @@ const OutputSchema = ToolResponseSchema(
 export const addExternalAccount = tool<object, z.infer<typeof OutputSchema>>({
 	description:
 		'Initiates an authorization flow via Auth0 to an external identity provider. For this demo application the external provider is a mock external bank. The user will authenticate using a demo set of credentials provided to them in advance in the lab guide. This is a multi-step tool that requires input from the user (if it cannot be inferred from their prompt). If it can be inferred, provide \`overrideStep: step-2\` to skip ahead.',
-	name: 'addExternalAccount',
+	name: 'addExternalAccounts',
 	inputSchema: z.object(),
 	outputSchema: OutputSchema,
 	execute: async () => {

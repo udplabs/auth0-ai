@@ -1,4 +1,3 @@
-import { APIError } from '@/lib/errors';
 import { tool } from 'ai';
 import { z } from 'zod';
 import { ToolResponseSchema, TransactionSchema } from '../schemas';
@@ -20,13 +19,13 @@ export const getTransactions = tool<
 		console.log('getTransactions called....');
 
 		try {
-			const { getUser } = await import('@/lib/auth0/client');
+			const { getUser } = await import('@/lib/auth0');
 
 			const user = await getUser();
 
 			// Dynamically import to avoid circular dependencies
 			const { getTransactions: getTransactionsAPI } = await import(
-				'@/app/(accounts)/actions'
+				'@/lib/api/accounts'
 			);
 
 			const data = await getTransactionsAPI({ accountId, userId: user.sub });
@@ -40,6 +39,10 @@ export const getTransactions = tool<
 		} catch (error: unknown) {
 			console.log('error fetching transactions...');
 			console.log(error);
+
+			// Wait to import
+			const { APIError } = await import('@/lib/errors');
+
 			return {
 				status: 'error',
 				message: 'Failed to fetch transactions.',

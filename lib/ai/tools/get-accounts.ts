@@ -1,4 +1,3 @@
-import { APIError } from '@/lib/errors';
 import { tool } from 'ai';
 import { z } from 'zod';
 import { AccountSchema, ToolResponseSchema } from '../schemas';
@@ -14,13 +13,12 @@ export const getAccounts = tool<object, z.infer<typeof outputSchema>>({
 	execute: async () => {
 		console.log('getAccounts tool called');
 
-		const { getUser } = await import('@/lib/auth0/client');
+		const { getUser } = await import('@/lib/auth0');
 
 		const user = await getUser();
 
-		const { getAccounts: getAccountsApi } = await import(
-			'@/app/(accounts)/actions'
-		);
+		// Wait to import until needed
+		const { getAccounts: getAccountsApi } = await import('@/lib/api/accounts');
 
 		try {
 			const data = await getAccountsApi(user.sub);
@@ -37,6 +35,9 @@ export const getAccounts = tool<object, z.infer<typeof outputSchema>>({
 		} catch (error: unknown) {
 			console.log('error fetching accounts...');
 			console.log(error);
+
+			const { APIError } = await import('@/lib/errors');
+
 			return {
 				status: 'error',
 				message: 'Failed to fetch accounts.',

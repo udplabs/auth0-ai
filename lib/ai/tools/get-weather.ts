@@ -10,6 +10,7 @@ export const getWeather = tool<
 		latitude: z.number(),
 		longitude: z.number(),
 	}),
+	name: 'getWeather',
 	execute: async ({ latitude, longitude }) => {
 		const query = new URLSearchParams({
 			latitude: latitude.toString(),

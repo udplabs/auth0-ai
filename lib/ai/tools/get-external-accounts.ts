@@ -1,6 +1,5 @@
 import { AccountSchema, ToolResponseSchema } from '@/lib/ai/schemas';
 import { withExternalAccount } from '@/lib/auth0/ai';
-import { APIError } from '@/lib/errors';
 import { FederatedConnectionError } from '@auth0/ai/interrupts';
 import { tool } from 'ai';
 import { z } from 'zod';
@@ -17,21 +16,27 @@ export const getExternalAccounts = withExternalAccount(
 		execute: async () => {
 			console.log('getExternalAccounts tool called');
 
-			const { getAccessToken } = await import('@/lib/auth0/ai');
-			const { getUser } = await import('@/lib/auth0/client');
-			const { createAccounts } = await import('@/lib/db/services/accounts');
-			const { getExternalAccountsByUserId } = await import(
-				'@/lib/db/queries/accounts'
-			);
+			const { getUser } = await import('@/lib/auth0');
 
 			const user = await getUser();
+
+			// Wait to import
+			const { getAccessToken } = await import('@/lib/auth0/ai');
 
 			// 1) Fetch an access token from the Auth0 token vault.
 			const accessToken = await getAccessToken();
 
 			console.log(accessToken);
 
+			// Wait to import
+			const { APIError } = await import('@/lib/errors');
+
 			try {
+				// Wait to import
+				const { getExternalAccountsByUserId } = await import(
+					'@/lib/db/queries/accounts'
+				);
+
 				// 2) Check locally first. Accounts may have already been fetched.
 				let data = await getExternalAccountsByUserId(user.sub);
 
@@ -65,6 +70,9 @@ export const getExternalAccounts = withExternalAccount(
 					}
 
 					const body = (await res.json()) as Accounts.Account[];
+
+					// Wait to import
+					const { createAccounts } = await import('@/lib/api/accounts');
 
 					// Create the accounts to persist locally
 					data = await createAccounts({

@@ -1,5 +1,3 @@
-import { getUser } from '@/lib/auth0/client';
-import { createMFAEnrollment } from '@/lib/auth0/create-mfa-enrollment';
 import { tool } from 'ai';
 import { z } from 'zod';
 
@@ -11,7 +9,11 @@ export const pushEnrollment = tool({
 	execute: async () => {
 		console.log('pushEnrollment tool called!');
 
+		const { getUser } = await import('@/lib/auth0');
+
 		const user = await getUser();
+
+		const { createMFAEnrollment } = await import('@/lib/api/user');
 
 		const data = await createMFAEnrollment(user.sub);
 
