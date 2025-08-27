@@ -50,4 +50,4 @@ yarn-error.log*
 *.secret
 
 # generated code
-lib/generated/**
+lib/db/generated/**
