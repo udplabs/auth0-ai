@@ -1,38 +1,88 @@
-import { z } from 'zod';
+import { toolRegistry } from '@/lib/ai/tool-registry';
+import type {
+	Chat as DBChat,
+	Prisma,
+	Stream,
+	Suggestion,
+} from '@/lib/db/generated/prisma';
 
-import type { UIMessage } from 'ai';
-import type { Geo } from '@vercel/functions';
-import type { ArtifactKind } from '@/components/artifact';
-import type { Suggestion } from '@/lib/db/schema';
-
-const messageMetadataSchema = z.object({
-  createdAt: z.string(),
-});
+import type {
+	UIMessage as AIMessage,
+	InferUITool,
+	ToolUIPart,
+	UIDataTypes,
+} from 'ai';
 
 declare global {
-  type DataPart = { type: 'append-message'; message: string };
-  type MessageMetadata = z.infer<typeof messageMetadataSchema>;
+	namespace Chat {
+		interface UIChat extends DBChat {
+			title?: string;
+			userId?: string;
+			createdAt: string;
+			updatedAt: string;
+			messages?: Chat.UIMessage[];
+			streams?: Chat.UIStream[];
+		}
 
-  type ChatMessage = UIMessage<MessageMetadata, CustomUIDataTypes, ChatTools>;
+		type DataPart = { type: 'append-message'; message: string };
+		type ToolPart = ToolUIPart<Chat.Tools.AvailableTools>;
 
-  interface CustomUIDataTypes {
-    textDelta: string;
-    imageDelta: string;
-    sheetDelta: string;
-    codeDelta: string;
-    suggestion: Suggestion;
-    appendMessage: string;
-    id: string;
-    title: string;
-    kind: ArtifactKind;
-    clear: null;
-    finish: null;
-  }
+		// If you update this, update ./app/(chat)/api/chat/schema.ts
+		interface MessageMetadata {
+			createdAt?: string;
+			updatedAt?: string;
+			isUpVoted?: boolean;
+			isDownVoted?: boolean;
+			chatId: string;
+			userId?: string;
+		}
 
-  interface RequestHints {
-    latitude: Geo['latitude'];
-    longitude: Geo['longitude'];
-    city: Geo['city'];
-    country: Geo['country'];
-  }
+		type UIMessage = AIMessage<
+			Chat.MessageMetadata,
+			CustomUIDataTypes,
+			InferUITools<typeof toolRegistry>
+		>;
+
+		interface CustomUIDataTypes extends UIDataTypes {
+			appendMessage: string;
+			connectionPicker: ExternalConnection[];
+			redirect: string;
+			notification: string;
+			accounts: Accounts.Account[];
+			titleText: string;
+			titleTextStart: '...';
+			titleTextEnd: '';
+		}
+		interface RequestHints {
+			userId?: string;
+			geolocation: UIGeolocation;
+			settings?: UISettings;
+		}
+		interface ListChatsByUserIdResult extends PaginatedResults {
+			chats: Chat.UIChat[];
+		}
+		interface CreateChatInput extends Prisma.ChatCreateInput {
+			createdAt?: string;
+			updatedAt?: string;
+			messages?: Chat.UIMessage[];
+		}
+
+		type ChatWithoutMessages = Prisma.ChatGetPayload<{
+			include: { messages: false };
+		}>;
+		type ChatWithMessages = Prisma.ChatGetPayload<{
+			include: { messages: true };
+		}>;
+		interface GroupedItems<T> {
+			today: T[];
+			yesterday: T[];
+			lastWeek: T[];
+			lastMonth: T[];
+			older: T[];
+		}
+		interface UIStream extends Stream {
+			createdAt?: string;
+			updatedAt?: string;
+		}
+	}
 }

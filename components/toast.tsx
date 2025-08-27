@@ -1,73 +1,92 @@
 'use client';
 
-import React, { useEffect, useRef, useState, type ReactNode } from 'react';
-import { toast as sonnerToast } from 'sonner';
-import { CheckCircleFillIcon, WarningIcon } from './icons';
-import { cn } from '@/lib/utils';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
+	CircleCheckIcon,
+	CircleXIcon,
+	InfoIcon,
+	TriangleAlert as WarningIcon,
+	XIcon,
+} from 'lucide-react';
+import React from 'react';
+import { toast as sonnerToast, ToastT } from 'sonner';
+import { CodeBlock } from './ui/ai-elements/code-block';
+import { Button } from './ui/button';
+import { Loader } from './ui/prompt-kit/loader';
 
-const iconsByType: Record<'success' | 'error', ReactNode> = {
-  success: <CheckCircleFillIcon />,
-  error: <WarningIcon />,
+type ToastTypes = Required<ToastT>['type'];
+
+const iconsByType: Record<ToastTypes, React.ReactNode> = {
+	normal: null,
+	action: null,
+	success: <CircleCheckIcon className='text-green-800' />,
+	info: <InfoIcon className='text-blue-800' />,
+	warning: <WarningIcon className='text-yellow-900' />,
+	error: <CircleXIcon className='text-red-800' />,
+	loading: <Loader />,
+	default: null,
 };
 
-export function toast(props: Omit<ToastProps, 'id'>) {
-  return sonnerToast.custom((id) => (
-    <Toast id={id} type={props.type} description={props.description} />
-  ));
+export function toast(options: ToastOptions) {
+	return sonnerToast.custom((id) => <Toast {...{ id, ...options }} />, options);
 }
 
-function Toast(props: ToastProps) {
-  const { id, type, description } = props;
+export function Toast({
+	action,
+	data,
+	id,
+	description,
+	title,
+	type = 'default',
+	onDismiss,
+}: ToastProps) {
+	return (
+		<Alert className='flex min-w-[364px] flex-col gap-6 md:max-w-[364px]'>
+			<div className='flex w-full items-center justify-between gap-4'>
+				{iconsByType[type] && (
+					<div
+						className={`flex h-5 w-5 items-center justify-center rounded-full`}
+					>
+						{iconsByType[type]}
+					</div>
+				)}
+				<div className='flex flex-2 flex-col'>
+					{title && typeof title === 'string' && (
+						<AlertTitle>{title}</AlertTitle>
+					)}
+					{description && <AlertDescription>{description}</AlertDescription>}
+				</div>
+				<div className='flex flex-1 p-0'>{action}</div>
+				<Button
+					className='bg-primary text-secondary absolute top-[-8px] right-[-8px] !h-5 !w-5 rounded-full p-0 text-xs'
+					onClick={() => {
+						sonnerToast.dismiss(id);
 
-  const descriptionRef = useRef<HTMLDivElement>(null);
-  const [multiLine, setMultiLine] = useState(false);
-
-  useEffect(() => {
-    const el = descriptionRef.current;
-    if (!el) return;
-
-    const update = () => {
-      const lineHeight = Number.parseFloat(getComputedStyle(el).lineHeight);
-      const lines = Math.round(el.scrollHeight / lineHeight);
-      setMultiLine(lines > 1);
-    };
-
-    update(); // initial check
-    const ro = new ResizeObserver(update); // re-check on width changes
-    ro.observe(el);
-
-    return () => ro.disconnect();
-  }, [description]);
-
-  return (
-    <div className="flex w-full toast-mobile:w-[356px] justify-center">
-      <div
-        data-testid="toast"
-        key={id}
-        className={cn(
-          'bg-zinc-100 p-3 rounded-lg w-full toast-mobile:w-fit flex flex-row gap-3',
-          multiLine ? 'items-start' : 'items-center',
-        )}
-      >
-        <div
-          data-type={type}
-          className={cn(
-            'data-[type=error]:text-red-600 data-[type=success]:text-green-600',
-            { 'pt-1': multiLine },
-          )}
-        >
-          {iconsByType[type]}
-        </div>
-        <div ref={descriptionRef} className="text-zinc-950 text-sm">
-          {description}
-        </div>
-      </div>
-    </div>
-  );
+						onDismiss?.();
+					}}
+				>
+					<XIcon />
+				</Button>
+			</div>
+			{data && (
+				<div className='w-full'>
+					<CodeBlock
+						code={data}
+						language='json'
+					/>
+				</div>
+			)}
+		</Alert>
+	);
 }
 
-interface ToastProps {
-  id: string | number;
-  type: 'success' | 'error';
-  description: string;
+interface ToastOptions extends Omit<ToastT, 'id' | 'action' | 'onDismiss'> {
+	action?: React.ReactNode;
+	description?: React.ReactNode;
+	data?: string;
+	onDismiss?: () => void;
+}
+interface ToastProps extends ToastOptions {
+	id?: string | number;
+	type?: ToastTypes;
 }

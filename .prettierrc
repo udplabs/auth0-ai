@@ -1,0 +1,26 @@
+{
+	"trailingComma": "es5",
+	"plugins": [
+		"prettier-plugin-organize-imports",
+		"prettier-plugin-tailwindcss"
+	],
+	"arrowParens": "always",
+	"bracketSameLine": false,
+	"bracketSpacing": true,
+	"embeddedLanguageFormatting": "auto",
+	"endOfLine": "lf",
+	"htmlWhitespaceSensitivity": "css",
+	"insertPragma": false,
+	"jsxSingleQuote": true,
+	"printWidth": 80,
+	"proseWrap": "preserve",
+	"quoteProps": "as-needed",
+	"rangeStart": 0,
+	"requirePragma": false,
+	"semi": true,
+	"singleAttributePerLine": true,
+	"singleQuote": true,
+	"tabWidth": 2,
+	"useTabs": true,
+	"organizeImportsSkipDestructiveCodeActions": true
+}

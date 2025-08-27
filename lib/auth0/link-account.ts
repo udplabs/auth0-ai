@@ -1,14 +1,15 @@
 // lib/auth0/link-account.ts
 'use server';
 
-import { auth0 } from '@/lib/auth0/client';
+import { getSession } from '@/lib/auth0';
+import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function linkAccount(formData: FormData): Promise<void> {
 	const connection = formData.get('connection')?.toString();
 	if (!connection) throw new Error('Missing connection name');
 
-	const session = await auth0.getSession();
+	const session = await getSession();
 	const id_token_hint = session?.tokenSet?.idToken;
 
 	if (!id_token_hint) {
@@ -24,6 +25,8 @@ export async function linkAccount(formData: FormData): Promise<void> {
 		// connection_scope: 'openid email profile',
 		returnTo: '/profile',
 	});
+
+	revalidateTag(`${session?.user?.sub}:user`);
 
 	redirect(`/auth/login?${params.toString()}`);
 }

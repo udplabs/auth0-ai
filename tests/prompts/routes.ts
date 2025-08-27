@@ -1,9 +1,9 @@
-import { generateUUID } from '@/lib/utils';
+import { ulid } from 'ulid';
 
 export const TEST_PROMPTS = {
   SKY: {
     MESSAGE: {
-      id: generateUUID(),
+      id: ulid(),
       createdAt: new Date().toISOString(),
       role: 'user',
       content: 'Why is the sky blue?',
@@ -24,7 +24,7 @@ export const TEST_PROMPTS = {
   },
   GRASS: {
     MESSAGE: {
-      id: generateUUID(),
+      id: ulid(),
       createdAt: new Date().toISOString(),
       role: 'user',
       content: 'Why is grass green?',

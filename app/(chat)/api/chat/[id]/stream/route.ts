@@ -1,112 +1,112 @@
-import { auth0 } from '@/lib/auth0';
+import { getUser } from '@/lib/auth0';
 import {
-  getChatById,
-  getMessagesByChatId,
-  getStreamIdsByChatId,
-} from '@/lib/db/queries';
-import type { Chat } from '@/lib/db/schema';
+	getChatById,
+	getMessagesByChatId,
+	getStreamIdsByChatId,
+} from '@/lib/db/queries/chat';
 import { APIError } from '@/lib/errors';
-
 import { createUIMessageStream, JsonToSseTransformStream } from 'ai';
-import { getStreamContext } from '../../route';
 import { differenceInSeconds } from 'date-fns';
+import { NextResponse } from 'next/server';
+import { getStreamContext } from '../handlers/post';
 
+/**
+ * This route is automatically called by useChat to handle resumable streams.
+ *
+ * It must be here (unless you remove support for resumable streams).
+ */
 export async function GET(
-  _: Request,
-  { params }: { params: Promise<{ id: string }> },
+	_: Request,
+	{ params }: { params: Promise<ApiPathParams> }
 ) {
-  const { id: chatId } = await params;
+	try {
+		const { id: chatId } = await params;
 
-  const streamContext = getStreamContext();
-  const resumeRequestedAt = new Date();
+		const streamContext = getStreamContext();
+		const resumeRequestedAt = new Date();
 
-  if (!streamContext) {
-    return new Response(null, { status: 204 });
-  }
+		if (!streamContext) {
+			return new Response(null, { status: 204 });
+		}
 
-  if (!chatId) {
-    return new APIError('bad_request:api').toResponse();
-  }
+		if (!chatId) {
+			throw new APIError('bad_request:api');
+		}
 
-  const { user } = (await auth0.getSession()) || {};
+		const user = await getUser();
 
-  if (!user) {
-    return new APIError('unauthorized:chat').toResponse();
-  }
+		const chat = await getChatById(chatId, user.sub);
 
-  let chat: Chat;
+		if (!chat) {
+			throw new APIError('not_found:chat');
+		}
 
-  try {
-    chat = await getChatById({ id: chatId });
-  } catch {
-    return new APIError('not_found:chat').toResponse();
-  }
+		const streamIds = await getStreamIdsByChatId(chatId);
 
-  if (!chat) {
-    return new APIError('not_found:chat').toResponse();
-  }
+		if (!streamIds.length) {
+			throw new APIError('not_found:stream');
+		}
 
-  if (chat.visibility === 'private' && chat.userId !== user.sub) {
-    return new APIError('forbidden:chat').toResponse();
-  }
+		const recentStreamId = streamIds.at(-1);
 
-  const streamIds = await getStreamIdsByChatId({ chatId });
+		if (!recentStreamId) {
+			throw new APIError('not_found:stream');
+		}
 
-  if (!streamIds.length) {
-    return new APIError('not_found:stream').toResponse();
-  }
+		const emptyDataStream = createUIMessageStream<Chat.UIMessage>({
+			execute: () => {},
+		});
 
-  const recentStreamId = streamIds.at(-1);
+		const stream = await streamContext.resumableStream(recentStreamId, () =>
+			emptyDataStream.pipeThrough(new JsonToSseTransformStream())
+		);
 
-  if (!recentStreamId) {
-    return new APIError('not_found:stream').toResponse();
-  }
+		/*
+		 * For when the generation is streaming during SSR
+		 * but the resumable stream has concluded at this point.
+		 */
+		if (!stream) {
+			const messages = await getMessagesByChatId(chatId);
+			const mostRecentMessage = messages.at(-1);
 
-  const emptyDataStream = createUIMessageStream<ChatMessage>({
-    execute: () => {},
-  });
+			if (!mostRecentMessage) {
+				return NextResponse.json(emptyDataStream, { status: 200 });
+			}
 
-  const stream = await streamContext.resumableStream(recentStreamId, () =>
-    emptyDataStream.pipeThrough(new JsonToSseTransformStream()),
-  );
+			if (mostRecentMessage.role !== 'assistant') {
+				return NextResponse.json(emptyDataStream, { status: 200 });
+			}
 
-  /*
-   * For when the generation is streaming during SSR
-   * but the resumable stream has concluded at this point.
-   */
-  if (!stream) {
-    const messages = await getMessagesByChatId({ id: chatId });
-    const mostRecentMessage = messages.at(-1);
+			const messageCreatedAt = new Date(
+				mostRecentMessage?.metadata?.createdAt || ''
+			);
 
-    if (!mostRecentMessage) {
-      return new Response(emptyDataStream, { status: 200 });
-    }
+			if (differenceInSeconds(resumeRequestedAt, messageCreatedAt) > 15) {
+				return NextResponse.json(emptyDataStream, { status: 200 });
+			}
 
-    if (mostRecentMessage.role !== 'assistant') {
-      return new Response(emptyDataStream, { status: 200 });
-    }
+			const restoredStream = createUIMessageStream<Chat.UIMessage>({
+				execute: ({ writer }) => {
+					writer.write({
+						type: 'data-appendMessage',
+						data: JSON.stringify(mostRecentMessage),
+						transient: true,
+					});
+				},
+			});
 
-    const messageCreatedAt = new Date(mostRecentMessage.createdAt);
+			return NextResponse.json(
+				restoredStream.pipeThrough(new JsonToSseTransformStream()),
+				{ status: 200 }
+			);
+		}
 
-    if (differenceInSeconds(resumeRequestedAt, messageCreatedAt) > 15) {
-      return new Response(emptyDataStream, { status: 200 });
-    }
+		return NextResponse.json(stream, { status: 200 });
+	} catch (error: unknown) {
+		if (error instanceof APIError) {
+			return error.toResponse();
+		}
 
-    const restoredStream = createUIMessageStream<ChatMessage>({
-      execute: ({ writer }) => {
-        writer.write({
-          type: 'data-appendMessage',
-          data: JSON.stringify(mostRecentMessage),
-          transient: true,
-        });
-      },
-    });
-
-    return new Response(
-      restoredStream.pipeThrough(new JsonToSseTransformStream()),
-      { status: 200 },
-    );
-  }
-
-  return new Response(stream, { status: 200 });
+		return new APIError(error).toResponse();
+	}
 }

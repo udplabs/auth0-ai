@@ -1,6 +1,2 @@
-export * from './client';
-export * from './link-account';
+export { getRefreshToken, getSession, getUser, updateSession } from './client';
 export { default as ManagementClient } from './management-client';
-export * from './unlink-account';
-export * from './get-user';
-export * from './get-authenticators';

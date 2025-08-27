@@ -1,40 +1,53 @@
+import type { UserUpdate } from 'auth0';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 
-import { auth0, getUser } from '@/lib/auth0/';
+import { getUserProfile, updateUser } from '@/lib/api/user';
+import { getSession, getUser, updateSession } from '@/lib/auth0';
 import { APIError } from '@/lib/errors';
 
 // Get user profile
-export async function GET(
-  _: NextRequest,
-  { params }: { params: Promise<ApiParams> },
-) {
-  try {
-    const { cached = false } = await params;
+export async function GET() {
+	try {
+		const user = await getUser();
+		const userId = user.sub;
 
-    const { user } = (await auth0.getSession()) || {};
+		const data = await getUserProfile({ userId });
 
-    if (!user) {
-      throw new APIError('unauthorized:auth').toResponse();
-    }
-    const userId = user.sub;
-    const key = `user:${userId}`;
+		return NextResponse.json(data);
+	} catch (error) {
+		console.log('API error:', error);
+		if (error instanceof APIError) {
+			return error.toResponse();
+		}
+		return new APIError(
+			'server_error:api',
+			error instanceof Error ? error.message : String(error)
+		).toResponse();
+	}
+}
 
-    if (cached) {
-      revalidateTag(key);
-    }
+export async function PATCH(request: NextRequest) {
+	try {
+		const body = (await request.json()) as UserUpdate;
 
-    const data = await getUser({ userId, key });
+		const session = await getSession(true);
 
-    return NextResponse.json({ data });
-  } catch (error) {
-    console.log('API error:', error);
-    if (error instanceof APIError) {
-      return error.toResponse();
-    }
-    return new APIError(
-      'server_error:api',
-      error instanceof Error ? error.message : String(error),
-    ).toResponse();
-  }
+		const data = await updateUser(session.user.sub, body);
+
+		// Force update the user session
+		await updateSession(session);
+
+		// Clear cache (for next request)
+		revalidateTag('profile');
+
+		return NextResponse.json({ data });
+	} catch (error: unknown) {
+		console.log('API error: ', error);
+		if (error instanceof APIError) {
+			return error.toResponse();
+		}
+
+		return new APIError('server_error:api', error).toResponse();
+	}
 }

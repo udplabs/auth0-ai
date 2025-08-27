@@ -1,39 +1,36 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 
-import { auth0 } from '@/lib/auth0';
+export const userInfo = tool<object, Chat.Tools.Response<UserProfile>>({
+	description: 'Get information about the current logged in user.',
+	inputSchema: z.object({}),
+	name: 'userInfo',
+	execute: async () => {
+		try {
+			const { getUser } = await import('@/lib/auth0');
 
-import type { User } from '@auth0/nextjs-auth0/types';
+			const user = await getUser();
 
-export const userInfo = tool({
-  description: 'Get information about the current logged in user.',
-  inputSchema: z.object({}),
-  execute: async () => {
-    try {
-      const session = await auth0.getSession();
-      if (!session) {
-        return 'There is no user logged in.';
-      }
+			// Wait to import until needed
+			const { getUserProfile } = await import('@/lib/api/user');
 
-      const response = await fetch(
-        `https://${process.env.AUTH0_DOMAIN}/userinfo`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.tokenSet.accessToken}`,
-          },
-        },
-      );
+			const data = await getUserProfile({ userId: user.sub });
 
-      if (response.ok) {
-        return (await response.json()) as User;
-      }
-
-      throw new Error('Failed to fetch user info');
-    } catch (error: unknown) {
-      console.log(error);
-      return {
-        error: 'Unable to fetch user info',
-      };
-    }
-  },
+			return {
+				status: 'success',
+				message: 'User info fetched successfully',
+				dataCount: 1,
+				// Type assertion to ensure the response matches the User type
+				data,
+				hasOwnUI: true,
+			};
+		} catch (error: unknown) {
+			console.log(error);
+			return {
+				status: 'error',
+				message: 'Failed to fetch user info',
+				dataCount: 0,
+			};
+		}
+	},
 });

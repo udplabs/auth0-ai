@@ -1,7 +1,8 @@
 // src/lib/auth0/unlink-account.ts
 'use server';
 
-import { auth0 } from '@/lib/auth0/client';
+import { getUser } from '@/lib/auth0';
+import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function unlinkAccount(formData: FormData): Promise<void> {
@@ -10,8 +11,8 @@ export async function unlinkAccount(formData: FormData): Promise<void> {
 
 	if (!provider || !userId) throw new Error('Missing parameters');
 
-	const session = await auth0.getSession();
-	const primaryUserId = session?.user?.sub;
+	const primaryUser = await getUser();
+	const primaryUserId = primaryUser?.sub;
 
 	if (!primaryUserId) throw new Error('Not authenticated');
 
@@ -51,6 +52,8 @@ export async function unlinkAccount(formData: FormData): Promise<void> {
 		console.error('Unlink error:', error);
 		throw new Error('Unlink failed');
 	}
+
+	revalidateTag(`${primaryUserId}:profile`);
 
 	// Optional: redirect or revalidate
 	redirect('/profile'); // or no-op if using client refresh

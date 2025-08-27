@@ -1,51 +1,42 @@
-import { Suspense } from 'react';
 import {
-  Authenticators,
-  DebugCard,
-  LinkedAccounts,
-  UserProfileCard,
-} from '@/components/user-profile';
-import { Header } from '@/components/header';
-import { auth0, getUser } from '@/lib/auth0';
+	Authenticators,
+	DebugCard,
+	LinkedAccounts,
+	UserProfileCard,
+} from '@/components/features/user-profile';
+import { Header } from '@/components/layout/header';
+import { getSession } from '@/lib/auth0';
 
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Profile',
+	title: 'Profile',
 };
 
 export default async function ProfilePage() {
-  const { tokenSet, user } = (await auth0.getSession()) || {};
+	const { tokenSet, user } = (await getSession()) || {};
 
-  if (!user) {
-    return <div>User not found</div>;
-  }
+	if (!user?.sub) {
+		return <div>User not found</div>;
+	}
 
-  return (
-    <div className="flex flex-col min-w-0 h-dvh bg-background">
-      <Header>
-        <span className="font-bold">Profile</span>
-      </Header>
+	return (
+		<div className='bg-background flex h-screen min-w-0 flex-col overflow-hidden'>
+			<Header label='Profile' />
 
-      <div className="flex flex-col min-w-0 h-dvh bg-background mx-auto w-full md:max-w-3xl gap-6 p-4 md:p-6">
-        <Suspense
-          fallback={
-            <UserProfileCard skeleton user={Promise.resolve(undefined)} />
-          }
-        >
-          {/* User profile info */}
-          <UserProfileCard user={getUser({ userId: user?.sub })} />
-        </Suspense>
+			<div className='bg-background mx-auto flex size-full min-w-0 flex-col gap-6 overflow-auto p-4 pb-8 md:max-w-4xl md:p-6'>
+				{/* User profile info */}
+				<UserProfileCard />
 
-        {/* Linked accounts */}
-        <LinkedAccounts />
+				{/* Linked accounts */}
+				<LinkedAccounts />
 
-        {/* Authenticators */}
-        <Authenticators />
+				{/* Authenticators */}
+				<Authenticators />
 
-        {/* Debug / full tokens */}
-        <DebugCard {...{ tokenSet }} />
-      </div>
-    </div>
-  );
+				{/* Debug / full tokens */}
+				<DebugCard {...{ tokenSet }} />
+			</div>
+		</div>
+	);
 }

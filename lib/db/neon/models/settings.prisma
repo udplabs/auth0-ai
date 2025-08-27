@@ -1,0 +1,34 @@
+// Settings is essentially a 'user'
+// We are representing it as settings since Auth0 has user data
+// This is for system/internal 'stuff'. Don't worry about it.
+model RemoteSettings {
+  // auth0 user_id
+  id             String   @id
+  currentLabStep String
+  nextLabStep    String?
+  // Random AI generated notes/information on a user's lab progress
+  labMeta        String?
+  // Any 'memories' or preferences the user specifies.
+  preferences    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  appInstanceId String      @unique
+  appInstance   AppInstance @relation(fields: [appInstanceId], references: [id])
+
+  @@index([appInstanceId])
+}
+
+model AppInstance {
+  id               String  @id @default(uuid())
+  auth0ClientId    String?
+  auth0Domain      String?
+  hashedInstanceId String?
+
+  Chats    RemoteChat[]
+  Settings RemoteSettings?
+
+  @@index([auth0ClientId])
+  @@index([auth0Domain])
+  @@index([hashedInstanceId])
+}
