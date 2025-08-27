@@ -1,15 +1,17 @@
 import { LocalVectorStore } from '@/lib/ai/rag/vector-store';
 import { APIError } from '@/lib/errors';
-import  { type NextRequest, NextResponse } from 'next/server'
 import { getSearchParams } from '@/lib/utils/get-search-params';
+import { type NextRequest, NextResponse } from 'next/server';
 
+// Gives us the ability to force initialize the vector store.
+// This is for development purposes only. Just a helper util.
 export async function GET(request: NextRequest) {
 	try {
 		const { count } = getSearchParams<{ count: string }>(request, ['count']);
 
 		if (count === 'true') {
-			const summary = LocalVectorStore.summary()
-			return NextResponse.json({ count: summary})
+			const summary = LocalVectorStore.summary();
+			return NextResponse.json({ count: summary });
 		}
 
 		await LocalVectorStore.init(true);
@@ -21,10 +23,12 @@ export async function GET(request: NextRequest) {
 			return error.toResponse();
 		}
 
-		return new APIError(error);
+		return new APIError(error).toResponse();
 	}
 }
 
+// Allows us to force delete/clear the vector store.
+// This is for development purposes only.
 export async function DELETE() {
 	try {
 		LocalVectorStore.reset();
@@ -35,6 +39,6 @@ export async function DELETE() {
 			return error.toResponse();
 		}
 
-		return new APIError(error);
+		return new APIError(error).toResponse();
 	}
 }
