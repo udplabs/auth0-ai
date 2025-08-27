@@ -1,9 +1,9 @@
 import type { Document, Prisma } from '@/lib/db/generated/prisma';
 import { convertToUI } from '@/lib/utils/db-converter';
-import { prisma } from '../client';
+import { prisma } from '../prisma/client';
 
 export async function saveEmbeddings(
-	documents: Documents.Document[],
+	documents: Documents.CreateDocumentInput[],
 	embeddings: Documents.Embedding[],
 	table: 'sample' | 'dev' = 'sample'
 ): Promise<Documents.DocumentWithEmbedding[]> {
@@ -49,7 +49,7 @@ export async function saveEmbeddings(
 }
 
 export async function saveDocuments(
-	documents: Documents.DocumentWithEmbedding[]
+	documents: Documents.CreateDocumentInput[]
 ) {
 	console.log('saving documents:', documents.length);
 
@@ -67,22 +67,6 @@ export async function saveDocuments(
 
 	return;
 }
-
-// export function convertDBEmbeddingToUIEmbedding(
-// 	embeddings: Embedding[],
-// ): DB.UIEmbedding[] {
-// 	return embeddings.map(
-// 		({ createdAt, embedding, updatedAt, metadata, ...rest }) => ({
-// 			...rest,
-// 			embedding: embedding as number[],
-// 			metadata: {
-// 				createdAt: createdAt.toISOString(),
-// 				updatedAt: updatedAt.toISOString(),
-// 				...(metadata as DB.DocumentMetadata),
-// 			},
-// 		})
-// 	);
-// }
 
 // THESE ARE INTERNAL FUNCTIONS
 // DO NOT USE THIS IN ANY API ROUTES

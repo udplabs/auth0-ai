@@ -1,0 +1,36 @@
+model Content {
+    id          String   @id @default(ulid())
+    contentText String
+    name        String
+    // Free-form for now.
+    // We should be more opinionated in the future.
+    // e.g. `guide/step => `GUIDE_STEP` `guide/lab` => `GUIDE_LAB` `prompt/step` => `PROMPT_STEP`
+    type        String
+    mimeType    MimeType @default(TEXT_PLAIN)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([type])
+    @@index([name])
+}
+
+enum MimeType {
+    TEXT_MARKDOWN @map("text/markdown")
+    TEXT_PLAIN    @map("text/plain")
+    TEXT_HTML     @map("text/html")
+    TEXT_CSV      @map("text/csv")
+
+    APPLICATION_JSON @map("application/json")
+    APPLICATION_XML  @map("application/xml")
+
+    // Not supporting these at this time.
+    // Use demo platform CDN instead
+    // APPLICATION_PDF   @map("application/pdf")
+
+    // IMAGE_PNG     @map("image/png")
+    // IMAGE_JPEG    @map("image/jpeg")
+    // IMAGE_GIF     @map("image/gif")
+    // IMAGE_WEBP    @map("image/webp")
+    // IMAGE_SVG_XML @map("image/svg+xml")
+}

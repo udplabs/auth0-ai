@@ -1,0 +1,21 @@
+model Message {
+  id          String    @id @default(ulid())
+  chatId      String
+  userId      String?
+  chat        Chat      @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  role        String
+  parts       Json
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  attachments Json?
+  vote        VoteType?
+
+  @@index([chatId])
+  @@index([userId])
+}
+
+enum VoteType {
+  up
+  down
+}

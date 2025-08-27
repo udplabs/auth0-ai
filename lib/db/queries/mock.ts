@@ -1,5 +1,5 @@
 import { convertToUI } from '@/lib/utils/db-converter';
-import { prisma } from '../client';
+import { prisma } from '../prisma/client';
 
 import { Document } from '@/lib/db/generated/prisma';
 
