@@ -4,7 +4,7 @@ import * as AvatarPrimitive from '@radix-ui/react-avatar';
 import * as React from 'react';
 import { Skeleton } from './skeleton';
 
-import { cn } from '@/lib/utils/index';
+import { cn } from '@/lib/utils/utils';
 
 function Avatar({ loading = false, ...props }: AvatarProps) {
 	const className = cn(
@@ -21,7 +21,10 @@ function Avatar({ loading = false, ...props }: AvatarProps) {
 	}
 
 	return (
-		<AvatarPrimitive.Root data-slot='avatar' {...{ ...props, className }} />
+		<AvatarPrimitive.Root
+			data-slot='avatar'
+			{...{ ...props, className }}
+		/>
 	);
 }
 
@@ -40,7 +43,7 @@ function AvatarFallback({ className, ...props }: AvatarFallbackProps) {
 		<AvatarPrimitive.Fallback
 			data-slot='avatar-fallback'
 			className={cn(
-				'bg-muted flex size-full items-center justify-center rounded-full',
+				'bg-background flex size-full items-center justify-center rounded-full',
 				className
 			)}
 			{...props}

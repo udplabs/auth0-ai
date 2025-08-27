@@ -4,7 +4,7 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Check, ChevronRight, Circle } from 'lucide-react';
 import * as React from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/utils';
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -60,7 +60,7 @@ DropdownMenuSubContent.displayName =
 
 const DropdownMenuContent = React.forwardRef<
 	React.ElementRef<typeof DropdownMenuPrimitive.Content>,
-	React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
+	DropdownMenuContentProps
 >(({ className, sideOffset = 4, ...props }, ref) => (
 	<DropdownMenuPrimitive.Portal>
 		<DropdownMenuPrimitive.Content
@@ -213,3 +213,31 @@ export {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 };
+
+export type DropdownMenuProps = DropdownMenuPrimitive.DropdownMenuProps;
+export type DropdownMenuContentProps =
+	DropdownMenuPrimitive.DropdownMenuContentProps;
+export type DropdownMenuCheckboxItemProps =
+	DropdownMenuPrimitive.DropdownMenuCheckboxItemProps;
+export type DropdownMenuGroupProps =
+	DropdownMenuPrimitive.DropdownMenuGroupProps;
+export type DropdownMenuItemProps = DropdownMenuPrimitive.DropdownMenuItemProps;
+export type DropdownMenuItemIndicatorProps =
+	DropdownMenuPrimitive.DropdownMenuItemIndicatorProps;
+export type DropdownMenuLabelProps =
+	DropdownMenuPrimitive.DropdownMenuLabelProps;
+export type DropdownMenuPortalProps =
+	DropdownMenuPrimitive.DropdownMenuPortalProps;
+export type DropdownMenuRadioGroupProps =
+	DropdownMenuPrimitive.DropdownMenuRadioGroupProps;
+export type DropdownMenuRadioItemProps =
+	DropdownMenuPrimitive.DropdownMenuRadioItemProps;
+export type DropdownMenuSeparatorProps =
+	DropdownMenuPrimitive.DropdownMenuSeparatorProps;
+export type DropdownMenuSubProps = DropdownMenuPrimitive.DropdownMenuSubProps;
+export type DropdownMenuSubContentProps =
+	DropdownMenuPrimitive.DropdownMenuSubContentProps;
+export type DropdownMenuSubTriggerProps =
+	DropdownMenuPrimitive.DropdownMenuSubTriggerProps;
+export type DropdownMenuTriggerProps =
+	DropdownMenuPrimitive.DropdownMenuTriggerProps;

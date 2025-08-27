@@ -10,9 +10,9 @@ import {
 } from 'lucide-react';
 import React from 'react';
 import { toast as sonnerToast, ToastT } from 'sonner';
-import { CodeBlock } from './code-block';
+import { CodeBlock } from './ui/ai-elements/code-block';
 import { Button } from './ui/button';
-import { Loader } from './ui/loader';
+import { Loader } from './ui/prompt-kit/loader';
 
 type ToastTypes = Required<ToastT>['type'];
 
@@ -70,7 +70,10 @@ export function Toast({
 			</div>
 			{data && (
 				<div className='w-full'>
-					<CodeBlock>{data}</CodeBlock>
+					<CodeBlock
+						code={data}
+						language='json'
+					/>
 				</div>
 			)}
 		</Alert>

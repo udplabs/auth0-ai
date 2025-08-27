@@ -1,5 +1,7 @@
+'use client';
+
 import { Button, type ButtonProps } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 export interface CountDownButtonProps extends Omit<ButtonProps, 'children'> {

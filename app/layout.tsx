@@ -1,8 +1,8 @@
-import { AppSidebar } from '@/components/app-sidebar/app-sidebar';
 import { FAB } from '@/components/fab';
-import { SWRProvider } from '@/components/providers/swr-provider';
-import { ThemeProvider } from '@/components/providers/theme-provider';
+import { AppSidebar } from '@/components/layout/app-sidebar';
+import { SWRProvider, ThemeProvider } from '@/components/providers';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
@@ -11,9 +11,10 @@ import { cookies } from 'next/headers';
 import './globals.css';
 
 export const metadata: Metadata = {
-	metadataBase: new URL('https://chat.vercel.ai'),
-	title: 'Next.js Chatbot Template',
-	description: 'Next.js chatbot template using the AI SDK.',
+	metadataBase: new URL('https://ai.auth.rocks'),
+	title: 'AIya -- Your Personal Banking Assistant',
+	description:
+		'a developer lab (dev{camp}) designed to help developers build a Personal Banking Assistant -- powered by Auth0, Vercel, and OpenAI.',
 };
 
 export const viewport = {
@@ -77,7 +78,7 @@ export default async function RootLayout({
 					}}
 				/>
 			</head>
-			<body className='antialiased'>
+			<body className='overflow-none overscroll-none antialiased'>
 				<ThemeProvider
 					attribute='class'
 					defaultTheme='system'
@@ -91,8 +92,10 @@ export default async function RootLayout({
 						/>
 						<SidebarProvider defaultOpen={!isCollapsed}>
 							<AppSidebar />
-							<SidebarInset>{children}</SidebarInset>
-							<div className='fixed right-6 bottom-5 z-50'>
+							<SidebarInset className='overflow-none overscroll-none'>
+								{children}
+							</SidebarInset>
+							<div className={cn('fixed right-6 bottom-5 z-50', 'top-1/2')}>
 								<FAB />
 							</div>
 						</SidebarProvider>
