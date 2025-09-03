@@ -1,30 +1,25 @@
-import { devcampContext } from './devcamp-context';
-import { devcampLabGuide } from './devcamp-lab-guide';
-import { devcampUseCases } from './devcamp-use-cases';
-import { financialAnalysisPrompt } from './financial-analysis-prompt';
+import { sortBy } from 'lodash-es';
+// import { financialAnalysisPrompt } from './financial-analysis-prompt';
+import { upsertSettings } from '@/lib/db/queries/settings';
 import { getGeolocationPrompt } from './geolocation-prompt';
-import { rootPrompt } from './root-prompt';
-import { toolGuide } from './tool-guide';
 import { getUserPrompt } from './user-prompt';
 
-import { getStepPrompts } from '@/lib/db/queries/settings';
+import { findAllContent, getStepPrompts } from '@/lib/db/queries/content';
 
 export async function getSystemPrompts({
-	requestHints,
+	requestHints: { settings, ...hints },
 }: {
 	requestHints: Chat.RequestHints;
 }) {
-	const requestPrompt = await getRequestPromptFromHints(requestHints);
+	if (!settings && hints?.userId) {
+		settings = await upsertSettings({ id: hints.userId });
+	}
 
-	const prompts = [
-		rootPrompt,
-		requestPrompt,
-		toolGuide,
-		devcampContext,
-		devcampUseCases,
-		devcampLabGuide,
-		financialAnalysisPrompt,
-	];
+	const prompts = await getPrompts(settings);
+
+	prompts.push(...(await getRequestPromptFromHints(hints)));
+
+	console.log('System Prompts Loaded:', prompts.length);
 
 	return prompts.flat().join('\n\n');
 }
@@ -32,7 +27,6 @@ export async function getSystemPrompts({
 export async function getRequestPromptFromHints({
 	geolocation,
 	userId,
-	settings,
 }: Chat.RequestHints) {
 	const prompts = [];
 
@@ -44,18 +38,35 @@ export async function getRequestPromptFromHints({
 		prompts.push(getGeolocationPrompt(geolocation));
 	}
 
-	if (settings) {
-		const { currentLabStep, nextLabStep } = settings;
-		const labStep =
-			nextLabStep && currentLabStep != nextLabStep
-				? nextLabStep
-				: currentLabStep;
+	return prompts;
+}
 
-		// fetch lab step prompt
-		const content = await getStepPrompts(labStep);
+async function getPrompts(settings?: UISettings) {
+	const content = await findAllContent({ type: 'prompt' });
 
-		prompts.push(...content);
+	const { currentLabStep, nextLabStep } = settings || {};
+
+	const labStep =
+		nextLabStep && currentLabStep != nextLabStep ? nextLabStep : currentLabStep;
+
+	if (labStep) {
+		const stepPrompts = await getStepPrompts(labStep);
+		content.push(...stepPrompts);
 	}
 
+	const orderedPrompts = sortBy(content, ['name']);
+	const prompts = [];
+
+	if (orderedPrompts.length > 0) {
+		for (const prompt of orderedPrompts) {
+			const { textData, name, mimeType } = prompt;
+			if (mimeType.startsWith('TEXT_')) {
+				console.log(`loading prompt: ${name}`);
+				prompts.push(textData);
+			}
+		}
+	}
+
+	console.log('loaded prompts:', prompts);
 	return prompts;
 }
