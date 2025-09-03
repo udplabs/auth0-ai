@@ -38,8 +38,13 @@ Not entirely sure? We'll figure it out!
 
 ---
 
-#### Heads up on context
-*I have a general map of the lab and access to reference code.* However, to keep tokens lean, my system prompt dynamically updates based on your progress — so sometimes I’ll ask you to clarify where you are or what you've done. I have limits!
+> [!NOTE]
+> #### Heads up on context
+> *I have a general map of the lab and access to reference code.*
+>
+> However, to keep tokens lean, my system prompt dynamically updates based on your progress — so sometimes I’ll ask you to clarify where you are or what you've done.
+>
+> I have limits! Work with me. :)
 
 ---
 
@@ -51,37 +56,42 @@ Not entirely sure? We'll figure it out!
 - You may occasionally see an odd item in the chat. That's to help you with debugging and will appear anytime I use a tool to perform a task.
 
   <!-- TODO: UPDATE THIS -->
-  ![Tools Widget Example](http://localhost:3000/assets/images/ui-tool-wdget.png)
+  ![Tools Widget Example](http://localhost:3000/assets/images/ui-tool-widget.png)
    <!-- FUTURE IMAGE LOCATION? -->
    <!-- https://cdn.demo.okta.com/labs/devcamp-agentic/assets/images/ui-tool-widget.png -->
 
-### Important safety rails (*for now*)
-Until you’re authenticated, I’m limited to:
+> [!IMPORTANT]
+>
+> ##### Safety rails (_for now_)
+>
+> - Intro chat & setup guidance
+> - Explaining my role and the next steps
+>
+> Once Auth0 is configured, I’ll prompt you to log in and then we can get going!
 
-- Intro chat & setup guidance
-- Explaining my role and the next steps
-
-Once Auth0 is configured, I’ll prompt you to log in and then we can get going!
 
 ---
 
 ### What's next?
 
-##### ✅ <span style='color: green'>_Step 1: Get Setup_</span>
+- [x] <span style="color: green">_Step 1: Get Setup_</span>
 
-##### ✅ <span style='color: green'>_Step 2: Get Started_</span>
+- [x] <span style="color: green">_Step 2: Get Started_</span>
 
-##### ◻️ <span style=''>_Step 3: Get [Auth0] Configured_</span> _<span style='color: cyan'>📍←You are here</span>_
+- [ ] <span style='font-weight: 900;'>_Step 3: Get [Auth0] Configured_</span> _<span style='color: cyan; font-variant: small-caps'>📍←You are here</span>_
 
-##### 🔒 <span style='font-weight: 900; color: gray'>_Step 4: FGA for RAG_</span>
+- [ ] <span style='color: gray'>_Step 4: FGA for RAG_</span>
 
-##### 🔒 <span style='color: gray'>_Step 5: Async Auth_</span> _<span style='color: orange'>← COMING SOON</span>_
+- [ ] <span style='color: gray'>_Step 5: Async Auth_</span> _<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>_
 
-##### 🔒 <span style='color: gray'>_Step 6: Generative UI_</span> <span style='font-size: 8'>_optional_</span>  _<span style='color: orange'>← COMING SOON</span>_
+- [ ] <span className='' style='color: gray'>_Step 6: Generative UI_</span> <span style='font-size: 8'>[_optional_]</span>  _<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>_
 
 ---
 #### _So... what are you waiting for? Let's get to work!_
 
-Need help? Just let me know and I can walk you through it.
+> [!TIP]
+> Navigate back to the guide for this next step.
+>
+> But, if you need help, Just let me know and I can walk you through it.
 
 🚀 Let’s ship this.
