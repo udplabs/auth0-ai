@@ -1,5 +1,5 @@
 import ManagementClient from '@/lib/auth0/management-client';
-import { getSettings } from '@/lib/db/queries/settings';
+import { upsertSettings } from '@/lib/db/queries/settings';
 import { getCacheKey } from '@/lib/utils';
 import { unstable_cache } from 'next/cache';
 
@@ -8,7 +8,7 @@ async function fetchUserProfile(id: string): Promise<UserProfile> {
 
 	const { data: user } = await auth0Management.users.get({ id });
 
-	const custom_metadata = await getSettings(user.user_id);
+	const custom_metadata = await upsertSettings({ id: user.user_id });
 
 	return { ...user, custom_metadata };
 }
