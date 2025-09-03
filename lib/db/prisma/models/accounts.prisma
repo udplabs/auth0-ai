@@ -56,6 +56,21 @@ model Account {
   @@index([externalConnectionId])
 }
 
+model Transfer {
+  id            String   @id @default(ulid())
+  customerId    String
+  fromAccountId String
+  toAccountId   String
+  description   String
+  memo          String?
+  amount        Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([fromAccountId])
+  @@index([toAccountId])
+}
+
 model SampleAccount {
   id                  String    @id @default(ulid())
   customerId          String // The unique identifier for the customer that owns this account

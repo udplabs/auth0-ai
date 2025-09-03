@@ -1,48 +1,92 @@
+'use server';
+
 import { createHash } from 'crypto';
-import { access, readFile, writeFile } from 'fs/promises';
+import { promises } from 'fs';
 import { revalidateTag } from 'next/cache';
-import { after } from 'next/server';
 import path from 'path';
 import { ulid } from 'ulid';
+import { Prisma as PrismaNeon } from '../generated/neon';
+import { Prisma } from '../generated/prisma';
 import { neon } from '../neon/client';
 import { prisma } from '../prisma/client';
 
-export async function saveSettings(
-	data: UICreateSettingsInput
-): Promise<UISettings | undefined> {
-	const {
-		id,
-		createdAt: _,
-		updatedAt: __,
-		currentLabStep = 'unknown',
-		...updateData
-	} = data;
+const { access, readFile, writeFile } = promises;
 
-	if (!id) {
-		console.log('user has not yet authenticated!');
-		return;
+export async function upsertSettings(
+	data: UICreateSettingsInput
+): Promise<UISettings> {
+	const { id, ...rest } = data;
+
+	// Decide intent:
+	// - isUpsert = at least one provided field besides `id`
+	//   (null counts as a provided value; undefined does not)
+	const isUpsert = Object.values(rest).some((v) => v !== undefined);
+
+	// GET flow
+	// If GET fails, upsert will be called
+	if (!isUpsert) {
+		return await getSettings(id, true);
 	}
+
+	const { createdAt, updatedAt } = rest || {};
+
+	// Build base data object
+	// - coerce ISO strings to Date for createdAt/updatedAt
+	const _data = Object.entries({
+		currentLabStep: 'UNKNOWN',
+		...rest,
+		createdAt:
+			typeof createdAt === 'string'
+				? new Date(createdAt)
+				: (createdAt ?? undefined),
+		updatedAt:
+			typeof updatedAt === 'string'
+				? new Date(updatedAt)
+				: ((rest as any).updatedAt ?? undefined),
+	});
+
+	// Build update payload:
+	// - keep nulls (explicit clears)
+	// - drop undefined (not provided)
+	const update = Object.fromEntries(_data.filter(([, v]) => v !== undefined));
+
+	// Build create payload:
+	// undefined => null
+	const createData = {
+		id,
+		...Object.fromEntries(
+			_data.map(([k, v]) => (v === undefined ? [k, null] : [k, v]))
+		),
+	};
 
 	const result = await prisma.settings.upsert({
 		where: { id },
-		update: { currentLabStep, ...updateData },
-		create: { id, currentLabStep, ...updateData },
+		update,
+		create: createData as Prisma.SettingsCreateInput,
 	});
 
 	const appInstance = await saveAppInstance();
 
-	await neon.remoteSettings.create({
-		data: {
-			...result,
+	// Update remote DB
+	// TODO: make this a throw-away call 🤔
+	await neon.remoteSettings.upsert({
+		where: { id },
+		update: {
+			...update,
+			appInstanceId: appInstance.id,
+		},
+		create: {
+			...createData,
 			appInstance: {
 				connect: { id: appInstance.id },
 			},
-		},
+		} as PrismaNeon.RemoteSettingsCreateInput,
 	});
 
 	// Settings is returned in the user profile
 	// We need to inform the cache there has been a change.
-	// This is a hack.
+	// THIS IS A HACK.
+	// TODO: Implement a useSWR mutation? Something better? 🤔
 	revalidateTag('profile');
 
 	return {
@@ -52,8 +96,12 @@ export async function saveSettings(
 	} as UISettings;
 }
 
-export async function getSettings(
-	id?: string
+// Call upsertSettings
+async function getSettings(id?: string): Promise<UISettings | undefined>;
+async function getSettings(id?: string, upsert?: true): Promise<UISettings>;
+async function getSettings(
+	id?: string,
+	upsert?: boolean
 ): Promise<UISettings | undefined> {
 	if (!id) return;
 
@@ -68,50 +116,16 @@ export async function getSettings(
 		} as UISettings;
 	}
 
-	// NO settings found
-	// Create placeholder
-	return await saveSettings({ id, currentLabStep: 'unknown', ...settings });
-}
-
-export async function getContentByName(
-	name?: string | null
-): Promise<UIContent | undefined> {
-	if (!name) return;
-
-	const content = await neon.content.findFirst({
-		where: {
-			name: {
-				equals: name,
-			},
-		},
-	});
-
-	if (content !== null) {
-		return {
-			...content,
-			createdAt: content?.createdAt.toISOString(),
-			updatedAt: content?.updatedAt.toISOString(),
-		};
+	if (upsert) {
+		// NO settings found, otherwise we would have returned already
+		// Create placeholder
+		return await upsertSettings({
+			id,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		});
 	}
 }
-
-export async function getContentByType(type: string): Promise<UIContent[]> {
-	const content =
-		(await neon.content.findMany({
-			where: {
-				type: {
-					equals: type,
-				},
-			},
-		})) || [];
-
-	return content.map((c) => ({
-		...c,
-		createdAt: c?.createdAt.toISOString(),
-		updatedAt: c?.updatedAt.toISOString(),
-	}));
-}
-
 export async function saveAppInstance() {
 	const filename = '.app-instance.local';
 	const filepath = path.join(process.cwd(), filename);
@@ -142,7 +156,7 @@ export async function saveAppInstance() {
 
 	const appInstanceId = `${id}|${hashedInstanceId}`;
 
-	if (localAppInstance && localAppInstance !== appInstanceId) {
+	if (localAppInstance !== appInstanceId) {
 		console.log('replacing existing localAppInstance...');
 		// replace localAppInstanceId
 		try {
@@ -168,7 +182,7 @@ export async function saveAppInstance() {
 	});
 }
 
-async function fileExistsAtRoot(filepath: string) {
+export async function fileExistsAtRoot(filepath: string) {
 	try {
 		await access(filepath);
 		return true;

@@ -1,6 +1,5 @@
 import { APIError } from '@/lib/errors';
 import { convertToDB, convertToUI } from '@/lib/utils/db-converter';
-import { after } from 'next/server';
 import type { Prisma as PrismaNeon } from '../../generated/neon';
 import type { Message, Prisma } from '../../generated/prisma';
 import { neon } from '../../neon/client';
@@ -47,12 +46,10 @@ export async function updateMessage(
 
 	// Remote write
 	// Internal mechanism to keep Neon in sync with main
-	after(() =>
-		neon.remoteMessage.update({
-			where: { id: message.id },
-			data: dbMessage as PrismaNeon.RemoteMessageUpdateInput,
-		})
-	);
+	await neon.remoteMessage.update({
+		where: { id: message.id },
+		data: dbMessage as PrismaNeon.RemoteMessageUpdateInput,
+	});
 
 	return convertToUI<Message, Chat.UIMessage>(result);
 }
@@ -67,11 +64,9 @@ export async function saveMessages(messages: Chat.UIMessage[]): Promise<void> {
 
 	// Remote write
 	// Internal mechanism to keep Neon in sync with main
-	after(() =>
-		neon.remoteMessage.createMany({
-			data: dbMessages as PrismaNeon.RemoteMessageCreateManyInput,
-		})
-	);
+	await neon.remoteMessage.createMany({
+		data: dbMessages as PrismaNeon.RemoteMessageCreateManyInput,
+	});
 }
 
 export async function deleteMessagesByChatId(chatId: string): Promise<void> {

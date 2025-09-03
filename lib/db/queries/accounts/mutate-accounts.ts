@@ -1,6 +1,6 @@
 import { convertToDB, convertToUI } from '@/lib/utils/db-converter';
 import { uniqBy } from 'lodash-es';
-import { Account, Prisma, Transaction } from '../../generated/prisma';
+import { Account, Prisma, Transaction, Transfer } from '../../generated/prisma';
 import { prisma } from '../../prisma/client';
 
 export async function saveAccounts(
@@ -91,4 +91,39 @@ async function saveAccountsAndTransactions(
 	}
 
 	return { accounts: uiAccounts, transactions: [] };
+}
+
+export async function updateBalances(transfer: Transfer) {
+	const { fromAccountId, toAccountId, amount } = transfer;
+
+	const fromAccount = await prisma.account.findUnique({
+		where: { id: fromAccountId },
+	});
+	const toAccount = await prisma.account.findUnique({
+		where: { id: toAccountId },
+	});
+
+	await prisma.$transaction([
+		prisma.account.update({
+			where: { id: fromAccountId },
+			data: {
+				balance: { decrement: amount },
+				...(fromAccount?.type === 'deposit' && {
+					availableBalance: { decrement: amount },
+				}),
+			},
+		}),
+		prisma.account.update({
+			where: { id: toAccountId },
+			data: {
+				balance: { increment: amount },
+				...(toAccount?.type === 'deposit' && {
+					availableBalance: { increment: amount },
+				}),
+				...(toAccount?.type === 'loan' && {
+					balanceDue: Math.max(0, (toAccount?.balanceDue || 0) - amount),
+				}),
+			},
+		}),
+	]);
 }

@@ -10,7 +10,7 @@ model Transaction {
   description            String
   memo                   String?
   amount                 Float
-  date                   DateTime
+  date                   DateTime        @default(now())
   type                   TransactionType
   categoryId             String?
   categoryName           String

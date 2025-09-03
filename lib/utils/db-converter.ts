@@ -64,7 +64,6 @@ export function convertToDB<UI = any, DB = any>(
 			return result[0] as DB;
 		}
 
-		console.log('result:', result);
 		return result as DB;
 	} catch (error: unknown) {
 		console.log('convertToDB error');

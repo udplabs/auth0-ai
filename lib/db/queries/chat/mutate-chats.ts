@@ -11,7 +11,6 @@ import { getChatById } from './query-chats';
 import { deleteStreams } from './stream';
 
 export async function saveChat(input: Chat.CreateChatInput) {
-	console.log('input:', input);
 	const { messages = [], ...chat } = input;
 
 	const convertedChat = convertToDB<

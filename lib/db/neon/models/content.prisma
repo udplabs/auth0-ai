@@ -1,12 +1,15 @@
-model Content {
-    id          String   @id @default(ulid())
-    contentText String
-    name        String
+// UPDATE ZOD SCHEMA lib/db/zod/content.ts IF YOU UPDATE THIS FILE
+model RemoteContent {
+    id              String      @id @default(ulid())
+    textData        String?
+    applicationData Json?
+    name            String
     // Free-form for now.
     // We should be more opinionated in the future.
     // e.g. `guide/step => `GUIDE_STEP` `guide/lab` => `GUIDE_LAB` `prompt/step` => `PROMPT_STEP`
-    type        String
-    mimeType    MimeType @default(TEXT_PLAIN)
+    type            String
+    contentType     ContentType @default(PROMPT_UNKNOWN)
+    mimeType        MimeType    @default(TEXT_PLAIN)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -15,11 +18,24 @@ model Content {
     @@index([name])
 }
 
+enum ContentType {
+    GUIDE_STEP @map("guide/step")
+    GUIDE_LAB  @map("guide/lab")
+
+    PROMPT_STEP    @map("prompt/step")
+    PROMPT_SYSTEM  @map("prompt/system")
+    PROMPT_LAB     @map("prompt/lab")
+    PROMPT_UNKNOWN @map("prompt/unknown")
+
+    REFERENCE_CODE @map("reference/code")
+}
+
 enum MimeType {
-    TEXT_MARKDOWN @map("text/markdown")
-    TEXT_PLAIN    @map("text/plain")
-    TEXT_HTML     @map("text/html")
-    TEXT_CSV      @map("text/csv")
+    TEXT_MARKDOWN   @map("text/markdown")
+    TEXT_PLAIN      @map("text/plain")
+    TEXT_HTML       @map("text/html")
+    TEXT_CSV        @map("text/csv")
+    TEXT_TYPESCRIPT @map("text/typescript")
 
     APPLICATION_JSON @map("application/json")
     APPLICATION_XML  @map("application/xml")
