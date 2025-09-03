@@ -28,9 +28,11 @@ export const Suggestions = ({
 
 export type SuggestionProps = ComponentProps<typeof Button> & {
 	suggestion: string;
+	label?: string;
 };
 
 export const Suggestion = ({
+	label,
 	suggestion,
 	className,
 	variant = 'outline',
@@ -46,7 +48,7 @@ export const Suggestion = ({
 			variant={variant}
 			{...props}
 		>
-			{children || suggestion}
+			{children || label || suggestion}
 		</Button>
 	);
 };

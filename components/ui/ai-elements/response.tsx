@@ -2,6 +2,9 @@
 
 import { cn } from '@/lib/utils';
 import { type ComponentProps, memo } from 'react';
+import rehypeRaw from 'rehype-raw';
+import { remarkAlert } from 'remark-github-blockquote-alert';
+import 'remark-github-blockquote-alert/alert.css';
 import { Streamdown } from 'streamdown';
 
 export type ResponseProps = ComponentProps<typeof Streamdown>;
@@ -16,6 +19,8 @@ export const Response = memo(
 					className
 				),
 				parseIncompleteMarkdown,
+				remarkPlugins: [remarkAlert],
+				rehypePlugins: [rehypeRaw],
 			}}
 		/>
 	),

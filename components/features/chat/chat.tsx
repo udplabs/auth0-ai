@@ -9,10 +9,11 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Loader } from '@/components/ui/prompt-kit/loader';
 import { useChat } from '@/hooks';
+import { cn } from '@/lib/utils';
 import { ChatMessage } from './chat-message';
+import { ChatThinkingMessage } from './chat-thinking-message';
 import { PromptInput } from './prompt-input';
 import { Greeting } from './ui';
-import { cn} from '@/lib/utils'
 
 export function Chat() {
 	const { messages, status } = useChat<Chat.UIMessage>();
@@ -38,7 +39,7 @@ export function Chat() {
 							return (
 								<Loader
 									variant='pulse-dot'
-									className={cn({'bg-red-500': status === 'error'})}
+									className={cn({ 'bg-red-500': status === 'error' })}
 								/>
 							);
 						})()}
@@ -67,10 +68,18 @@ export function Chat() {
 											isLoading,
 											isThinking,
 											message,
+											showActions: status === 'ready',
 										}}
 									/>
 								);
 							})}
+							{/* This shows a thinking indicator before the 'assistant' message arrives. Otherwise it's awkward. */}
+							<ChatThinkingMessage
+								{...{
+									className: 'm-4',
+									isThinking,
+								}}
+							/>
 						</div>
 					</ConversationContent>
 					<ConversationScrollButton />

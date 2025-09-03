@@ -4,7 +4,7 @@ import { toast } from '@/components/toast';
 import { useAutoResume, useChatHistory, useUserProfile } from '@/hooks';
 import { APIError } from '@/lib/errors';
 import { fetchWithErrorHandlers } from '@/lib/utils';
-import { Chat as AIChat, CreateUIMessage } from '@ai-sdk/react';
+import { Chat as AIChat } from '@ai-sdk/react';
 import {
 	ChatInit,
 	DefaultChatTransport,
@@ -35,6 +35,7 @@ export interface ChatProviderOptions<
 	chatId: string;
 	autoResume?: boolean;
 	isNewChat?: boolean;
+	syncContent?: boolean;
 }
 
 function createChat<UI_MESSAGE extends Chat.UIMessage = Chat.UIMessage>(
@@ -168,9 +169,25 @@ export function ChatProvider<
 	autoResume = true,
 	children,
 	isNewChat,
+	syncContent,
 }: ChatProviderOptions<UI_MESSAGE>) {
 	const { mutate: refreshChatHistory } = useChatHistory();
 	const { data: user, isAuthenticated } = useUserProfile();
+
+	useEffect(() => {
+		if (!syncContent) return;
+
+		const ctrl = new AbortController();
+		console.log('triggering db sync...');
+
+		fetch('/api/me/settings', {
+			method: 'POST',
+			cache: 'no-store',
+			signal: ctrl.signal,
+		});
+
+		console.log('db synced!');
+	}, [syncContent]);
 
 	const isFirstMessage = firstMessage(isAuthenticated);
 	const isFirstLogin = user?.logins_count === 1;
@@ -197,17 +214,17 @@ export function ChatProvider<
 	// 	}
 	// }, [id, isFirstMessage, chat]);
 
-	// useEffect(() => {
-	// 	if (id && isFirstLogin) {
-	// 		// User has authenticated successfully.
-	// 		// Kick off the next step.
-	// 		chat.sendMessage({
-	// 			text: 'Hi AIya! I have successfully authenticated. What\s next?',
-	// 		});
+	useEffect(() => {
+		if (id && isFirstLogin) {
+			// User has authenticated successfully.
+			// Kick off the next step.
+			chat.sendMessage({
+				text: 'Hi AIya! I have successfully authenticated. What\s next?',
+			});
 
-	// 		//TODO: update settings w/ correct step number
-	// 	}
-	// }, [id, isFirstLogin, chat]);
+			//TODO: update settings w/ correct step number
+		}
+	}, [id, isFirstLogin, chat]);
 
 	useAutoResume({
 		autoResume,

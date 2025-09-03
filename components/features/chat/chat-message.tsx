@@ -16,8 +16,8 @@ import {
 	Response,
 	type ResponseProps,
 } from '@/components/ui/ai-elements/response';
-import { Loader } from '@/components/ui/prompt-kit/loader';
 import { isToolUIPart } from 'ai';
+import { memo } from 'react';
 import { ChatMessageActions } from './chat-message-actions';
 import { ChatThinkingMessage } from './chat-thinking-message';
 // Type narrowing is handled by TypeScript's control flow analysis
@@ -25,6 +25,7 @@ import { ChatThinkingMessage } from './chat-thinking-message';
 
 export interface ChatMessageProps extends React.ComponentProps<'div'> {
 	message: Chat.UIMessage;
+	showActions?: boolean;
 	isLastMessage?: boolean;
 	isLoading?: boolean;
 	isThinking?: boolean;
@@ -37,6 +38,7 @@ export interface ChatMessageProps extends React.ComponentProps<'div'> {
 
 export const ChatMessage = ({
 	message,
+	showActions = false,
 	isLastMessage = false,
 	isLoading = false,
 	isThinking = false,
@@ -87,7 +89,7 @@ export const ChatMessage = ({
 					})()}
 				</MessageContent>
 			</Message>
-			<ChatMessageActions {...{ isLastMessage, message }} />
+			{showActions && <ChatMessageActions {...{ isLastMessage, message }} />}
 		</div>
 	);
 };

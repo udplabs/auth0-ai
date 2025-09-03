@@ -61,7 +61,7 @@ export function Header({
 			</div>
 			{!hideSecondaryActions && (
 				<div className='order-5 flex flex-1 items-center justify-end gap-2 md:ml-auto'>
-					{!user && showIcons && (
+					{!user && (
 						<>
 							<Button
 								className='order-1 h-[34px]'
@@ -70,6 +70,10 @@ export function Header({
 							>
 								Sign Up
 							</Button>
+						</>
+					)}
+					{!user && showIcons && (
+						<>
 							<Button
 								className='order-1 h-[34px]'
 								href='/auth/login'
@@ -77,7 +81,7 @@ export function Header({
 								Log In
 							</Button>
 						</>
-					)}{' '}
+					)}
 					<ModeToggle
 						className='order-2'
 						variant='dropdown'
