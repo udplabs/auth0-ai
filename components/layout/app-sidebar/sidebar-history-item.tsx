@@ -20,7 +20,7 @@ const PureSidebarHistoryItem = ({
 		<SidebarMenuItem>
 			<SidebarMenuButton
 				asChild
-				isActive={isActive}
+				{...{ isActive }}
 			>
 				<Link
 					href={`/chat/${chat.id}`}
