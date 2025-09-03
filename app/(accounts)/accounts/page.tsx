@@ -19,7 +19,8 @@ export default function AccountsPage() {
 					<div className='flex items-center justify-between'>
 						<div>
 							<h1 className='text-3xl font-bold tracking-tight'>
-								Welcome, {user?.displayName}
+								Welcome,{' '}
+								<span className='text-bank-primary'>{user?.displayName}</span>
 							</h1>
 							<p className='text-muted-foreground'>
 								Here's an overview of your accounts

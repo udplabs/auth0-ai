@@ -30,6 +30,15 @@ export const TransferModal = ({
 	transferAmount = 0,
 	transferFunds,
 }: TransferModalProps) => {
+	const getBalanceString = (balance?: number) => {
+		if (balance) {
+			return balance.toLocaleString('en-US', {
+				minimumFractionDigits: 2,
+			});
+		}
+		return '**hidden**';
+	};
+
 	return (
 		<Dialog {...{ open, onOpenChange: () => toggleModal() }}>
 			<DialogContent className='sm:max-w-[425px]'>
@@ -45,7 +54,11 @@ export const TransferModal = ({
 						<Label htmlFor='from-account'>From Account</Label>
 						<Select
 							value={fromAccountId}
-							onValueChange={(from) => selectAccount({ from })}
+							onValueChange={(fromAccountId) =>
+								selectAccount({
+									fromAccount: accounts.find((a) => a.id === fromAccountId),
+								})
+							}
 						>
 							<SelectTrigger id='from-account'>
 								<SelectValue placeholder='Select account' />
@@ -55,12 +68,9 @@ export const TransferModal = ({
 									<SelectItem
 										key={account.id}
 										value={account.id}
+										disabled={!account?.permissions?.includes('can_transfer')}
 									>
-										{account.name} ($
-										{account.balance.toLocaleString('en-US', {
-											minimumFractionDigits: 2,
-										})}
-										)
+										{account.name} {getBalanceString(account?.balance)}
 									</SelectItem>
 								))}
 							</SelectContent>
@@ -70,7 +80,11 @@ export const TransferModal = ({
 						<Label htmlFor='to-account'>To Account</Label>
 						<Select
 							value={toAccountId}
-							onValueChange={(to) => selectAccount({ to })}
+							onValueChange={(toAccountId) =>
+								selectAccount({
+									toAccount: accounts.find((a) => a.id === toAccountId),
+								})
+							}
 						>
 							<SelectTrigger id='to-account'>
 								<SelectValue placeholder='Select account' />
@@ -82,12 +96,9 @@ export const TransferModal = ({
 										<SelectItem
 											key={account.id}
 											value={account.id}
+											disabled={!account?.permissions?.includes('can_transfer')}
 										>
-											{account.name} ($
-											{account.balance.toLocaleString('en-US', {
-												minimumFractionDigits: 2,
-											})}
-											)
+											{account.name} {getBalanceString(account?.balance)}
 										</SelectItem>
 									))}
 							</SelectContent>

@@ -251,6 +251,7 @@ export const AccountRootSchema = z.object({
 	balance: z
 		.number()
 		.default(0)
+		.optional()
 		.describe(
 			'The current balance of the account. For loan accounts, this represents the current outstanding balance.'
 		),
@@ -331,6 +332,19 @@ export const AccountRootSchema = z.object({
 		.array(TransactionSchema)
 		.optional()
 		.describe('List of transactions associated with this account.'),
+	permissions: z
+		.array(
+			z.enum([
+				'can_view',
+				'can_view_balances',
+				'can_view_transactions',
+				'can_transfer',
+			])
+		)
+		.optional()
+		.describe('The permissions the user has for this account.'),
+	createdAt: z.string(),
+	updatedAt: z.string(),
 });
 
 export const LoanSubTypeSchema = z.enum([
@@ -349,6 +363,7 @@ export const LoanAccountSchema = AccountRootSchema.extend({
 	 */
 	balanceDue: z
 		.number()
+		.optional()
 		.describe('The calculated payment/balance due on the loan.'),
 
 	/**
@@ -356,6 +371,7 @@ export const LoanAccountSchema = AccountRootSchema.extend({
 	 */
 	currentPrincipal: z
 		.number()
+		.optional()
 		.describe('The current principal balance of the loan.'),
 	dueDate: z
 		.string()
@@ -392,6 +408,7 @@ export const LoanAccountSchema = AccountRootSchema.extend({
 	 */
 	originalPrincipal: z
 		.number()
+		.optional()
 		.describe('The original opening balance of the loan.'),
 
 	/**
@@ -443,6 +460,7 @@ export const CreditAccountSchema = LoanAccountSchema.omit({
 	 */
 	statementBalance: z
 		.number()
+		.optional()
 		.describe('The amount due for the current billing cycle.'),
 });
 
@@ -457,7 +475,7 @@ export const DepositAccountSchema = AccountRootSchema.extend({
 	 */
 	availableBalance: z
 		.number()
-		.default(0)
+		.optional()
 		.describe('The available balance of the account.'),
 
 	dividendRate: z.number(),
@@ -535,4 +553,50 @@ export const SettingsSchema = z.object({
 	firstMessage: z.boolean().optional().default(true),
 	createdAt: z.string(),
 	updatedAt: z.string(),
+});
+
+export const ContentSchema = z.object({
+	id: z.string(),
+	textData: z
+		.string()
+		.optional()
+		.describe('The text of the given content if the mimeType is of text/*'),
+	applicationData: z
+		.json()
+		.optional()
+		.describe('Any additional application specific data.'),
+	name: z
+		.string()
+		.describe(
+			'A name/code for the content. Not intended to be human readable.'
+		),
+	contentType: z
+		.enum([
+			'guide/step',
+			'guide/lab',
+			'prompt/step',
+			'prompt/system',
+			'prompt/lab',
+			'prompt/unknown',
+			'reference/code',
+		])
+		.describe(
+			'The type and subtype of content. Similar to mimetype but more specific to the application domain.'
+		),
+	type: z
+		.string()
+		.describe('The primary type of content (e.g. `guide`, `prompt`).'),
+	mimeType: z
+		.enum([
+			'text/markdown',
+			'text/plain',
+			'text/html',
+			'text/typescript',
+			'text/csv',
+			'application/json',
+			'application/xml',
+		])
+		.describe('The mime type of the content data (e.g. text/markdown).'),
+	createdAt: z.string(),
+	updatedAt: z.string().optional(),
 });

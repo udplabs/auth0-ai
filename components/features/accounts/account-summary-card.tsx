@@ -36,12 +36,22 @@ const PureAccountSummaryCard = ({
 	...props
 }: AccountSummaryCardProps) => {
 	const { toggleModal } = useTransferModal();
-	const { balance, currencyCode, displayName, id, name, number, subType } =
-		account;
+	const {
+		balance,
+		currencyCode,
+		displayName,
+		id,
+		name,
+		number,
+		subType,
+		permissions = [],
+	} = account;
 
 	const availableBalance = (account as Accounts.Account<'deposit'>)
 		?.availableBalance;
 	const creditLimit = (account as Accounts.Account<'credit'>)?.creditLimit;
+
+	const canTransfer = permissions.some((p) => p.startsWith('can_transfer'));
 
 	return (
 		<Card
@@ -108,7 +118,8 @@ const PureAccountSummaryCard = ({
 				<Button
 					variant='outline'
 					size='sm'
-					onClick={() => toggleModal({ from: id })}
+					disabled={!canTransfer}
+					onClick={() => toggleModal({ fromAccountId: id })}
 				>
 					Transfer
 				</Button>

@@ -2,7 +2,7 @@
 
 import { useAccounts } from '@/hooks';
 import { merge } from 'lodash-es';
-import { createContext, use, useCallback, useMemo, useReducer } from 'react';
+import { createContext, useCallback, useMemo, useReducer } from 'react';
 import { toast } from 'sonner';
 import { TransferModal } from './transfer-modal';
 
@@ -28,17 +28,14 @@ const TransferReducer: React.Reducer<
 > = (state, { type, ...newState }) => {
 	switch (type) {
 		case 'CLOSE':
-			return merge(
-				{ ...state },
-				{
-					open: false,
-					transferAmount: 0,
-					fromAccountId: undefined,
-					toAccountId: undefined,
-				},
-				{ ...newState }
-			);
-
+			return {
+				...state,
+				open: false,
+				transferAmount: 0,
+				fromAccountId: undefined,
+				toAccountId: undefined,
+				...newState,
+			};
 		case 'OPEN':
 			return merge(
 				{ ...state },
@@ -63,7 +60,7 @@ const TransferReducer: React.Reducer<
 export type TransferProviderOptions = React.PropsWithChildren;
 
 export const TransferProvider = ({ children }: TransferProviderOptions) => {
-	const { data: accounts = [] } = useAccounts();
+	const { data: accounts = [], mutate } = useAccounts();
 
 	const [state, dispatch] = useReducer<
 		React.Reducer<Transfers.TransferContext, Transfers.TransferAction>
@@ -72,8 +69,8 @@ export const TransferProvider = ({ children }: TransferProviderOptions) => {
 	const toggleModal: Transfers.TransferContext['toggleModal'] = useCallback(
 		(options) => {
 			const {
-				from: fromAccountId,
-				to: toAccountId,
+				fromAccountId,
+				toAccountId,
 				amount: transferAmount = 0,
 				open = true,
 			} = options || {};
@@ -90,12 +87,12 @@ export const TransferProvider = ({ children }: TransferProviderOptions) => {
 
 	const selectAccount: Transfers.TransferContext['selectAccount'] = useCallback(
 		(options) => {
-			const { from: fromAccountId, to: toAccountId } = options || {};
+			const { fromAccount, toAccount } = options || {};
 
 			return dispatch({
 				type: 'UPDATE',
-				fromAccountId,
-				toAccountId,
+				fromAccountId: fromAccount?.id,
+				toAccountId: toAccount?.id,
 			} as Transfers.TransferAction);
 		},
 		[]
@@ -116,22 +113,48 @@ export const TransferProvider = ({ children }: TransferProviderOptions) => {
 	const transferFunds: Transfers.TransferContext['transferFunds'] = useCallback(
 		(options) => {
 			const {
+				fromAccountId = state?.fromAccountId,
+				fromAccountNumber = state?.fromAccountNumber ||
+					getFriendlyAccountNumber(state?.fromAccountId || ''),
+				toAccountId = state?.toAccountId,
+				toAccountNumber = state?.toAccountNumber ||
+					getFriendlyAccountNumber(state?.toAccountId || ''),
 				amount = state?.transferAmount,
-				from = getFriendlyAccountNumber(state?.fromAccountId),
-				to = getFriendlyAccountNumber(state?.toAccountId),
+				memo = state?.memo,
 			} = options || {};
 
-			// In a real app, this would call a server action or API
-			toast.success(`Transfer from ${from} to ${to} for $${amount} completed.`);
+			toast.promise(
+				async () => {
+					await fetch('/api/accounts/transfers', {
+						method: 'POST',
+						body: JSON.stringify({
+							fromAccountId,
+							fromAccountNumber,
+							toAccountId,
+							toAccountNumber,
+							amount,
+							memo,
+						}),
+					});
+				},
+				{
+					loading: 'Moving da money...',
+					success: () => {
+						mutate();
+						return 'Transfer completed!';
+					},
+					error: () => 'Whoops! Something went wrong.',
+				}
+			);
 
 			dispatch({ type: 'CLOSE' } as Transfers.TransferAction);
 		},
-		[state]
+		[state, toast]
 	);
 
-	const getFriendlyAccountNumber = (accountId?: string) => {
-		return accounts.find((a) => a.id === accountId)?.number;
-	};
+	function getFriendlyAccountNumber(accountId: string) {
+		return accounts.find((a) => a.id === accountId)?.number || '';
+	}
 
 	const context = useMemo(
 		() => ({ ...state, onChange, selectAccount, toggleModal, transferFunds }),

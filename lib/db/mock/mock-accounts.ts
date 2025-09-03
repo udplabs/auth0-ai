@@ -81,9 +81,7 @@ export async function createMockAccounts(userId: string) {
 		await saveAccountsAndReturnSeparate(accounts, transactions);
 
 	// Dynamically load to prevent initialization before env is ready.
-	const { createOwnerPermissions } = await import(
-		'@/lib/auth0/fga/permissions'
-	);
+	const { createOwnerPermissions } = await import('@/lib/auth0/fga/utils');
 	// Set permissions for the created accounts
 	await createOwnerPermissions(
 		userId,

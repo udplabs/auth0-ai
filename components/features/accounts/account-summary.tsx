@@ -18,7 +18,12 @@ export const AccountSummary = ({ ...props }: AccountSummaryProps) => {
 			}}
 		>
 			{isLoading ? (
-				<Loader className='size-32' />
+				<div className='flex flex-col items-center'>
+					<Loader className='m-12 size-24' />
+					<span className='text-muted-foreground dark:text-foreground italic'>
+						Gathering your accounts...
+					</span>
+				</div>
 			) : (
 				<TransferProvider>
 					<AccountSummarySubHeader />
