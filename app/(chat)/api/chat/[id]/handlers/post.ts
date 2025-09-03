@@ -1,7 +1,7 @@
 import { getSystemPrompts } from '@/lib/ai/prompts/system-prompt';
 import { toolRegistry } from '@/lib/ai/tool-registry';
 import { createStreamId, saveMessages } from '@/lib/db/queries/chat';
-import { chunk, withStaticContent, withStreamingJitter } from '@/lib/utils';
+import { withStaticContent } from '@/lib/utils';
 import { openai } from '@ai-sdk/openai';
 import { setAIContext } from '@auth0/ai-vercel';
 import { geolocation } from '@vercel/functions';
@@ -20,8 +20,6 @@ import {
 	type ToolSet,
 	type UIMessageStreamWriter,
 } from 'ai';
-import { readFile } from 'fs/promises';
-import path from 'path';
 import { ulid } from 'ulid';
 
 import { APIError } from '@/lib/errors';
@@ -33,7 +31,7 @@ import {
 import { ZodError } from 'zod';
 import {
 	UIMessageMetadataSchema,
-	hasOwnUI,
+	// hasOwnUI,
 	parseIncomingChatRequest,
 } from './_helpers';
 
@@ -76,39 +74,69 @@ export async function POST(
 
 		const modelMessages = convertToModelMessages(uiMessages);
 
+		const systemPrompts = await getSystemPrompts({
+			requestHints: {
+				geolocation: geolocation(request),
+				userId,
+			},
+		});
+
 		const stream = createUIMessageStream<UseChatToolsMessage>({
 			// Custom wrapper to handle lab content
 			execute: withStaticContent(
-				(settings) =>
-					async ({ writer: dataStream }) => {
-						const result = streamText({
-							model: openai('gpt-5-nano'),
-							system: await getSystemPrompts({
-								requestHints: {
-									geolocation: geolocation(request),
-									userId,
-									settings,
-								},
-							}),
-							messages: modelMessages,
-							stopWhen: [hasOwnUI(), stepCountIs(5)],
-							experimental_transform: [
-								uiEphemeralTransform(dataStream),
-								smoothStream(),
-							],
-							tools: toolRegistry,
-						});
-						result.consumeStream();
+				({ writer: dataStream }) => {
+					const result = streamText({
+						model: openai('gpt-5-nano'),
+						system: systemPrompts,
+						messages: modelMessages,
+						// stopWhen: [hasOwnUI(), stepCountIs(5)],
+						stopWhen: (ctx) => {
+							const { steps } = ctx;
+							console.log('=== stopWhen ===');
+							console.log(steps);
 
-						dataStream.merge(
-							result.toUIMessageStream({
-								sendReasoning: false,
-								originalMessages: uiMessages,
-								sendFinish: false,
-								sendStart: false,
-							})
-						);
-					},
+							const lastMessage = steps.at(-1);
+
+							console.log(
+								'lastMessage:',
+								JSON.stringify(lastMessage?.content, null, 2)
+							);
+
+							let hasOwnUI = false;
+
+							if (lastMessage) {
+								// v5 aggregates results; support both properties for backward compatibility
+								const results =
+									lastMessage?.toolResults ??
+									lastMessage?.dynamicToolResults ??
+									[];
+								const lastResult = results.at(-1);
+								console.log('lastResult:', lastResult);
+
+								hasOwnUI = (lastResult?.output as any)?.hasOwnUI;
+								console.log('hasOwnUI:', hasOwnUI, hasOwnUI ? 'Stopping!' : '');
+							}
+
+							return hasOwnUI || stepCountIs(5)(ctx);
+						},
+						experimental_transform: [
+							// uiEphemeralTransform(dataStream),
+							smoothStream(),
+						],
+						tools: toolRegistry,
+					});
+
+					result.consumeStream();
+
+					dataStream.merge(
+						result.toUIMessageStream({
+							sendReasoning: false,
+							originalMessages: uiMessages,
+							// sendFinish: false,
+							// sendStart: false,
+						})
+					);
+				},
 				{ messages: uiMessages, userId }
 			),
 			generateId: ulid,
@@ -118,12 +146,26 @@ export async function POST(
 				console.log(messages);
 
 				if (messages.length > 0) {
-					await saveMessages(
-						messages.map((m) => ({
+					// Strip out excessive data (i.e. transactions/accounts)
+					const sanitized = messages.map((m) => {
+						return {
 							...m,
 							metadata: { ...m?.metadata, userId, chatId: chat.id },
-						}))
-					);
+							parts: m.parts.map((p) => {
+								if (p.type === 'tool-getTransactions' && p.output?.data) {
+									const { data: _, ...output } = p.output || {};
+
+									return {
+										...p,
+										output: { ...output },
+									};
+								}
+
+								return p;
+							}),
+						} as Chat.UIMessage;
+					});
+					await saveMessages(sanitized);
 				}
 			},
 			//TODO make this better
@@ -209,6 +251,7 @@ function uiEphemeralTransform<TOOLS extends ToolSet>(
 			TextStreamPart<typeof toolRegistry>
 		>({
 			transform(chunk, controller) {
+				console.log(chunk);
 				if (
 					chunk?.type === 'tool-result' &&
 					['getAccounts', 'getTransactions'].includes(chunk.toolName)
@@ -230,23 +273,4 @@ function uiEphemeralTransform<TOOLS extends ToolSet>(
 				}
 			},
 		});
-}
-
-function isFirstMessage(messages: UIMessage[]) {
-	if (messages.length === 0) return false;
-
-	const lastMessage =
-		messages.length === 1 ? messages[0] : messages[messages.length - 1];
-	const { parts = [] } = lastMessage;
-	const lastPart =
-		parts.length > 1
-			? parts[parts.length - 1]
-			: parts.length === 1
-				? parts[0]
-				: undefined;
-
-	return (
-		lastPart?.type === 'text' &&
-		lastPart?.text?.toUpperCase().includes('SUCCESSFULLY AUTHENTICATED')
-	);
 }

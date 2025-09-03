@@ -1,10 +1,7 @@
-import {
-	getContentByName,
-	getSettings,
-	saveSettings,
-} from '@/lib/db/queries/settings';
+import { upsertSettings } from '@/lib/db/queries/settings';
 import type { UIMessage, UIMessageStreamWriter } from 'ai';
 import { ulid } from 'ulid';
+import { findFirstContent } from '../db/queries/content';
 import { chunk } from './chunking';
 import { getLastPart } from './get-last-part';
 import { withStreamingJitter } from './with-streaming-jitter';
@@ -25,13 +22,13 @@ export interface WithStaticContentOptions<
 export function withStaticContent<
 	UI_MESSAGE extends UIMessage = Chat.UIMessage,
 >(
-	fn: ((settings?: UISettings) => (options: {
-		writer: UIMessageStreamWriter<UI_MESSAGE>;
-	}) => Promise<void> | void,
+	fn: (options: { writer: UIMessageStreamWriter }) => Promise<void> | void,
 	{ userId, messages, ...config }: WithStaticContentOptions<UI_MESSAGE>
 ) {
 	return async (options: { writer: UIMessageStreamWriter<UI_MESSAGE> }) => {
-		const settings = config?.userSettings || (await getSettings(userId));
+		const settings =
+			config?.userSettings ||
+			(userId ? await upsertSettings({ id: userId }) : undefined);
 
 		let onFinish: () => Promise<void> | void = () => {};
 
@@ -45,43 +42,47 @@ export function withStaticContent<
 		const content: string[] = [];
 		let contentId: string | null = null;
 
-		// 1) Check if this is the first message; return step-01-intro.md
-		if (
-			lastPart?.type === 'text' &&
-			lastPart?.text?.toUpperCase().includes('MY FIRST MESSAGE')
-		) {
-			console.log('returning intro...');
-			contentId = 'step-02_intro';
+		if (lastPart?.type === 'text') {
+			if (lastPart.text.toUpperCase().includes('MY FIRST MESSAGE')) {
+				console.log('returning intro...');
+				contentId = 'step-02_intro';
+				onFinish = async () => {
+					// If user is somehow authenticated...
+					// They shouldn't be but ¯\_(ツ)_/¯
+					if (userId) {
+						await upsertSettings({
+							...settings,
+							id: userId,
+							currentLabStep: 'step-02',
+							nextLabStep: 'step-03',
+						});
+					}
+				};
+			} else if (
+				lastPart.text.toUpperCase().includes('SUCCESSFULLY AUTHENTICATED') &&
+				userId
+			) {
+				console.log('returning post auth...');
+				contentId = 'step-03_post-auth';
 
-			onFinish = async () => {
-				await saveSettings({
-					...settings,
-					currentLabStep: 'step-02',
-					nextLabStep: 'step-03',
-				});
-			};
-
-			/* 2) Check if this is post first auth; return step-02-post-auth.md */
-		} else if (
-			lastPart?.type === 'text' &&
-			lastPart?.text?.toUpperCase().includes('SUCCESSFULLY AUTHENTICATED')
-		) {
-			console.log('returning post auth...');
-			contentId = 'step-03_post-auth';
-
-			onFinish = async () => {
-				await saveSettings({
-					...settings,
-					currentLabStep: 'step-03',
-					nextLabStep: 'step-04',
-				});
-			};
+				onFinish = async () => {
+					await upsertSettings({
+						id: userId,
+						...settings,
+						currentLabStep: 'step-03',
+						nextLabStep: 'step-04',
+					});
+				};
+			}
 		}
+
 		const { writer: dataStream } = options;
 
-		const { contentText } = (await getContentByName(contentId)) || {};
+		const { textData } = contentId
+			? (await findFirstContent({ name: contentId })) || {}
+			: {};
 
-		if (contentText) {
+		if (textData) {
 			// We have custom content!
 			// Stream baby! Stream!
 
@@ -90,7 +91,7 @@ export function withStaticContent<
 
 			jitterStream.write({ type: 'text-start', id });
 
-			const chunks = chunk(contentText, 'paragraphs');
+			const chunks = chunk(textData, 'paragraphs');
 
 			for (const delta of chunks) {
 				jitterStream.write({
@@ -108,10 +109,10 @@ export function withStaticContent<
 				console.log('calling withStaticContent onFinish...');
 				await onFinish();
 			}
+			// Return otherwise the model will ruin the experience.
+			return;
 		}
-		// Always return
-		// Unless otherwise 🤪...
-		// No, really, always return
-		return fn(settings)(options);
+
+		await fn(options);
 	};
 }
