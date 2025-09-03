@@ -28,7 +28,8 @@
 		"**/*.ts",
 		"**/*.tsx",
 		".next/types/**/*.ts",
-		"next.config.js"
+		"next.config.js",
+		"lib/ai/tools/.add-external-account.ts"
 	],
 	"exclude": ["node_modules"]
 }

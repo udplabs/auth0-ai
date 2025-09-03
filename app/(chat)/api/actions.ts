@@ -15,8 +15,6 @@ const model = openai('gpt-5-nano');
 export async function generateTitleFromUserMessage(
 	message: UIMessage | string
 ) {
-	console.log('generating title...');
-
 	let messageText = 'Unknown';
 
 	if (typeof message !== 'string') {
@@ -39,7 +37,6 @@ export async function generateTitleFromUserMessage(
 		prompt: messageText,
 	});
 
-	console.log('title:', title);
 	return title;
 }
 

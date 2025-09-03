@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { ulid } from 'ulid';
 
 import { Chat, ChatProvider } from '@/components/features/chat';
@@ -55,10 +55,14 @@ export default async function Page({
 		}
 	}
 
+	const cookieStore = await cookies();
+	const syncContent = !cookieStore.has('db:sync');
+
 	return (
 		<ChatProvider
 			{...{
 				chatId: id,
+				syncContent,
 				chatOptions: {
 					...(initialMessages.length > 0 ? { messages: initialMessages } : {}),
 				},
