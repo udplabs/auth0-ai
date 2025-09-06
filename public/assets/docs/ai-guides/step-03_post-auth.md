@@ -37,11 +37,15 @@ I’m **AIya**, in case you forgot 🤭, and I just "detected" a successful logi
 
 - [x] <span style='color: green; font-weight: 600'>_Step 3: Get [Auth0] Configured_</span>
 
-- [ ] <span style='font-weight: 900'>_Step 4: FGA for RAG_</span> _<span style='color: cyan; font-variant: small-caps'>📍←You are here</span>_
+- [ ] <span style='font-weight: 900'>_Step 4: Configure FGA_</span> _<span style='color: cyan; font-variant: small-caps'>📍←You are here</span>_
 
-- [ ] <span style='color: gray'>_Step 5: Async Auth_</span> _<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>_
+- [ ] <span style='color: gray'>_Step 5: Setup FGA for RAG_</span>
 
-- [ ] <span style='color: gray'>_Step 6: Generative UI_</span> <span style='font-size: 8'>_optional_</span>  _<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>_
+- [ ] <span style='color: gray'>_Step 6: Async Auth_</span> _<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>_
+
+- [ ] <span style='color: gray'>_Step 7: Call External APIs_</span>  _<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>_
+
+- [ ] <span style='color: gray'>_Step 8: Generative UI_</span> <span style='font-size: 8'>_optional_</span>  _<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>_
 
 ---
 

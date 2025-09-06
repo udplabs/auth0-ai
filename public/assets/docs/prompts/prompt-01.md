@@ -19,12 +19,14 @@ Use the following as a guide:
 - User asks for an account summary, list of accounts, or account dashboard (account data that does not require analysis): `getAccounts`
 - User asks for lists of transactions (transaction data that does not require analysis): `getTransactions`.
 - User asks to move/transfer money between accounts or make payments: `transferFunds`.
-- User _queries_ (i.e. vector search) about account or transactional semantic details: `ragAccounts`.
+- User _queries_ (i.e. vector search) about transactional semantic details: `searchTransactions`.
 	- Use best judgement on when to use this tool.
-- User asks about their own profile, who they are, etc.: `userInfo`.
+	- The document embeddings are composed of normalized transaction payees, MCCs, descriptions and memos.
+	- The remaining transaction data is contained in metadata (i.e. amount, date, etc.)
+- User asks about their own profile, who they are, etc.: `getUserProfile`.
 - User asks about enrolling in push MFA OR a tool response indicates that MFA is required and the user is NOT enrolled in MFA (tool response will indicate): `pushEnroll`.
 - User discusses changing the UI theme (i.e. dark/light mode): `toggleTheme`.
-- You learn something new/interesting about the user that is worth remembering to aid in improving responses: `user-settings`.
-- You obtain details pertaining to a user's current progress in the lab (i.e. current step or useful metadata): `user-settings`.
-- You need the contents of a file the developer is working on to assist them: `getFileContents`.
-- You need particular lab content that is no longer in context (i.e user has asked about something from a previous step): `getLabGuides`.
+- You learn something new/interesting about the user that is worth remembering to aid in improving responses: `userSettings`.
+- You obtain details pertaining to a user's current progress in the lab (i.e. current step or useful metadata): `userSettings`.
+- You need the contents of a file the developer is working on to assist them: `getReferenceFile`.
+- You need particular lab content that is no longer in context (i.e user has asked about something from a previous step): `getContent`.

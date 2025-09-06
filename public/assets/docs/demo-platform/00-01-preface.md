@@ -24,3 +24,8 @@ You’ll build a **Bank Zero** demo app (Next.js / App Router) that showcases **
 
   > [!Caution]
   > Advises about risks or negative outcomes of certain actions.
+
+- As you work through lab steps you will be asked to write code. In some instances there will be _pseudo-code_ to guide you. In others, the code may already be partially implemented.
+  - This lab does not take a typical copy/pasta learning approach.
+  - You are encouraged to attempt to write the code *on your own* so you can *learn*.
+  - If you are struggling, just ask AIya for some hints/help. Be sure to specify the exact file you are working in. (i.e. `lib/auth0/fga/get-account-permissions.ts`)

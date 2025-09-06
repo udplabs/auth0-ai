@@ -18,7 +18,7 @@ You’re a developer at *Bank Zero*. Your task: wire an AI assistant into your b
 >
 > - *Never* paste secrets or production data into the chat prompt.
 >
-> - By continuing you agree to the sharing of any/all content/information generated with or by the LLM (_**including the content of chat messages**_) within the learning application.
+> - By continuing you agree to the sharing of any/all content/information generated with or by the LLM (***including the content of chat messages***) within the learning application.
 >
 
 ## Objective
@@ -28,7 +28,7 @@ By the end, you will:
 - Run a Next.js banking starter app integrated with **Auth0 Auth for AI**.
 - Stand up an **Auth0 FGA Store**, load a model, and author tuples.
 - Implement a **RAG retriever** that filters results using FGA (policy‑aware retrieval).
-- Trigger a **CIBA**-style async authorization flow for a sensitive action. _<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>_
+- Trigger a **CIBA**-style async authorization flow for a sensitive action. *<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>*
 
 **Expected outcome.** A working local app you can reuse as a starter: readable, composable, and production‑opinionated.
 
@@ -38,7 +38,7 @@ You should be comfortable with:
 
 - Web fundamentals (HTML, CSS, JavaScript/TypeScript)
 - Service/back‑end basics (HTTP, REST)
-- Identity basics (OAuth 2.0, OIDC, tokens) _<span style='color: orange; font-variant: small-caps'>← dev{camp} 101 is great for this!</span>_
+- Identity basics (OAuth 2.0, OIDC, tokens) *<span style='color: orange; font-variant: small-caps'>← dev{camp} 101 is great for this!</span>*
   <br><sup>[_Learn more_](https://auth0.com/docs/get-started/identity-fundamentals/introduction-to-auth0)</sup>
 - Authorization concepts (subjects, objects, relations, policies)
   <br><sup>[_Learn more_](https://openfga.dev/docs/authorization-concepts)</sup>
@@ -47,14 +47,14 @@ You should be comfortable with:
 
 **Recommended tooling**
 
-* **Node.js ≥ 20** (LTS)
-* **pnpm ≥ 9** (we use patched code + lockfile consistency) _<span style='color: red; font-variant: small-caps'>← Required</span>_
+* **Node.js ≥ 20**
+* **pnpm ≥ 9** (we use patched code + lockfile consistency) *<span style='color: red; font-variant: small-caps'>← Required</span>*
 * **git** and a **GitHub** account
 * A modern browser (Chrome recommended)
 
 > [!IMPORTANT]
 >
-> _This is not an Auth0 FGA lab_. However, this lab does utilizes Auth0 FGA.
+> *This is not an Auth0 FGA lab*. However, this lab does utilizes Auth0 FGA.
 >
 > If you’re new to FGA, we recommend you skim the [concepts](https://docs.fga.dev/fga-concepts).
 
@@ -63,20 +63,20 @@ You should be comfortable with:
 - **Tools**: what a tool is in the Vercel AI SDK, how to define, validate input, and return structured results.
 - **RAG**: external knowledge retrieval, chunking/embeddings, and filtering results by policy.
 - [**Auth0 FGA**](https://auth0.com/fine-grained-authorization): model + tuples to gate which *documents/accounts* an identity can access.
-- **Async Auth (CIBA)**: decoupled approval for sensitive actions (e.g., high‑value transfer). _<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>_
-- **Token Vault**: calling 3P APIs (Google Calendar) via Auth0 AI without handling user secrets directly. _<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>_
+- **Async Auth (CIBA)**: decoupled approval for sensitive actions (e.g., high‑value transfer). *<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>*
+- **Token Vault**: calling 3P APIs (Google Calendar) via Auth0 AI without handling user secrets directly. *<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>*
 
 ## What you will need
 
-- Laptop with Internet, ability to run Node and write code natively.
-- Code editor (_VS Code recommended_).
-- Access to the [**Auth0 Demo Platform**](https://demo.okta.com) (_this one should be easy!_).
+- Laptop with Internet and the ability to run Node and write code natively.
+- Code editor (*VS Code recommended*).
+- Access to the [**Auth0 Demo Platform**](https://demo.okta.com) (*this one should be easy!*).
 
 > [!CAUTION]
-> Web IDEs _may_ work, but are not tested. Local dev is strongly recommended.
+> Web IDEs *may* work, but are not tested. Local dev is strongly recommended.
 
 
-- Installed (_and usable_) software
+- Installed (*and usable*) software
   - `git` <span style='font-size: 10px; font-variant: small=caps'>[Install](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)</span>
   - Node.js <span style='font-size: 10px; font-variant: small=caps'>[Install](https://nodejs.org/en/download/)</span>
-  - `pnpm` <span style='font-size: 10px; font-variant: small=caps'>[Install](https://pnpm.io/installation)</span> _<span style='color: red; font-variant: small-caps'>← Required. Do not use other package managers.</span>_
+  - `pnpm` <span style='font-size: 10px; font-variant: small=caps'>[Install](https://pnpm.io/installation)</span> *<span style='color: red; font-variant: small-caps'>← Required. Do not use other package managers.</span>*
