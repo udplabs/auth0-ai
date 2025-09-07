@@ -1,5 +1,4 @@
 // lib/ai/tools/search-transactions.ts
-// THIS IS THE 'DONE' STATE
 import { tool } from 'ai';
 import { z } from 'zod';
 import { DocumentWithScoreSchema, ToolResponseSchema } from '../schemas';
@@ -87,28 +86,7 @@ export const searchTransactions = tool<
 		//   - a non-existent relation (should yield zero docs)
 		// ---------------------------------------------------------------------
 		// TODO: Initialize FGA Filter here
-		const fgaRetriever = FGAFilter.create<Documents.DocumentWithScore>({
-			buildQuery: (doc) => {
-				// OPTIONAL Defensive coding: ensure metadata has expected shape.
-				// If missing, return a relation that will certainly fail.
-				const accountId = doc?.metadata?.accountId;
-
-				if (!accountId) {
-					return {
-						user: `user:${user.sub}`,
-						object: `account:__missing__`,
-						relation: 'can_view_transactions',
-					};
-				}
-
-				// You could just as easily send just this
-				return {
-					user: `user:${user.sub}`,
-					object: `account:${doc.metadata.accountId}`,
-					relation: 'can_view_transactions',
-				};
-			},
-		});
+		const fgaRetriever = () => {};
 
 		// ---------------------------------------------------------------------
 		// ✅ STEP 4: Vector store retrieval.
@@ -139,7 +117,7 @@ export const searchTransactions = tool<
 		// Internally may batch; returns only documents passing the relation check.
 		// ---------------------------------------------------------------------
 		// TODO: Apply FGA filter to raw results
-		const authorizedResults = await fgaRetriever.filter(rawResults);
+		const authorizedResults: Documents.DocumentWithScore[] = [];
 		// const authorizedResults = [];
 		console.log(
 			'[searchTransactions] Authorized results:',

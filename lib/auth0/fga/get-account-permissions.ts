@@ -1,10 +1,11 @@
 // lib/auth0/fga/get-account-permissions.ts
-// THIS IS THE 'DONE' STATE
-
-import type { Account } from '@/lib/db/generated/prisma';
 import { getFgaClient } from './client';
 
 const fga = await getFgaClient();
+
+if (fga) {
+	console.log('Success! FGA client initialized.');
+}
 
 /**
  * Lab Exercise: Implement `getAccountPermissions`
@@ -53,7 +54,7 @@ const fga = await getFgaClient();
  */
 export async function getAccountPermissions(accounts: Accounts.Account[]) {
 	// ---------------------------------------------------------------------------
-	// STEP 1: Guard! Soft fail if client is not initialized.
+	// ✅ STEP 1: Guard! Soft fail if client is not initialized.
 	//
 	// THIS IS NOT HOW YOU WOULD DO IT IN PRODUCTION
 	// ---------------------------------------------------------------------------
@@ -63,52 +64,57 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 	}
 
 	// ---------------------------------------------------------------------------
-	// STEP 2: Define the relations we care about (must match your FGA model).
+	// ❌ STEP 2: Define the relations we care about (must match your FGA model).
 	// ---------------------------------------------------------------------------
 	const RELATIONS: Accounts.AccountPermissions[] = [
 		'can_view',
-		'can_view_balances',
-		'can_view_transactions',
-		'can_transfer',
+		// TODO: ... add other relations here
 	];
 
 	// ---------------------------------------------------------------------------
-	// STEP 3: Build the batch checks.
+	// ❌ STEP 3: Build the batch checks.
 	// Ask: “Does user:<customerId> have <relation> on account:<id>?”
 	// ---------------------------------------------------------------------------
 	const checks = accounts.flatMap(({ id, customerId }) => {
-		return RELATIONS.map((relation) => ({
-			user: `user:${customerId}`,
-			relation,
-			object: `account:${id}`,
-		}));
+		return RELATIONS.map(() => {
+			// TODO: Build FGA checks
+			return {};
+		});
 	});
 
 	// ---------------------------------------------------------------------------
-	// STEP 4: Call FGA once with all checks.
+	// ❌ STEP 4: Call FGA once with all checks.
+	//
+	// NOTE: The code below is a placeholder so the app doesn't blow up.
 	// ---------------------------------------------------------------------------
-	const { result } = await fga.batchCheck({ checks });
+	const { result } = /* TODO: call FGA */ { result: [] };
 
 	// ---------------------------------------------------------------------------
-	// STEP 5: Collect allowed relations per account id.
+	// ❌ STEP 5: Collect allowed relations per account id.
 	// Initialize a simple map: accountId -> string[]
 	// ---------------------------------------------------------------------------
 	const granted: Record<string, Accounts.AccountPermissions[]> = {};
+
+	// Initialize empty arrays for each account
 	for (const a of accounts) granted[a.id] = [];
 
 	for (const { allowed, request } of result) {
 		if (!allowed) continue;
 
 		// request.object comes back like "account:<id>"
-		// Simple parse for the lab (first colon split is fine here).
-		const accountId = request.object.split(':')[1] ?? request.object;
+		// TODO: Simple parse for the lab (first colon split is fine here).
+		const accountId = undefined;
 
 		// Record the granted relation for this account.
-		granted[accountId]?.push(request.relation as Accounts.AccountPermissions);
+		if (accountId) {
+			// TODO: Uncomment the following line when ready
+			// granted[accountId]?.push(request?.relation as Accounts.AccountPermissions);
+		}
 	}
 
 	// ---------------------------------------------------------------------------
-	// STEP 6: Build the final accounts array.
+	// ❌ STEP 6: Build the final accounts array. (rudimentary implementation)
+	//
 	// Attach `permissions`, and strip sensitive fields if "can_view_balances" is NOT present.
 	// ---------------------------------------------------------------------------
 	const output: (Accounts.Account | null)[] = accounts.map((account) => {
@@ -120,19 +126,16 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 		// Shallow copy so we don’t mutate the original.
 		const copy: any = { ...account, permissions };
 
-		// Remove sensitive fields unless user can view balances.
+		// TODO: Remove sensitive fields unless user can view balances.
 		if (!permissions.includes('can_view_balances')) {
 			delete copy.balance;
-			delete copy.availableBalance;
-			delete copy.originalPrincipal;
-			delete copy.currentPrincipal;
-			delete copy.statementBalance;
-			delete copy.cashBalance;
+			// availableBalance?
+			// What other fields?
+			// Not sure? Check @types/accounts.d.ts
 		}
 
-		if (!permissions.includes('can_view_transactions') && copy?.transactions) {
-			delete copy.transactions;
-		}
+		// TODO: Transactions are returned in account.transactions
+		// Should they always be returned? 🤔
 
 		// Helpful in the lab to see what was granted.
 		console.log('Account Permissions:', permissions);
@@ -141,7 +144,7 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 	});
 
 	// ---------------------------------------------------------------------------
-	// STEP 7: Return the new list.
+	// ✅ STEP 7: Return the new list.
 	// ---------------------------------------------------------------------------
 	return output.filter((a) => a !== null) as Accounts.Account[];
 }

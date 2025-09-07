@@ -1,5 +1,3 @@
-// lib/ai/tool-registry.ts
-// THIS IS THE 'DONE' STATE
 import type { ToolSet } from 'ai';
 
 import {
@@ -17,7 +15,7 @@ import { pushEnrollment } from './tools/_push-enroll';
 
 // ---------------------------------------------------------------------------
 // ❌ STEP 8: Import searchTransactions tool
-import { searchTransactions } from './tools/search-transactions';
+// TODO
 // ---------------------------------------------------------------------------
 
 export const toolRegistry = {
@@ -32,6 +30,6 @@ export const toolRegistry = {
 	userSettings,
 	// ---------------------------------------------------------------------------
 	// ❌ STEP 9: Add searchTransactions tool
-	searchTransactions,
+	// TODO
 	// ---------------------------------------------------------------------------
 } satisfies ToolSet;

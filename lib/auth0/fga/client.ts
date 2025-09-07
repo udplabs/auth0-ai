@@ -1,6 +1,4 @@
 // lib/auth0/fga/client.ts
-// THIS IS THE 'DONE' STATE
-
 'use server';
 
 /**
@@ -44,20 +42,16 @@
  *    - Using the client before env vars are loaded.
  */
 
-import {
-	CredentialsMethod,
-	OpenFgaClient,
-	type ClientConfiguration,
-} from '@openfga/sdk';
+import { OpenFgaClient, type ClientConfiguration } from '@openfga/sdk';
 
 // ---------------------------------------------------------------------------
-// STEP 1: Define a (mutable) module‑level singleton reference.
+// ✅ STEP 1: Define a (mutable) module‑level singleton reference.
 // ---------------------------------------------------------------------------
 
 let singleton: OpenFgaClient | null = null;
 
 // ---------------------------------------------------------------------------
-// STEP 2: Build client options (WITHOUT secrets logged).
+// ❌ STEP 2: Build client options (WITHOUT secrets logged).
 // You may choose to omit authorizationModelId so the SDK always uses the latest model.
 //
 // NOTE: Do NOT console.log secrets.
@@ -65,30 +59,21 @@ let singleton: OpenFgaClient | null = null;
 // ---------------------------------------------------------------------------
 function buildOptions() {
 	return {
-		apiUrl: process.env.FGA_API_URL ?? 'https://api.us1.fga.dev',
-		storeId: process.env.FGA_STORE_ID,
-		authorizationModelId: process.env.FGA_MODEL_ID,
-		credentials: {
-			method: CredentialsMethod.ClientCredentials,
-			config: {
-				apiTokenIssuer: process.env.FGA_API_TOKEN_ISSUER ?? 'auth.fga.dev',
-				apiAudience: process.env.FGA_API_AUDIENCE ?? 'https://api.us1.fga.dev/',
-				clientId: process.env.FGA_CLIENT_ID,
-				clientSecret: process.env.FGA_CLIENT_SECRET,
-			},
-		},
+		// TODO: ... Get options from .env
 	} as ClientConfiguration;
 }
 
 // ---------------------------------------------------------------------------
-// STEP 4: Create (internal) client. Keep separate from public getter so you
+// ❌ STEP 4: Create (internal) client. Keep separate from public getter so you
 // can add retries / backoff later if desired.
 // ---------------------------------------------------------------------------
 export async function createClient() {
 	try {
 		const options = buildOptions();
 
-		return new OpenFgaClient(options);
+		// TODO: Initialize FGA client
+
+		return null; // Return the client
 	} catch (error: unknown) {
 		console.warn('FGA Client initialization failed!');
 		console.warn(error);
@@ -97,7 +82,7 @@ export async function createClient() {
 }
 
 // ---------------------------------------------------------------------------
-// STEP 5: Public getter.
+// ✅ STEP 5: Public getter.
 //
 // Usage:
 // const fga = await getFgaClient();
