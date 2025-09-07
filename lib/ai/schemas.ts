@@ -1,3 +1,4 @@
+// lib/ai/schemas.ts
 import { z } from 'zod';
 
 export const ToolResponseSchema = <T extends z.ZodTypeAny>(schema: T) =>
@@ -560,11 +561,11 @@ export const ContentSchema = z.object({
 	textData: z
 		.string()
 		.optional()
-		.describe('The text of the given content if the mimeType is of text/*'),
+		.describe('The text of the given content if the mimeType is of `text/*`'),
 	applicationData: z
 		.json()
 		.optional()
-		.describe('Any additional application specific data.'),
+		.describe('The data if the mimeType is of `application/*`.'),
 	name: z
 		.string()
 		.describe(
@@ -583,9 +584,17 @@ export const ContentSchema = z.object({
 		.describe(
 			'The type and subtype of content. Similar to mimetype but more specific to the application domain.'
 		),
-	type: z
+	labStep: z
 		.string()
-		.describe('The primary type of content (e.g. `guide`, `prompt`).'),
+		.optional()
+		.describe(
+			'The lab step the content relates to. Steps are formatted as `step-00` where `00` is a zero-padded number. i.e. `step-01` `step-02`, etc.'
+		),
+	contentPlacement: z
+		.enum(['aiya', 'labs', 'secret'])
+		.describe(
+			'The primary presenter of the content. The platform that will be showing the content. If `aiya` this indicates that the user will consume the content in the chat dialog. If `labs` they will have consumed it via https://labs.demo.okta.com.'
+		),
 	mimeType: z
 		.enum([
 			'text/markdown',

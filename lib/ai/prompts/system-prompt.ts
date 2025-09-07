@@ -4,7 +4,10 @@ import { upsertSettings } from '@/lib/db/queries/settings';
 import { getGeolocationPrompt } from './geolocation-prompt';
 import { getUserPrompt } from './user-prompt';
 
-import { findAllContent, getStepPrompts } from '@/lib/db/queries/content';
+import {
+	getSystemPrompts as getDBSystemPrompts,
+	getStepPrompts,
+} from '@/lib/db/queries/content';
 
 export async function getSystemPrompts({
 	requestHints: { settings, ...hints },
@@ -42,7 +45,7 @@ export async function getRequestPromptFromHints({
 }
 
 async function getPrompts(settings?: UISettings) {
-	const content = await findAllContent({ type: 'prompt' });
+	const systemPrompts = await getDBSystemPrompts();
 
 	const { currentLabStep, nextLabStep } = settings || {};
 
@@ -51,22 +54,22 @@ async function getPrompts(settings?: UISettings) {
 
 	if (labStep) {
 		const stepPrompts = await getStepPrompts(labStep);
-		content.push(...stepPrompts);
+		systemPrompts.push(...stepPrompts);
 	}
 
-	const orderedPrompts = sortBy(content, ['name']);
+	const orderedPrompts = sortBy(systemPrompts, ['name']);
 	const prompts = [];
 
 	if (orderedPrompts.length > 0) {
 		for (const prompt of orderedPrompts) {
 			const { textData, name, mimeType } = prompt;
-			if (mimeType.startsWith('TEXT_')) {
+			if (mimeType?.toUpperCase().startsWith('TEXT_')) {
 				console.log(`loading prompt: ${name}`);
 				prompts.push(textData);
 			}
 		}
 	}
 
-	console.log('loaded prompts:', prompts);
+	console.log('loaded prompts:', prompts.length);
 	return prompts;
 }
