@@ -1,4 +1,4 @@
-import type { Transfer as DBTransfer } from '@/lib/db/generated/prisma';
+import type { Transfer as TransferModel } from '@/lib/db/generated/prisma';
 
 declare global {
 	namespace Transfers {
@@ -29,7 +29,8 @@ declare global {
 			type: 'OPEN' | 'CLOSE' | 'UPDATE';
 		}
 
-		interface Transaction extends Omit<DBTransfer, 'createdAt' | 'updatedAt'> {
+		interface Transaction
+			extends Omit<TransferModel, 'createdAt' | 'updatedAt'> {
 			fromAccountNumber: string;
 			toAccountNumber: string;
 			createdAt: string;
@@ -41,4 +42,3 @@ declare global {
 		type CreateTransactionInput = Omit<Transfers.Transaction, 'id'>;
 	}
 }
-export {};
