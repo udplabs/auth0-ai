@@ -3,6 +3,7 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useChatHistory } from '@/hooks';
 import { TrashIcon } from 'lucide-react';
 import Link from 'next/link';
 import { memo } from 'react';
@@ -16,6 +17,7 @@ const PureSidebarHistoryItem = ({
 	isActive: boolean;
 	setOpenMobile: (open: boolean) => void;
 }) => {
+	const { deleteChat } = useChatHistory();
 	return (
 		<SidebarMenuItem>
 			<SidebarMenuButton
@@ -33,6 +35,7 @@ const PureSidebarHistoryItem = ({
 			<SidebarMenuAction
 				className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:text-destructive focus:bg-destructive/15 focus:text-destructive mr-0.5 cursor-pointer dark:text-red-500'
 				showOnHover={!isActive}
+				onClick={() => deleteChat(chat.id)}
 			>
 				<TrashIcon />
 				<span className='sr-only'>Delete</span>
