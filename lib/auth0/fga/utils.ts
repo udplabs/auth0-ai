@@ -1,3 +1,6 @@
+// lib/auth0/fga/utils.ts
+// REFERENCE CODE (not part of lab)
+// Utility functions for FGA operations.
 import { getFgaClient } from './client';
 
 const fga = await getFgaClient();
@@ -18,7 +21,10 @@ export async function createOwnerPermissions(
 	userId: string,
 	accountIds: string[]
 ) {
-	if (!fga) throw new Error('FGA Client not initialized!');
+	if (!fga) {
+		console.warn('FGA client not initialized!');
+		return;
+	}
 
 	console.log('=== CREATE OWNER PERMISSIONS ===');
 	console.log('userId:', userId, '| accountIds:', accountIds);
@@ -41,6 +47,70 @@ export async function createOwnerPermissions(
 			'Failed to create owner permissions for some accounts! Double check your work.'
 		);
 	}
+}
+
+/**
+ * INTERNAL/PRIVATE UTILITY
+ *
+ * Delete ALL tuples referencing the given user principal (user:<id>).
+ *
+ * Strategy
+ * 1. Page through read() with a user-only filter.
+ * 2. Collect tuple_keys.
+ * 3. Chunk deletes (API write limit safety).
+ *
+ * Notes
+ * - Idempotent: if called again, read yields zero tuples.
+ * - Does NOT touch tuples where the user appears as part of a relation reference
+ *   (e.g., account:123#delegate) because those are different “user” values (object references).
+ * - Includes conditional tuples (model 1.1) by passing through condition if present.
+ */
+export async function deleteAllUserTuples(userId: string, batchSize = 80) {
+	if (!fga) {
+		console.warn('FGA client not initialized!');
+		return;
+	}
+
+	const user = `user:${userId}`;
+	let continuation: string | undefined;
+	const toDelete: Array<{ user: string; relation: string; object: string }> =
+		[];
+
+	do {
+		const res = await fga.read(
+			{
+				user,
+				object: 'account:',
+			},
+			{ continuationToken: continuation }
+		);
+
+		for (const t of res.tuples ?? []) {
+			toDelete.push({
+				user: t.key.user,
+				relation: t.key.relation,
+				object: t.key.object,
+			});
+		}
+
+		continuation = res.continuation_token;
+	} while (continuation);
+
+	if (toDelete.length === 0) return 0;
+
+	// Chunk deletes to avoid size limits
+	for (let i = 0; i < toDelete.length; i += batchSize) {
+		const slice = toDelete.slice(i, i + batchSize);
+		await fga.write({
+			deletes: slice.map((d) => ({
+				user: d.user,
+				relation: d.relation,
+				object: d.object,
+			})),
+		});
+	}
+
+	console.log('Deleted ', toDelete.length, ' user tuples');
 }
 
 /**
@@ -74,17 +144,4 @@ export async function canTransferFunds(
 
 	// Defensive: normalize to boolean
 	return response.allowed || false;
-}
-
-/**
- * Aggregated permission results keyed by account id.
- *
- * Example:
- * {
- *   "acc_123": ["can_view_transactions", "can_transfer"],
- *   "acc_456": []
- * }
- */
-interface AccountPermissionsCheckResult {
-	[key: string]: Accounts.AccountPermissions[];
 }

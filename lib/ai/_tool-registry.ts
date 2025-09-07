@@ -1,5 +1,3 @@
-// lib/ai/tool-registry.ts
-// THIS IS THE 'DONE' STATE
 import type { ToolSet } from 'ai';
 
 import {

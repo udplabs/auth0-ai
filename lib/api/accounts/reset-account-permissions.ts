@@ -1,3 +1,4 @@
+// lib/api/accounts/reset-account-permissions.ts
 import { createOwnerPermissions } from '@/lib/auth0/fga/utils';
 import { getAccounts } from './get-accounts';
 

@@ -1,3 +1,4 @@
+// lib/ai/tools/get-accounts.ts
 import { tool } from 'ai';
 import { z } from 'zod';
 import { AccountSchema, ToolResponseSchema } from '../schemas';

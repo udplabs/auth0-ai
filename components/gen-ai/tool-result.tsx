@@ -51,7 +51,7 @@ const renderByType: Partial<
 		const accounts = getToolOutput<Accounts.Account[]>(part) ?? [];
 		return <AccountSummary {...{ accounts }} />;
 	},
-	'tool-userInfo': (part) => {
+	'tool-getUserProfile': (part) => {
 		const data = getToolOutput<UserProfile>(part);
 		if (!data) return null;
 		return <UserProfileCard data={data} />;
@@ -79,6 +79,15 @@ export const ToolResult = ({
 	const errorText = output?.error?.message;
 	const state = !!errorText ? 'output-error' : toolPart?.state;
 	const widget = renderByType[toolPart.type as ToolType]?.(toolPart);
+
+	// Hide certain internal tools
+	if (
+		['tool-getContent', 'tool-getReferenceFile', 'tool-userSettings'].includes(
+			toolPart.type
+		)
+	) {
+		return null;
+	}
 
 	return (
 		<div className='items-stretch, flex w-full flex-col-reverse gap-3'>

@@ -1,3 +1,4 @@
+// lib/auth0/client.ts
 /**
  * Auth0 server helpers used by the lab.
  *

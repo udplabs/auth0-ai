@@ -1,10 +1,10 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 
-export const userInfo = tool<object, Chat.Tools.Response<UserProfile>>({
+export const getUserProfile = tool<object, Chat.Tools.Response<UserProfile>>({
 	description: 'Get information about the current logged in user.',
 	inputSchema: z.object({}),
-	name: 'userInfo',
+	name: 'getUserProfile',
 	execute: async () => {
 		try {
 			const { getUser } = await import('@/lib/auth0');
@@ -18,7 +18,7 @@ export const userInfo = tool<object, Chat.Tools.Response<UserProfile>>({
 
 			return {
 				status: 'success',
-				message: 'User info fetched successfully',
+				message: 'User profile fetched successfully',
 				dataCount: 1,
 				// Type assertion to ensure the response matches the User type
 				data,
