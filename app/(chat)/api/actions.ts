@@ -1,7 +1,7 @@
 'use server';
 
+import { openai } from '@/lib/ai/openai';
 import { chunk, withStreamingJitter } from '@/lib/utils';
-import { openai } from '@ai-sdk/openai';
 import {
 	type UIMessage,
 	type UIMessageStreamWriter,

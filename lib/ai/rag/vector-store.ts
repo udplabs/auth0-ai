@@ -1,6 +1,7 @@
+// lib/ai/rag/vector-store.ts
+import { openai } from '@/lib/ai/openai';
 import { getAllTransactions } from '@/lib/db/queries/accounts';
 import { getDocuments } from '@/lib/db/queries/documents';
-import { openai } from '@ai-sdk/openai';
 import { cosineSimilarity, embed } from 'ai';
 import { createDocumentsWithEmbeddings } from './create-documents';
 
@@ -8,11 +9,12 @@ export class LocalVectorStore {
 	private static db: Documents.DocumentWithEmbedding[] = [];
 	static initialized = false;
 
-	static count = LocalVectorStore.db.length;
-
+	static get count() {
+		return LocalVectorStore.db.length;
+	}
 	static summary() {
 		console.log('LocalVectorStore summary:');
-		console.log('Total documents:', LocalVectorStore.db.length);
+		console.log('Total documents:', LocalVectorStore.count);
 	}
 
 	static reset() {
@@ -36,7 +38,7 @@ export class LocalVectorStore {
 
 		console.log('checking for existing documents with embeddings...');
 		// check for existing documents so we don't recreate unnecessarily.
-		const existingDocuments = await getDocuments('dev');
+		const existingDocuments = await getDocuments();
 
 		console.log('existing documents:', existingDocuments.length);
 
@@ -52,7 +54,7 @@ export class LocalVectorStore {
 		// Attempt to initialize the entire DB
 
 		const existingTransactionIds = existingDocuments.flatMap(
-			(doc) => doc.metadata?.transactionId || []
+			(doc) => doc.id || []
 		);
 
 		// 1) Fetch transactions from DB that do not yet have embeddings
@@ -100,7 +102,7 @@ export class LocalVectorStore {
 		}
 	}
 
-	static async search(query: string, limit = 999) {
+	static async search(query: string, limit = 200) {
 		const model = openai.textEmbedding('text-embedding-3-small');
 		const { embedding: q } = await embed({
 			model,
