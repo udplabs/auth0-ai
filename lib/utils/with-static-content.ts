@@ -1,7 +1,7 @@
 import { upsertSettings } from '@/lib/db/queries/settings';
 import type { UIMessage, UIMessageStreamWriter } from 'ai';
 import { ulid } from 'ulid';
-import { findFirstContent } from '../db/queries/content';
+import { getContentById } from '../db/queries/content';
 import { chunk } from './chunking';
 import { getLastPart } from './get-last-part';
 import { withStreamingJitter } from './with-streaming-jitter';
@@ -45,7 +45,7 @@ export function withStaticContent<
 		if (lastPart?.type === 'text') {
 			if (lastPart.text.toUpperCase().includes('MY FIRST MESSAGE')) {
 				console.log('returning intro...');
-				contentId = 'step-02_intro';
+				contentId = '01K3VDGK1XKJR87HZZS1JY57HJ';
 				onFinish = async () => {
 					// If user is somehow authenticated...
 					// They shouldn't be but ¯\_(ツ)_/¯
@@ -63,7 +63,7 @@ export function withStaticContent<
 				userId
 			) {
 				console.log('returning post auth...');
-				contentId = 'step-03_post-auth';
+				contentId = '01K3VDJ331E72V2RE00M81J9WR';
 
 				onFinish = async () => {
 					await upsertSettings({
@@ -79,7 +79,7 @@ export function withStaticContent<
 		const { writer: dataStream } = options;
 
 		const { textData } = contentId
-			? (await findFirstContent({ name: contentId })) || {}
+			? (await getContentById(contentId)) || {}
 			: {};
 
 		if (textData) {
