@@ -7,9 +7,9 @@ import { type NextRequest, NextResponse } from 'next/server';
 // This is for development purposes only. Just a helper util.
 export async function GET(request: NextRequest) {
 	try {
-		const { count } = getSearchParams<{ count: string }>(request, ['count']);
+		const { count } = getSearchParams<{ count: boolean }>(request, ['count']);
 
-		if (count === 'true') {
+		if (count) {
 			const summary = LocalVectorStore.summary();
 			return NextResponse.json({ count: summary });
 		}

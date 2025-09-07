@@ -40,16 +40,11 @@ export function SuggestedActions({
 	const { isAuthenticated } = useUserProfile();
 
 	const suggestedActions: SuggestedActions[] = [
-		...(firstMessage(isAuthenticated)
-			? [
-					{
-						label: 'Send first message',
-						suggestion: 'Hi AIya! This is my first message.',
-						preSubmitAction: () =>
-							localStorage.setItem('first-message-sent', 'true'),
-					},
-				]
-			: []),
+		{
+			label: 'Send first message',
+			suggestion: 'Hi AIya! This is my first message.',
+			preSubmitAction: () => localStorage.setItem('first-message-sent', 'true'),
+		},
 		...(isAuthenticated
 			? [
 					{
@@ -123,12 +118,4 @@ export function SuggestedActions({
 			</CollapsibleContent>
 		</Collapsible>
 	);
-}
-
-function firstMessage(isAuthenticated?: boolean) {
-	if (isAuthenticated) return false;
-
-	const string = localStorage?.getItem('first-message-sent');
-
-	return string === null || string === 'false';
 }

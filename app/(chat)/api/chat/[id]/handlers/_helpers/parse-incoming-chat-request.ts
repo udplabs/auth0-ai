@@ -1,6 +1,6 @@
 import { generateTitleFromUserMessage } from '@/app/(chat)/api/actions';
 import { getUser } from '@/lib/auth0';
-import { getChatById, saveChat, saveMessages } from '@/lib/db/queries/chat';
+import { saveChat } from '@/lib/db/queries/chat';
 import { APIError } from '@/lib/errors';
 
 import { z } from 'zod';
@@ -25,11 +25,6 @@ export async function parseIncomingChatRequest(
 
 	const chatId = id && Array.isArray(id) ? id[0] : id;
 
-	let dbChat = await getChatById(chatId, {
-		userId,
-		includeMessages: true,
-	});
-
 	if (message && _messages.length > 0) {
 		throw new APIError(
 			'bad_request:chat',
@@ -46,22 +41,14 @@ export async function parseIncomingChatRequest(
 		metadata: { ...m?.metadata, userId, chatId },
 	})) as Chat.UIMessage[];
 
-	if (!dbChat) {
-		// Chat does not exist. Create it!
-		dbChat = await saveChat({
-			id: chatId,
-			userId,
-			messages: incomingMessages,
-			title: await generateTitleFromUserMessage(
-				incomingMessages[incomingMessages.length - 1]
-			),
-		});
-	} else {
-		if (incomingMessages.length > 0) {
-			// Add incoming messages to DB
-			await saveMessages(incomingMessages);
-		}
-	}
+	const dbChat = await saveChat({
+		id: chatId,
+		userId,
+		messages: incomingMessages,
+		title: await generateTitleFromUserMessage(
+			incomingMessages[incomingMessages.length - 1]
+		),
+	});
 
 	return dbChat;
 }

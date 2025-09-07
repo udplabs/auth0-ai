@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import {
 	BugOffIcon,
 	EyeIcon,
+	FileStackIcon,
 	LockIcon,
 	RotateCcwIcon,
 	WandSparkles,
@@ -29,8 +30,12 @@ const handleVectorSummary = async () => {
 	await fetch('/api/accounts/db?count=true');
 };
 
+const handleEmbeddingsBuild = async () => {
+	await fetch('/api/accounts', { method: 'DELETE' });
+};
+
 export const FAB = () => {
-	const { resetPermissions } = useAccounts();
+	const { resetPermissions, mutate } = useAccounts();
 
 	return (
 		<Popover>
@@ -58,6 +63,22 @@ export const FAB = () => {
 							onClick={() => handleVectorReInit()}
 						>
 							<WandSparkles className='h-5 w-5' />
+						</Button>
+					</div>
+					<div className='flex items-center gap-2'>
+						Regenerate Embeddings
+						<Button
+							className='h-8 w-8 rounded-full p-4'
+							onClick={() => {
+								handleEmbeddingsBuild()
+									.then(() => {
+										mutate();
+									})
+									.finally(() => handleVectorReset());
+							}}
+							variant='warning'
+						>
+							<FileStackIcon className='h-5 w-5' />
 						</Button>
 					</div>
 					<div className='flex items-center gap-2'>

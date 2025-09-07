@@ -36,6 +36,8 @@ export interface ChatMessageProps extends React.ComponentProps<'div'> {
 	ToolResultProps?: ToolResultProps;
 }
 
+const MemoResponse = memo(Response);
+
 export const ChatMessage = ({
 	message,
 	showActions = false,
@@ -67,12 +69,12 @@ export const ChatMessage = ({
 
 							if (type === 'text') {
 								return (
-									<Response
+									<MemoResponse
 										key={key}
 										{...ResponseProps}
 									>
 										{part.text}
-									</Response>
+									</MemoResponse>
 								);
 							}
 

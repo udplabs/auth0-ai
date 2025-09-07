@@ -5,11 +5,13 @@
 			"name": "Next.js: debug server-side",
 			"type": "node-terminal",
 			"request": "launch",
-			"command": "pnpm debug",
+			"command": "pnpm dev",
 			"skipFiles": [
 				"${workspaceFolder}/node_modules/**",
 				"!${workspaceFolder}/node_modules/.pnpm_patches/**", // allow your patched pkgs
-				"!${workspaceFolder}/node_modules/@auth0/**"
+				"!${workspaceFolder}/node_modules/@auth0/**",
+				"${workspaceFolder}/lib/db/generated/prisma/runtime/**",
+				"${workspaceFolder}/lib/db/generated/neon/runtime/**"
 			],
 			"resolveSourceMapLocations": [
 				"${workspaceFolder}/**",
@@ -17,7 +19,10 @@
 				"!**/node_modules/**",
 				"${workspaceFolder}/node_modules/.pnpm_patches/**",
 				"${workspaceFolder}/node_modules/@auth0/**"
-			]
+			],
+			"sourceMapPathOverrides": {
+				"/turbopack/[project]/*": "${webRoot}/*"
+			}
 		},
 		{
 			"name": "Next.js: debug client-side",
@@ -31,12 +36,11 @@
 			"request": "launch",
 			"program": "${workspaceFolder}/node_modules/next/dist/bin/next",
 			"runtimeArgs": ["--inspect"],
-			"skipFiles": ["<node_internals>/**"],
-			"resolveSourceMapLocations": [
-				"${workspaceFolder}/**",
-				"${workspaceFolder}/node_modules/@auth0/**",
-				"${workspaceFolder}/node_modules/.next/**"
-			],
+			"skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+			"sourceMaps": true,
+			"sourceMapPathOverrides": {
+				"/turbopack/[project]/*": "${webRoot}/*"
+			},
 			"serverReadyAction": {
 				"action": "debugWithChrome",
 				"killOnServerStop": true,

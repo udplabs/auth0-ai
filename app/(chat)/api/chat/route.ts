@@ -5,7 +5,7 @@ import { getSearchParams } from '@/lib/utils/get-search-params';
 import { type NextRequest, NextResponse } from 'next/server';
 
 interface GetChatsParams extends ApiQueryParams {
-	grouped?: 'true' | 'false';
+	grouped?: boolean;
 }
 export async function GET(request: NextRequest) {
 	try {

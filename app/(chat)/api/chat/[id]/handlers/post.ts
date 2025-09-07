@@ -1,8 +1,8 @@
+import { openai } from '@/lib/ai/openai';
 import { getSystemPrompts } from '@/lib/ai/prompts/system-prompt';
 import { toolRegistry } from '@/lib/ai/tool-registry';
-import { createStreamId, saveMessages } from '@/lib/db/queries/chat';
+import { saveMessages } from '@/lib/db/queries/chat';
 import { withStaticContent } from '@/lib/utils';
-import { openai } from '@ai-sdk/openai';
 import { setAIContext } from '@auth0/ai-vercel';
 import { geolocation } from '@vercel/functions';
 import {
@@ -23,11 +23,7 @@ import {
 import { ulid } from 'ulid';
 
 import { APIError } from '@/lib/errors';
-import { NextResponse, after, type NextRequest } from 'next/server';
-import {
-	createResumableStreamContext,
-	type ResumableStreamContext,
-} from 'resumable-stream';
+import { type NextRequest } from 'next/server';
 import { ZodError } from 'zod';
 import {
 	UIMessageMetadataSchema,
@@ -43,8 +39,6 @@ type UseChatToolsMessage = UIMessage<
 	Chat.CustomUIDataTypes,
 	AvailableTools
 >;
-
-let globalStreamContext: ResumableStreamContext | null = null;
 
 export async function POST(
 	request: NextRequest,
@@ -68,9 +62,7 @@ export async function POST(
 			metadataSchema: UIMessageMetadataSchema,
 		});
 
-		const { id: streamId } = await createStreamId(chat.id);
-
-		setAIContext({ threadID: streamId });
+		setAIContext({ threadID: chat.id });
 
 		const modelMessages = convertToModelMessages(uiMessages);
 
@@ -89,18 +81,13 @@ export async function POST(
 						model: openai('gpt-5-nano'),
 						system: systemPrompts,
 						messages: modelMessages,
+						// temperature: 0,
 						// stopWhen: [hasOwnUI(), stepCountIs(5)],
 						stopWhen: (ctx) => {
 							const { steps } = ctx;
 							console.log('=== stopWhen ===');
-							console.log(steps);
 
 							const lastMessage = steps.at(-1);
-
-							console.log(
-								'lastMessage:',
-								JSON.stringify(lastMessage?.content, null, 2)
-							);
 
 							let hasOwnUI = false;
 
@@ -111,7 +98,6 @@ export async function POST(
 									lastMessage?.dynamicToolResults ??
 									[];
 								const lastResult = results.at(-1);
-								console.log('lastResult:', lastResult);
 
 								hasOwnUI = (lastResult?.output as any)?.hasOwnUI;
 								console.log('hasOwnUI:', hasOwnUI, hasOwnUI ? 'Stopping!' : '');
@@ -120,10 +106,16 @@ export async function POST(
 							return hasOwnUI || stepCountIs(5)(ctx);
 						},
 						experimental_transform: [
-							// uiEphemeralTransform(dataStream),
+							uiEphemeralTransform(dataStream),
 							smoothStream(),
 						],
 						tools: toolRegistry,
+						// prepareStep: async (step) => {
+						// 	console.log('=== prepareStep ===');
+						// 	console.log(step);
+
+						// 	return step;
+						// },
 					});
 
 					result.consumeStream();
@@ -131,7 +123,7 @@ export async function POST(
 					dataStream.merge(
 						result.toUIMessageStream({
 							sendReasoning: false,
-							originalMessages: uiMessages,
+							// originalMessages: uiMessages,
 							// sendFinish: false,
 							// sendStart: false,
 						})
@@ -188,18 +180,7 @@ export async function POST(
 			},
 		});
 
-		const streamContext = getStreamContext();
-
-		if (streamContext) {
-			console.log('returning resumable stream...');
-			return new NextResponse(
-				await streamContext.resumableStream(streamId, () =>
-					stream.pipeThrough(new JsonToSseTransformStream())
-				)
-			);
-		} else {
-			return new Response(stream.pipeThrough(new JsonToSseTransformStream()));
-		}
+		return new Response(stream.pipeThrough(new JsonToSseTransformStream()));
 	} catch (error) {
 		console.log('=== POST error ===');
 		console.log(error);
@@ -217,31 +198,6 @@ export async function POST(
 	}
 }
 
-/**
- * Setup an instance of Redis if you would like to use resumable streams. See .env for details.
- *
- * Running locally will NOT use resumable streams (unless you run Redis locally).
- */
-export function getStreamContext() {
-	if (!globalStreamContext) {
-		try {
-			globalStreamContext = createResumableStreamContext({
-				waitUntil: after,
-			});
-		} catch (error: any) {
-			if (error.message.includes('REDIS_URL')) {
-				console.warn(
-					' > Resumable streams are disabled due to missing REDIS_URL'
-				);
-			} else {
-				console.error(error);
-			}
-		}
-	}
-
-	return globalStreamContext;
-}
-
 function uiEphemeralTransform<TOOLS extends ToolSet>(
 	dataStream: UIMessageStreamWriter<UseChatToolsMessage>
 ): StreamTextTransform<typeof toolRegistry> {
@@ -251,7 +207,6 @@ function uiEphemeralTransform<TOOLS extends ToolSet>(
 			TextStreamPart<typeof toolRegistry>
 		>({
 			transform(chunk, controller) {
-				console.log(chunk);
 				if (
 					chunk?.type === 'tool-result' &&
 					['getAccounts', 'getTransactions'].includes(chunk.toolName)
