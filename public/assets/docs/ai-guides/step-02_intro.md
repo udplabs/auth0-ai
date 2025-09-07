@@ -90,8 +90,10 @@ Not entirely sure? We'll figure it out!
 #### _So... what are you waiting for? Let's get to work!_
 
 > [!TIP]
-> Navigate back to the guide for this next step.
+> I recommend navigating back to the guide for this next step.
 >
-> But, if you need help, Just let me know and I can walk you through it.
+> It has some preloaded values that I don't have access to.
+>
+> But, if you need help, just let me know and I can walk you through it.
 
-🚀 Let’s ship this.
+*🚀 Let’s ship this.*

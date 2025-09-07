@@ -2,10 +2,13 @@
 - Lab Step: `step-05`
 - Lab Guide Name: `setup-fga-for-rag`
 - Static AIya response: none
-- Reference Code:
+- Implementation Code:
   - `lib/auth0/fga/client.ts`
   - `lib/auth0/fga/get-account-permissions.ts`
+- Relevant/Reference Code:
   - `lib/auth0/fga/utils.ts` <-- For your use only
+  - `lib/ai/tool-registry.ts`
+  - `lib/ai/tools/get-accounts.ts`
 
 Expected Outcome:
 - Implemented `getFgaClient()`

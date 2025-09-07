@@ -2,7 +2,7 @@
 - Lab Step: `step-04`
 - Lab Guide Name: `configure-fga`
 - Static AIya response: none
-- Reference Code:
+- Implementation Code:
   - `.env`
   - `.env.local`
 
