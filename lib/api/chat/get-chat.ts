@@ -41,7 +41,7 @@ export async function getChat({
 }
 
 export interface GetChatHistoryOptions extends ActionOptions {
-	grouped?: boolean | string;
+	grouped?: boolean;
 	page?: number | string;
 	pageSize?: number | string;
 }
@@ -54,7 +54,6 @@ export async function getChatHistory({
 	key,
 	tags,
 }: GetChatHistoryOptions) {
-	if (typeof grouped === 'string') grouped = grouped === 'true';
 	if (typeof page === 'string') page = Number.parseInt(page);
 	if (typeof pageSize === 'string') pageSize = Number.parseInt(pageSize);
 
