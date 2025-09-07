@@ -1,6 +1,4 @@
 import { Header } from '@/components/layout/header';
-import { Loader } from '@/components/ui/prompt-kit/loader';
-import { redirect } from 'next/navigation';
 
 export default async function TransfersPage() {
 	return (
