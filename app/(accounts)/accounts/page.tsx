@@ -6,6 +6,12 @@ import { Button } from '@/components/ui/button';
 import { useUserProfile } from '@/hooks';
 import { Bell, Settings } from 'lucide-react';
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: 'Accounts Dashboard',
+};
+
 export default function AccountsPage() {
 	const { data: user } = useUserProfile();
 

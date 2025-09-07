@@ -4,6 +4,11 @@ import { Header } from '@/components/layout/header';
 import { getUser } from '@/lib/auth0';
 import { redirect } from 'next/navigation';
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: 'Account Details',
+};
 export default async function AccountDetailsPage({
 	params,
 }: {
