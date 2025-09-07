@@ -4,6 +4,7 @@ import { APIError } from '@/lib/errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+// Fetch a chat by ID
 export async function GET(
 	_: NextRequest,
 	{ params }: { params: Promise<ApiPathParams> }

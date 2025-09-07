@@ -7,6 +7,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 interface GetChatsParams extends ApiQueryParams {
 	grouped?: boolean;
 }
+// Fetches chat history [for sidebar].
 export async function GET(request: NextRequest) {
 	try {
 		console.log('fetching chat history...');

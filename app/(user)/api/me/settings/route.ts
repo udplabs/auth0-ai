@@ -3,11 +3,12 @@ import { cookies } from 'next/headers';
 
 import { APIError } from '@/lib/errors';
 
+// Helper to sync user content with the database
+// Sets a cookie so we know whether we have already synced.
 export async function POST() {
 	try {
 		// Set a sync cookie
 		const cookieStore = await cookies();
-		// const isSynced = cookieStore.has('db:synced');
 
 		console.log('syncing remote content...');
 
@@ -17,8 +18,6 @@ export async function POST() {
 			path: '/',
 			expires: new Date(Date.now() + 1000 * 60 * 30),
 		});
-		// if (!isSynced) {
-		// }
 
 		return new Response(null, { status: 201 });
 	} catch (error: unknown) {

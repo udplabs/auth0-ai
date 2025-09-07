@@ -8,6 +8,10 @@ import type { NextRequest } from 'next/server';
 
 export const maxDuration = 60;
 
+/**
+ *
+ * Deletes an individual chat by `chatId`.
+ */
 export async function DELETE(
 	_: NextRequest,
 	context: { params: Promise<{ id: string }> }
@@ -23,7 +27,7 @@ export async function DELETE(
 
 		await deleteChatById(id, user.sub);
 
-		revalidateTag(chatKey({ userId: user.sub }));
+		revalidateTag(chatKey({ userId: user.sub, id }));
 
 		return Response.json(null, { status: 201 });
 	} catch (error: unknown) {
