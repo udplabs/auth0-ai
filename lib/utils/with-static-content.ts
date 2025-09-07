@@ -39,7 +39,6 @@ export function withStaticContent<
 
 		const lastPart = getLastPart(lastMessage);
 
-		const content: string[] = [];
 		let contentId: string | null = null;
 
 		if (lastPart?.type === 'text') {
