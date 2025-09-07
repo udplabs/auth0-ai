@@ -1,14 +1,13 @@
-import { type Chat as DBChat, Prisma } from '@/lib/db/generated/prisma';
+'use server';
+
+import { type Chat as ChatModel, Prisma } from '@/lib/db/generated/prisma';
 import { APIError } from '@/lib/errors';
-import { convertToDB, convertToUI } from '@/lib/utils/db-converter';
-// import { after } from 'next/server';
-import { Prisma as PrismaNeon } from '../../generated/neon';
+import { convertToDB } from '@/lib/utils/db-converter';
 import { neon } from '../../neon/client';
 import { prisma } from '../../prisma/client';
 import { saveAppInstance } from '../settings';
-import { deleteMessagesByChatId } from './mutate-messages';
+import { deleteMessagesByChatId, saveMessages } from './mutate-messages';
 import { getChatById } from './query-chats';
-import { deleteStreams } from './stream';
 
 export async function saveChat(input: Chat.CreateChatInput) {
 	const { messages = [], ...chat } = input;
@@ -17,36 +16,31 @@ export async function saveChat(input: Chat.CreateChatInput) {
 		Chat.CreateChatInput,
 		Prisma.ChatCreateInput
 	>(chat);
-	const dbMessages = convertToDB<
-		Chat.UIMessage[],
-		Prisma.MessageUncheckedCreateInput[]
-	>(messages, ['chatId']);
 
-	const dbChat = await prisma.chat.create({
-		data: {
-			...convertedChat,
-			messages: {
-				create: dbMessages,
-			},
-		},
-		include: { messages: true },
+	// Upsert chat
+	const dbChat = await prisma.chat.upsert({
+		where: { id: chat?.id },
+		update: convertedChat,
+		create: convertedChat,
 	});
 
 	// Remote write
 	// Internal mechanism to keep Neon in sync with main
-	await upsertRemoteChat(dbChat, dbMessages);
+	await upsertRemoteChat(dbChat);
 
-	return convertToUI<DBChat, Chat.UIChat>(dbChat);
+	// Upsert messages separately
+	// Will also update remote db so must be run after remote chat write
+	await saveMessages(messages);
+
+	return (await getChatById(dbChat.id, {
+		includeMessages: true,
+	})) as Chat.UIChat;
 }
 
-async function upsertRemoteChat(
-	chat: DBChat,
-	messages: Prisma.MessageUncheckedCreateInput[] = []
-) {
+async function upsertRemoteChat(chat: ChatModel) {
 	const { id, title, userId } = chat;
 
 	const { id: appInstanceId } = await saveAppInstance();
-
 	await neon.$transaction(async (tx) => {
 		await tx.remoteChat.upsert({
 			where: { id },
@@ -62,16 +56,6 @@ async function upsertRemoteChat(
 				appInstanceId,
 			},
 		});
-
-		if (messages?.length > 0) {
-			await tx.remoteMessage.createMany({
-				data: messages.map((m) => ({
-					...m,
-					chatId: id,
-				})) as PrismaNeon.RemoteMessageCreateManyInput[],
-				skipDuplicates: true,
-			});
-		}
 	});
 }
 /**
@@ -91,17 +75,13 @@ export async function deleteChatById(
 		throw new APIError('not_found:chat');
 	}
 
-	const { messages = [], streams = [], ...chat } = _chat;
+	const { messages = [], ...chat } = _chat;
 
 	if (chat.userId !== userId) {
 		throw new APIError(
 			'unauthorized:chat',
 			'You do not have permission to delete this chat.'
 		);
-	}
-
-	if (streams.length > 0) {
-		await deleteStreams(streams);
 	}
 
 	if (messages.length) {

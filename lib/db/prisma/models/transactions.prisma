@@ -68,7 +68,9 @@ model SampleTransaction {
   currencyNumericCode Float?          @default(840)
 
   created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+
+  lastSyncedAt DateTime?
+  expiresAt    DateTime?
 
   account SampleAccount? @relation(fields: [accountId], references: [id], onDelete: Cascade)
 

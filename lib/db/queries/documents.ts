@@ -1,5 +1,12 @@
-import type { Document, Prisma } from '@/lib/db/generated/prisma';
+// lib/db/queries/documents.ts
+'use server';
+
+import type {
+	Document as DocumentModel,
+	Prisma,
+} from '@/lib/db/generated/prisma';
 import { convertToUI } from '@/lib/utils/db-converter';
+import { neon } from '../neon/client';
 import { prisma } from '../prisma/client';
 
 export async function saveEmbeddings(
@@ -15,21 +22,21 @@ export async function saveEmbeddings(
 			...doc,
 			embedding,
 			metadata: {
+				...metadata,
 				...(metadata?.accountId && { accountId: metadata.accountId }),
 				...(metadata?.transactionId && {
 					transactionId: metadata.transactionId,
 				}),
 				...(metadata?.modelId && { modelId: metadata.modelId }),
 				...(metadata?.accountType && { accountType: metadata.accountType }),
-				...(metadata?.customerId && { userId: metadata.customerId }),
 			},
 		};
 	});
 
-	let dbResult: Document[] = [];
+	let dbResult: DocumentModel[] = [];
 
 	if (table === 'sample') {
-		dbResult = await prisma.sampleDocument.createManyAndReturn({
+		dbResult = await neon.remoteSampleDocument.createManyAndReturn({
 			data,
 		});
 		console.log('saved sample documents:', dbResult.length);
@@ -39,7 +46,7 @@ export async function saveEmbeddings(
 		});
 	}
 	const uiDocuments = convertToUI<
-		Document[],
+		DocumentModel[],
 		Documents.DocumentWithEmbedding[]
 	>(dbResult);
 
@@ -77,7 +84,7 @@ export async function getDocumentsForVectorStore() {
 	});
 
 	const uiDocuments = convertToUI<
-		Document[],
+		DocumentModel[],
 		Documents.DocumentWithEmbedding[]
 	>(dbDocuments);
 
@@ -98,35 +105,17 @@ export async function getDocumentsForVectorStore() {
 }
 export async function getDocuments(): Promise<
 	Documents.DocumentWithEmbedding[]
->;
-export async function getDocuments(
-	table: 'dev'
-): Promise<Documents.DocumentWithEmbedding[]>;
-export async function getDocuments(
-	table?: 'sample' | 'dev'
-): Promise<Documents.DocumentWithEmbedding[]> {
+> {
 	console.log('getting all documents...');
-	if (table === 'dev') {
-		const dbDocuments = await prisma.document.findMany({
-			orderBy: { createdAt: 'desc' },
-		});
+	const dbDocuments = await prisma.document.findMany({
+		orderBy: { createdAt: 'desc' },
+	});
 
-		return convertToUI<Document[], Documents.DocumentWithEmbedding[]>(
-			dbDocuments
-		);
-	}
-
-	const dbSampleDocs = await prisma.sampleDocument.findMany();
-
-	return convertToUI<Document[], Documents.DocumentWithEmbedding[]>(
-		dbSampleDocs
+	return convertToUI<DocumentModel[], Documents.DocumentWithEmbedding[]>(
+		dbDocuments
 	);
 }
 
-export async function deleteDocuments(table: 'sample' | 'dev' = 'sample') {
-	if (table === 'dev') {
-		return await prisma.document.deleteMany();
-	}
-
+export async function deleteDocuments() {
 	return await prisma.sampleDocument.deleteMany();
 }

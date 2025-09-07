@@ -1,5 +1,10 @@
+'use server';
+
 import { convertToUI } from '@/lib/utils/db-converter';
-import { Transaction as DBTransaction, Prisma } from '../../generated/prisma';
+import {
+	Prisma,
+	Transaction as TransactionModel,
+} from '../../generated/prisma';
 import { prisma } from '../../prisma/client';
 import { getAccountsByUserId } from './query-accounts';
 
@@ -13,7 +18,7 @@ export async function getTransactionsByAccountId(
 		orderBy: { date: 'desc' },
 	});
 
-	return convertToUI<DBTransaction[], Accounts.Transaction[]>(transactions);
+	return convertToUI<TransactionModel[], Accounts.Transaction[]>(transactions);
 }
 
 export async function getTransactionsByUserId(
@@ -34,5 +39,5 @@ export async function getAllTransactions(
 		where,
 	});
 
-	return convertToUI<DBTransaction[], Accounts.Transaction[]>(transactions);
+	return convertToUI<TransactionModel[], Accounts.Transaction[]>(transactions);
 }

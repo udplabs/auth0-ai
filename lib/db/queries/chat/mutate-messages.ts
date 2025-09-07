@@ -1,7 +1,9 @@
+'use server';
+
 import { APIError } from '@/lib/errors';
 import { convertToDB, convertToUI } from '@/lib/utils/db-converter';
-import type { Prisma as PrismaNeon } from '../../generated/neon';
-import type { Message, Prisma } from '../../generated/prisma';
+import type { Prisma as Neon } from '../../generated/neon';
+import type { Message as MessageModel, Prisma } from '../../generated/prisma';
 import { neon } from '../../neon/client';
 import { prisma } from '../../prisma/client';
 import { getMessageById } from './query-messages';
@@ -48,25 +50,45 @@ export async function updateMessage(
 	// Internal mechanism to keep Neon in sync with main
 	await neon.remoteMessage.update({
 		where: { id: message.id },
-		data: dbMessage as PrismaNeon.RemoteMessageUpdateInput,
+		data: dbMessage as Neon.RemoteMessageUpdateInput,
 	});
 
-	return convertToUI<Message, Chat.UIMessage>(result);
+	return convertToUI<MessageModel, Chat.UIMessage>(result);
 }
 export async function saveMessages(messages: Chat.UIMessage[]): Promise<void> {
-	const dbMessages = convertToDB<
-		Chat.UIMessage[],
-		Prisma.MessageCreateManyInput
-	>(messages);
-	await prisma.message.createMany({
-		data: dbMessages,
-	});
+	const dbMessages = convertToDB<Chat.UIMessage[], Prisma.MessageCreateInput[]>(
+		messages
+	);
+
+	await prisma.$transaction([
+		...dbMessages.map((m) => {
+			return prisma.message.upsert({
+				where: { id: m?.id },
+				update: {
+					...m,
+				},
+				create: {
+					...m,
+				},
+			});
+		}),
+	]);
 
 	// Remote write
 	// Internal mechanism to keep Neon in sync with main
-	await neon.remoteMessage.createMany({
-		data: dbMessages as PrismaNeon.RemoteMessageCreateManyInput,
-	});
+	await prisma.$transaction([
+		...dbMessages.map((m) => {
+			return neon.remoteMessage.upsert({
+				where: { id: m?.id },
+				update: {
+					...(m as Neon.RemoteMessageUpdateInput),
+				},
+				create: {
+					...(m as Neon.RemoteMessageCreateInput),
+				},
+			});
+		}),
+	]);
 }
 
 export async function deleteMessagesByChatId(chatId: string): Promise<void> {

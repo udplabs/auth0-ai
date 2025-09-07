@@ -116,8 +116,9 @@ model SampleAccount {
   // Relations
   transactions SampleTransaction[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt    DateTime  @default(now())
+  lastSyncedAt DateTime?
+  expiresAt    DateTime?
 
   @@index([customerId])
 }

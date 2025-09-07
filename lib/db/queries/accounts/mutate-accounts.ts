@@ -1,6 +1,13 @@
+'use server';
+
 import { convertToDB, convertToUI } from '@/lib/utils/db-converter';
 import { uniqBy } from 'lodash-es';
-import { Account, Prisma, Transaction, Transfer } from '../../generated/prisma';
+import {
+	Account as AccountModel,
+	Prisma,
+	Transaction as TransactionModel,
+	Transfer as TransferModel,
+} from '../../generated/prisma';
 import { prisma } from '../../prisma/client';
 
 export async function saveAccounts(
@@ -72,7 +79,7 @@ async function saveAccountsAndTransactions(
 		data: dbAccounts,
 	});
 
-	const uiAccounts = convertToUI<Account[], Accounts.Account[]>(
+	const uiAccounts = convertToUI<AccountModel[], Accounts.Account[]>(
 		createdAccounts
 	);
 
@@ -83,9 +90,10 @@ async function saveAccountsAndTransactions(
 		});
 
 		// 3) Convert transactions to UI format
-		const uiTransactions = convertToUI<Transaction[], Accounts.Transaction[]>(
-			createdTransactions
-		);
+		const uiTransactions = convertToUI<
+			TransactionModel[],
+			Accounts.Transaction[]
+		>(createdTransactions);
 
 		return { accounts: uiAccounts, transactions: uiTransactions };
 	}
@@ -93,7 +101,7 @@ async function saveAccountsAndTransactions(
 	return { accounts: uiAccounts, transactions: [] };
 }
 
-export async function updateBalances(transfer: Transfer) {
+export async function updateBalances(transfer: TransferModel) {
 	const { fromAccountId, toAccountId, amount } = transfer;
 
 	const fromAccount = await prisma.account.findUnique({
@@ -126,4 +134,19 @@ export async function updateBalances(transfer: Transfer) {
 			},
 		}),
 	]);
+}
+
+export async function deleteAccountData(userId: string) {
+	// Delete Documents
+	await prisma.document.deleteMany({
+		where: { userId },
+	});
+	// Delete Transactions
+	await prisma.transaction.deleteMany({
+		where: { customerId: userId },
+	});
+	// Delete Accounts
+	await prisma.account.deleteMany({
+		where: { customerId: userId },
+	});
 }

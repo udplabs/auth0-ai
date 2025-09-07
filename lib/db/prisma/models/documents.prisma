@@ -1,5 +1,6 @@
 model Document {
   id          String   @id @default(ulid())
+  userId      String
   pageContent String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -10,10 +11,12 @@ model Document {
 }
 
 model SampleDocument {
-  id          String   @id @default(ulid())
-  pageContent String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  embedding   Json
-  metadata    Json
+  id           String    @id @default(ulid())
+  userId       String
+  pageContent  String
+  createdAt    DateTime  @default(now())
+  lastSyncedAt DateTime?
+  expiresAt    DateTime?
+  embedding    Json
+  metadata     Json
 }

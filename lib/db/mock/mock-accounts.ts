@@ -1,10 +1,10 @@
 import { createDocumentsWithEmbeddings } from '@/lib/ai/rag/create-documents';
 import { LocalVectorStore } from '@/lib/ai/rag/vector-store';
 import { saveAccountsAndReturnSeparate } from '@/lib/db/queries/accounts';
-import { deleteDocuments, saveDocuments } from '@/lib/db/queries/documents';
+import { saveDocuments } from '@/lib/db/queries/documents';
 import { fakerEN as faker } from '@faker-js/faker';
 import { ulid } from 'ulid';
-import { getSampleData } from '../queries/mock';
+import { deleteSampleDocuments, getSampleData } from '../queries/mock';
 
 // Should not be used outside of this function.
 const sampleUserIds = [
@@ -115,8 +115,8 @@ export async function generateMockEmbeddings() {
 		// Embeddings should be empty. If not, overwrite it.
 		// Deletes ALL sample documents!
 		if (_documents.length > 0) {
-			await deleteDocuments();
+			await deleteSampleDocuments();
 		}
-		await createDocumentsWithEmbeddings(transactions);
+		await createDocumentsWithEmbeddings(transactions, 'sample');
 	}
 }

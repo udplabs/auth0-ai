@@ -1,4 +1,6 @@
-import { type Chat as DBChat } from '@/lib/db/generated/prisma';
+'use server';
+
+import type { Chat as ChatModel } from '@/lib/db/generated/prisma';
 import { APIError } from '@/lib/errors';
 import { groupItemsByDate } from '@/lib/utils';
 import { convertToUI } from '@/lib/utils/db-converter';
@@ -29,7 +31,7 @@ export async function getChatById(
 			);
 		}
 
-		return convertToUI<DBChat, Chat.UIChat>(chat);
+		return convertToUI<ChatModel, Chat.UIChat>(chat);
 	}
 }
 
@@ -46,7 +48,7 @@ export async function getChatByMessageId(messageId: string, userId?: string) {
 		);
 	}
 
-	return convertToUI<DBChat, Chat.UIChat>(message.chat);
+	return convertToUI<ChatModel, Chat.UIChat>(message.chat);
 }
 
 export interface ListChatsParams extends PaginatedOptions {
@@ -88,7 +90,7 @@ export async function listChatsByUserId(
 		}),
 	]);
 
-	const uiChats = chats.map(convertToUI<DBChat, Chat.UIChat>);
+	const uiChats = chats.map(convertToUI<ChatModel, Chat.UIChat>);
 
 	if (grouped) {
 		return groupItemsByDate(uiChats);

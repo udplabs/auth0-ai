@@ -1,13 +1,12 @@
 model RemoteChat {
-  id        String          @id @default(ulid())
-  userId    String?
-  title     String?
-  messages  RemoteMessage[]
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-
+  id            String          @id @default(ulid())
+  userId        String?
+  title         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
   appInstanceId String
-  appInstance   AppInstance @relation(fields: [appInstanceId], references: [id])
+  appInstance   AppInstance     @relation(fields: [appInstanceId], references: [id])
+  messages      RemoteMessage[]
 
   @@index([userId])
   @@index([appInstanceId])

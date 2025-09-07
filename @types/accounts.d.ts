@@ -1,3 +1,4 @@
+// @types/accounts.d.ts
 declare global {
 	namespace Accounts {
 		type Type = 'deposit' | 'loan' | 'credit' | 'investment';
@@ -107,6 +108,7 @@ declare global {
 		}
 
 		type AccountPermissions =
+			| 'can_view'
 			| 'can_view_balances'
 			| 'can_view_transactions'
 			| 'can_transfer_funds'

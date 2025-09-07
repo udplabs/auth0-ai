@@ -5,7 +5,7 @@ import { promises } from 'fs';
 import { revalidateTag } from 'next/cache';
 import path from 'path';
 import { ulid } from 'ulid';
-import { Prisma as PrismaNeon } from '../generated/neon';
+import { Prisma as Neon } from '../generated/neon';
 import { Prisma } from '../generated/prisma';
 import { neon } from '../neon/client';
 import { prisma } from '../prisma/client';
@@ -80,7 +80,7 @@ export async function upsertSettings(
 			appInstance: {
 				connect: { id: appInstance.id },
 			},
-		} as PrismaNeon.RemoteSettingsCreateInput,
+		} as Neon.RemoteSettingsCreateInput,
 	});
 
 	// Settings is returned in the user profile
