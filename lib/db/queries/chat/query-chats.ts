@@ -9,18 +9,17 @@ import { prisma } from '../../prisma/client';
 interface GetChatByIdOptions {
 	userId?: string;
 	includeMessages?: boolean;
-	includeStreams?: boolean;
 }
 
 export async function getChatById(
 	id: string,
 	options: GetChatByIdOptions = {}
 ): Promise<Chat.UIChat | undefined> {
-	const { userId, includeMessages = false, includeStreams = false } = options;
+	const { userId, includeMessages = false } = options;
 
 	const chat = await prisma.chat.findUnique({
 		where: { id },
-		include: { messages: includeMessages, streams: includeStreams },
+		include: { messages: includeMessages },
 	});
 
 	if (chat !== null) {

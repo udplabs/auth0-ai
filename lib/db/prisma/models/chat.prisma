@@ -5,18 +5,6 @@ model Chat {
   messages  Message[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  streams   Stream[]
 
   @@index([userId])
-}
-
-model Stream {
-  id     String @id @default(ulid())
-  chatId String
-  chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([chatId])
 }

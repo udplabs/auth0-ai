@@ -68,7 +68,6 @@ export async function deleteChatById(
 	const _chat = await getChatById(chatId, {
 		userId,
 		includeMessages: true,
-		includeStreams: true,
 	});
 
 	if (!_chat) {
