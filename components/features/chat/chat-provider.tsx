@@ -1,7 +1,7 @@
 'use client';
 
 import { toast } from '@/components/toast';
-import { useAutoResume, useChatHistory, useUserProfile } from '@/hooks';
+import { useChatHistory, useUserProfile } from '@/hooks';
 import { APIError } from '@/lib/errors';
 import { fetchWithErrorHandlers } from '@/lib/utils';
 import { Chat as AIChat } from '@ai-sdk/react';
@@ -225,12 +225,6 @@ export function ChatProvider<
 			//TODO: update settings w/ correct step number
 		}
 	}, [id, isFirstLogin, chat]);
-
-	useAutoResume({
-		autoResume,
-		initialMessages: messages,
-		resumeStream: chat?.resumeStream,
-	});
 
 	const value = useMemo<ChatContextValue>(
 		() => ({ chat: chat as unknown as AIChat<Chat.UIMessage> }),
