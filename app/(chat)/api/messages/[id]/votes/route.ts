@@ -3,6 +3,8 @@ import { voteMessage } from '@/lib/db/queries/chat/mutate-messages';
 import { APIError } from '@/lib/errors';
 import { type NextRequest, NextResponse } from 'next/server';
 
+// Handles up/down voting a message.
+// Probably a bette way to do this but this works for now.
 export async function PATCH(
 	request: NextRequest,
 	{ params }: { params: Promise<ApiPathParams> }

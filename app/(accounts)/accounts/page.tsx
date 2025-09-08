@@ -6,6 +6,12 @@ import { Button } from '@/components/ui/button';
 import { useUserProfile } from '@/hooks';
 import { Bell, Settings } from 'lucide-react';
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: 'Accounts Dashboard',
+};
+
 export default function AccountsPage() {
 	const { data: user } = useUserProfile();
 
@@ -19,7 +25,8 @@ export default function AccountsPage() {
 					<div className='flex items-center justify-between'>
 						<div>
 							<h1 className='text-3xl font-bold tracking-tight'>
-								Welcome, {user?.displayName}
+								Welcome,{' '}
+								<span className='text-bank-primary'>{user?.displayName}</span>
 							</h1>
 							<p className='text-muted-foreground'>
 								Here's an overview of your accounts

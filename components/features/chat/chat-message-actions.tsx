@@ -45,7 +45,7 @@ export function PureChatMessageActions({
 						'text-muted-foreground h-fit px-2 py-1',
 						ActionProps?.className
 					),
-					toolTip: 'Copy',
+					tooltip: 'Copy',
 					variant: 'outline',
 					onClick: async () => {
 						const textFromParts = message.parts
@@ -74,7 +74,7 @@ export function PureChatMessageActions({
 						'text-muted-foreground !pointer-events-auto h-fit px-2 py-1',
 						ActionProps?.className
 					),
-					toolTip: 'Loved it!',
+					tooltip: 'Loved it!',
 					'data-testid': 'message-upvote',
 					variant: 'outline',
 					onClick: async () => {
@@ -105,7 +105,7 @@ export function PureChatMessageActions({
 						'text-muted-foreground !pointer-events-auto h-fit px-2 py-1',
 						ActionProps?.className
 					),
-					toolTip: 'Hated it!',
+					tooltip: 'Hated it!',
 					'data-testid': 'message-downvote',
 					variant: 'outline',
 					onClick: async () => {

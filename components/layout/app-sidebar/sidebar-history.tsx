@@ -13,8 +13,10 @@ import { useParams } from 'next/navigation';
 import { SidebarHistoryItem } from './sidebar-history-item';
 export function SidebarHistory() {
 	const { setOpenMobile } = useSidebar();
-	const { id } = useParams();
+	const { id: _id } = useParams<{ id: string }>();
 	const { user, isLoading: isAuthLoading } = useUser();
+
+	const id = _id && Array.isArray(_id) ? _id[0] : _id;
 
 	const { data: chats, count, isLoading, deleteChat } = useChatHistory();
 

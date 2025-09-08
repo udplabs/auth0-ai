@@ -1,3 +1,4 @@
+// @types/accounts.d.ts
 declare global {
 	namespace Accounts {
 		type Type = 'deposit' | 'loan' | 'credit' | 'investment';
@@ -43,7 +44,7 @@ declare global {
 			 *
 			 * For loan accounts, this represents the current outstanding balance (i.e. amount owed including principal/interest/fees).
 			 */
-			balance: number;
+			balance?: number;
 			/**
 			 * The ISO 4217 currency code (e.g. "USD" for US Dollars, "EUR" for Euros).
 			 *
@@ -103,17 +104,25 @@ declare global {
 				| 'dormant'
 				| 'delinquent';
 			transactions?: Accounts.Transaction[];
+			permissions?: AccountPermissions[];
 		}
+
+		type AccountPermissions =
+			| 'can_view'
+			| 'can_view_balances'
+			| 'can_view_transactions'
+			| 'can_transfer_funds'
+			| 'can_transfer';
 
 		interface LoanRoot {
 			/**
 			 * The calculated payment/balance due on the loan. This may differ from `paymentAmount` if the consumer has paid ahead or is behind on payments.
 			 */
-			balanceDue: number;
+			balanceDue?: number;
 			/**
 			 * The current principal balance of the loan. This is the amount that is currently owed (minus interest/fees) on the loan and decreases as payments are made.
 			 */
-			currentPrincipal: number;
+			currentPrincipal?: number;
 			/**
 			 * Represents the date (in ISO 8601 format) the `balanceDue` is due and may different from the `paymentDate` which is the recurring date a payment is expected.
 			 *
@@ -141,7 +150,7 @@ declare global {
 			/**
 			 * The original opening balance of the loan. This is the amount that was originally borrowed when the loan was first issued and does not change.
 			 */
-			originalPrincipal: number;
+			originalPrincipal?: number;
 			/**
 			 * The regular payment amount for the loan. This is typically the amount due each month but can differ from `balanceDue` if the consumer has paid ahead or is behind on payments.
 			 *
@@ -185,7 +194,7 @@ declare global {
 			/**
 			 * The amount due for the current billing cycle. This is the total amount that must be paid by the `paymentDueDate` to avoid interest charges, late fees or penalties.
 			 */
-			statementBalance: number;
+			statementBalance?: number;
 		};
 
 		interface DepositRoot {
@@ -194,7 +203,7 @@ declare global {
 			 *
 			 * This is the amount of money that is currently available for withdrawal or spending, and may differ from the `balance` due to pending transactions (e.g. holds on deposits, pending withdrawals).
 			 */
-			availableBalance: number;
+			availableBalance?: number;
 			dividendRate: number;
 			/**
 			 * The year-to-date interest earned on the account. This is the total amount of interest that has been credited to the account since the beginning of the calendar year.
@@ -237,20 +246,6 @@ declare global {
 			T extends Accounts.Type = Accounts.Type,
 			S extends Accounts.SubType = Accounts.SubTypeOf<T & Accounts.Type>,
 		> = Omit<Accounts.Account<T, S>, 'transactions'>;
-		// =============================
-
-		// Use when type is unknown.
-		// type AnyAccount =
-		// 	| Accounts.Account<'loan'>
-		// 	| Accounts.Account<'credit'>
-		// 	| Accounts.Account<'deposit'>
-		// 	| Accounts.Account<'investment'>;
-
-		// type AnyAccountWithoutTransactions = Omit<
-		// 	Accounts.AnyAccount,
-		// 	'transactions'
-		// >;
-		// =============================
 
 		interface CreateAccountInput extends Omit<Accounts.Account, 'id'> {
 			openedDate?: Accounts.Account['openedDate'];

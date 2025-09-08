@@ -1,22 +1,27 @@
 'use server';
 
+import { openai } from '@/lib/ai/openai';
+import { chatKey } from '@/lib/api/chat/get-chat';
+import { saveChat, saveMessages } from '@/lib/db/queries/chat';
 import { chunk, withStreamingJitter } from '@/lib/utils';
-import { openai } from '@ai-sdk/openai';
 import {
 	type UIMessage,
 	type UIMessageStreamWriter,
 	generateText,
 	TextPart,
 } from 'ai';
+import { revalidateTag } from 'next/cache';
 import { ulid } from 'ulid';
 
 const model = openai('gpt-5-nano');
 
+/**
+ * Generates a title from the user's message.
+ * A bit heavy, but worth it.
+ */
 export async function generateTitleFromUserMessage(
 	message: UIMessage | string
 ) {
-	console.log('generating title...');
-
 	let messageText = 'Unknown';
 
 	if (typeof message !== 'string') {
@@ -39,7 +44,6 @@ export async function generateTitleFromUserMessage(
 		prompt: messageText,
 	});
 
-	console.log('title:', title);
 	return title;
 }
 
@@ -72,6 +76,7 @@ async function streamTitle(
 	jitter.flush();
 }
 
+// Generates a user-friendly error message from an error object.
 export async function getErrorMessage(error: unknown) {
 	const err = error instanceof Error ? error.message : String(error);
 	const cause = error instanceof Error ? error.cause : '';
@@ -94,4 +99,49 @@ export async function getErrorMessage(error: unknown) {
 	});
 
 	return text;
+}
+
+export interface SaveMessagesActionOptions {
+	chatId: string;
+	userId?: string;
+}
+
+// API handler that invalidates cache + db action
+export async function saveMessagesAction(
+	messages: Chat.UIMessage[],
+	{ chatId, userId }: SaveMessagesActionOptions
+) {
+	// Invalidate chat cache.
+	revalidateTag(chatKey({ userId, id: chatId }));
+
+	// Save messages to the database.
+	await saveMessages(messages);
+}
+
+// API handler that invalidates cache + db action
+export async function saveChatAction({
+	id,
+	userId,
+	messages = [],
+	...chat
+}: Chat.CreateChatInput) {
+	// Persist (upsert) chat + messages + auto title derived from last message.
+	const dbChat = await saveChat({
+		id,
+		userId,
+		messages,
+		title:
+			chat?.title ??
+			(await generateTitleFromUserMessage(messages?.at(-1) || 'Unknown')),
+		...chat,
+	});
+
+	// Invalidate chat history cache.
+	revalidateTag('chat:history');
+	// Invalidate chat cache.
+	revalidateTag(
+		chatKey({ userId: userId != null ? userId : undefined, id: dbChat.id })
+	);
+
+	return dbChat;
 }

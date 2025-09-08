@@ -1,4 +1,3 @@
-import type { Content } from '@/lib/db/generated/neon';
 import type { Settings } from '@/lib/db/generated/prisma';
 import type { Geo } from '@vercel/functions';
 declare global {
@@ -18,12 +17,11 @@ declare global {
 		updatedAt: string;
 	}
 
-	type UICreateSettingsInput = Partial<UISettings>;
+	interface UICreateSettingsInput extends Partial<UISettings> {
+		id: string;
+		createdAt?: string | Date;
+		updatedAt?: string | Date;
+	}
 
 	type UIGeolocation = Geo;
-
-	interface UIContent extends Omit<Content, 'createdAt' | 'updatedAt'> {
-		createdAt?: string;
-		updatedAt?: string;
-	}
 }

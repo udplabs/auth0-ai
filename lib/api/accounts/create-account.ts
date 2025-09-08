@@ -1,5 +1,4 @@
-import { createDocumentsWithEmbeddings } from '@/lib/ai/rag/create-documents';
-import { createOwnerPermissions } from '@/lib/auth0/fga/permissions';
+import { createOwnerPermissions } from '@/lib/auth0/fga/utils';
 import { saveAccountsAndReturnSeparate } from '@/lib/db/queries/accounts';
 
 interface CreateAccountsOptions {
@@ -45,6 +44,10 @@ export async function createAccounts({
 	);
 
 	if (createEmbeddings) {
+		const { createDocumentsWithEmbeddings } = await import(
+			'@/lib/ai/rag/create-documents'
+		);
+
 		await createDocumentsWithEmbeddings(newTransactions);
 	}
 

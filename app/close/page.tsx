@@ -6,6 +6,9 @@ import { useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/prompt-kit/loader';
 
+// This page is used by @auth0/ai interrupt architecture
+// which is NOT currently implemented.
+// FOR FUTURE USE.
 export default function PopupClosePage() {
 	const { open, setOpen } = useSidebar();
 

@@ -64,7 +64,6 @@ export function convertToDB<UI = any, DB = any>(
 			return result[0] as DB;
 		}
 
-		console.log('result:', result);
 		return result as DB;
 	} catch (error: unknown) {
 		console.log('convertToDB error');
@@ -135,6 +134,11 @@ export function convertToUI<DB = any, UI = any>(dbItem: DB): UI {
 					// Move DB fields for messages into metadata without overwriting existing metadata
 					uiItem['metadata'] = uiItem['metadata'] ?? {};
 					uiItem['metadata'][key] = value;
+					continue;
+				}
+
+				// Remove Sample data fields
+				if (['lastSyncedAt', 'expiresAt'].includes(key)) {
 					continue;
 				}
 

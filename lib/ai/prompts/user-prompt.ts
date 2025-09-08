@@ -1,22 +1,19 @@
-import { getSettings } from '@/lib/db/queries/settings';
+import { upsertSettings } from '@/lib/db/queries/settings';
 
 export async function getUserPrompt(userId?: string) {
 	if (!userId) return '';
 
-	const {
-		currentLabStep,
-		labMeta,
-		preferences,
-		firstMessage = true,
-	} = (await getSettings(userId)) || {};
+	const { currentLabStep, nextLabStep, labMeta, preferences } =
+		(await upsertSettings({ id: userId })) || {};
 
-	const userPrompt = [
-		`Current authenticated user: ${userId}`,
-		`First message: ${firstMessage}`,
-	];
+	const userPrompt = [`Current authenticated userId: ${userId}`];
 
 	if (currentLabStep) {
 		userPrompt.push(`Current Lab Step: ${currentLabStep}`);
+	}
+
+	if (nextLabStep) {
+		userPrompt.push(`Next Lab Step: ${nextLabStep}`);
 	}
 
 	if (labMeta) {

@@ -1,5 +1,7 @@
+'use server';
+
 import { convertToUI } from '@/lib/utils/db-converter';
-import { Account, Prisma } from '../../generated/prisma';
+import { Account as AccountModel, Prisma } from '../../generated/prisma';
 import { prisma } from '../../prisma/client';
 
 export async function getExternalAccountsByUserId(userId: string) {
@@ -8,7 +10,7 @@ export async function getExternalAccountsByUserId(userId: string) {
 		include: { transactions: true },
 	});
 
-	return convertToUI<Account[], Accounts.Account[]>(dbAccounts);
+	return convertToUI<AccountModel[], Accounts.Account[]>(dbAccounts);
 }
 
 export async function getAccountsByUserId(
@@ -31,7 +33,7 @@ export async function getAccountsByUserId(
 		where: { customerId: userId },
 		include: includeTransactions ? { transactions: true } : undefined,
 	});
-	return convertToUI<Account[], Accounts.Account[]>(dbAccounts);
+	return convertToUI<AccountModel[], Accounts.Account[]>(dbAccounts);
 }
 
 export async function listAccountsByCustomerId(
@@ -40,7 +42,7 @@ export async function listAccountsByCustomerId(
 	const dbAccounts = await prisma.account.findMany({
 		where: { customerId },
 	});
-	return convertToUI<Account[], Accounts.Account[]>(dbAccounts);
+	return convertToUI<AccountModel[], Accounts.Account[]>(dbAccounts);
 }
 
 export async function getAccountsByAccountId(
@@ -51,7 +53,7 @@ export async function getAccountsByAccountId(
 		where: { id: { in: accountIds } },
 		include: { transactions: includeTransactions },
 	});
-	return convertToUI<Account[], Accounts.Account[]>(dbAccounts);
+	return convertToUI<AccountModel[], Accounts.Account[]>(dbAccounts);
 }
 
 // THIS IS AN INTERNAL FUNCTION USED ONLY TO GENERATE THE VECTOR DB
@@ -62,5 +64,5 @@ export async function getAllAccounts(
 	const dbAccounts = await prisma.account.findMany(
 		where ? { where } : undefined
 	);
-	return convertToUI<Account[], Accounts.Account[]>(dbAccounts);
+	return convertToUI<AccountModel[], Accounts.Account[]>(dbAccounts);
 }

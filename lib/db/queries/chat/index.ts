@@ -11,4 +11,3 @@ export {
 	listChatsByUserId,
 } from './query-chats';
 export { getMessagesByChatId } from './query-messages';
-export { createStreamId, getStreamIdsByChatId } from './stream';

@@ -10,7 +10,7 @@ import {
 	SidebarMenuItem,
 	SidebarContent as UISidebarContent,
 } from '@/components/ui/sidebar';
-import { LandmarkIcon, PiggyBankIcon } from 'lucide-react';
+import { LandmarkIcon, PiggyBankIcon, ReceiptTextIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SidebarHistory } from './sidebar-history';
@@ -36,9 +36,25 @@ export const SidebarContent = () => {
 							</SidebarMenuButton>
 						</SidebarMenuItem>
 						<SidebarMenuItem>
-							<SidebarMenuButton>
-								<LandmarkIcon />
-								Foo:bar
+							<SidebarMenuButton
+								asChild
+								isActive={pathname.includes('transfers')}
+							>
+								<Link href='/transfers'>
+									<LandmarkIcon />
+									Transfers
+								</Link>
+							</SidebarMenuButton>
+						</SidebarMenuItem>
+						<SidebarMenuItem>
+							<SidebarMenuButton
+								asChild
+								isActive={pathname.includes('payments')}
+							>
+								<Link href='/payments'>
+									<ReceiptTextIcon />
+									Bill Pay
+								</Link>
 							</SidebarMenuButton>
 						</SidebarMenuItem>
 					</SidebarMenu>

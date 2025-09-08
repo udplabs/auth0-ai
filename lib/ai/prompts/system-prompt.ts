@@ -1,30 +1,19 @@
-import { devcampContext } from './devcamp-context';
-import { devcampLabGuide } from './devcamp-lab-guide';
-import { devcampUseCases } from './devcamp-use-cases';
-import { financialAnalysisPrompt } from './financial-analysis-prompt';
-import { getGeolocationPrompt } from './geolocation-prompt';
-import { rootPrompt } from './root-prompt';
-import { toolGuide } from './tool-guide';
-import { getUserPrompt } from './user-prompt';
-
-import { getStepPrompts } from '@/lib/db/queries/settings';
-
 export async function getSystemPrompts({
-	requestHints,
+	requestHints: { settings, ...hints },
 }: {
 	requestHints: Chat.RequestHints;
 }) {
-	const requestPrompt = await getRequestPromptFromHints(requestHints);
+	if (!settings && hints?.userId) {
+		const { upsertSettings } = await import('@/lib/db/queries/settings');
 
-	const prompts = [
-		rootPrompt,
-		requestPrompt,
-		toolGuide,
-		devcampContext,
-		devcampUseCases,
-		devcampLabGuide,
-		financialAnalysisPrompt,
-	];
+		settings = await upsertSettings({ id: hints.userId });
+	}
+
+	const prompts = await getPrompts(settings);
+
+	prompts.push(...(await getRequestPromptFromHints(hints)));
+
+	console.log('System Prompts Loaded:', prompts.length);
 
 	return prompts.flat().join('\n\n');
 }
@@ -32,30 +21,79 @@ export async function getSystemPrompts({
 export async function getRequestPromptFromHints({
 	geolocation,
 	userId,
-	settings,
 }: Chat.RequestHints) {
 	const prompts = [];
+
+	const { getUserPrompt } = await import('@/lib/ai/prompts/user-prompt');
 
 	if (userId) {
 		prompts.push(await getUserPrompt(userId));
 	}
 
 	if (geolocation) {
+		const { getGeolocationPrompt } = await import(
+			'@/lib/ai/prompts/geolocation-prompt'
+		);
+
 		prompts.push(getGeolocationPrompt(geolocation));
 	}
 
-	if (settings) {
-		const { currentLabStep, nextLabStep } = settings;
-		const labStep =
-			nextLabStep && currentLabStep != nextLabStep
-				? nextLabStep
-				: currentLabStep;
+	return prompts;
+}
 
-		// fetch lab step prompt
-		const content = await getStepPrompts(labStep);
+async function getPrompts(settings?: Partial<UISettings>) {
+	const { sortBy } = await import('@/lib/utils');
 
-		prompts.push(...content);
+	const { getSystemPrompts: getDBSystemPrompts } = await import(
+		'@/lib/db/queries/content'
+	);
+	const systemPrompts = sortBy(await getDBSystemPrompts(), 'name');
+
+	console.log('=== found', systemPrompts.length, 'system prompts ===');
+
+	// Defaulting to Step 2 as it is the first step
+	// User will not be authenticated and will not have settings
+	const { currentLabStep, nextLabStep } = settings || {};
+
+	const labStep =
+		nextLabStep && currentLabStep != nextLabStep ? nextLabStep : currentLabStep;
+
+	if (labStep) {
+		const { getStepPrompts, getStepGuides } = await import(
+			'@/lib/db/queries/content'
+		);
+		const stepPrompts = sortBy(await getStepPrompts(labStep), 'name');
+
+		console.log('=== found', stepPrompts.length, 'step prompts ===');
+
+		systemPrompts.push(...stepPrompts);
+
+		const guidePrompts = sortBy(await getStepGuides(labStep), 'name');
+
+		console.log('=== found', guidePrompts.length, 'guides ===');
+
+		systemPrompts.push(...guidePrompts);
 	}
 
+	const prompts = [];
+
+	if (systemPrompts.length > 0) {
+		for (const prompt of systemPrompts) {
+			const { textData, name, contentType, mimeType } = prompt;
+			if (mimeType?.toUpperCase().startsWith('TEXT')) {
+				console.log(`loading prompt: ${name}`);
+
+				if (contentType === 'guide/step') {
+					// Wrap guide so AIya knows it's the guide
+					prompts.push(
+						`\n\n===== LAB GUIDE: ${name} =====\n\n${textData}\n\n====================`
+					);
+				}
+				prompts.push(textData);
+			}
+		}
+	}
+
+	console.log('loaded', prompts.length, 'prompts');
 	return prompts;
 }

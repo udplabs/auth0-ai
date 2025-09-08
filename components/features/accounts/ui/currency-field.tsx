@@ -1,5 +1,5 @@
 export const CurrencyField = ({
-	children = 0,
+	children = '**hidden**',
 	currencyCode = 'USD',
 	...props
 }: CurrencyProps) => {
@@ -9,11 +9,15 @@ export const CurrencyField = ({
 		minimumFractionDigits: 2,
 	}).format;
 
-	return <span {...props}>{formatter(children)}</span>;
+	return (
+		<span {...props}>
+			{typeof children === 'string' ? children : formatter(children)}
+		</span>
+	);
 };
 
 export interface CurrencyProps
 	extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> {
 	currencyCode?: Accounts.Account['currencyCode'];
-	children?: number;
+	children?: number | '**hidden**';
 }

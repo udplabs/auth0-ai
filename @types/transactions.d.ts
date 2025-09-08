@@ -1,3 +1,4 @@
+// @types/transactions.d.ts
 declare global {
 	namespace Accounts {
 		interface Transaction {

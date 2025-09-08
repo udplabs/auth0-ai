@@ -1,26 +1,35 @@
 import type { ToolSet } from 'ai';
-// import { addExternalAccount } from './tools/add-external-account';
-import { getAccounts } from './tools/get-accounts';
-// import { getExternalAccounts } from './tools/get-external-accounts';
-import { getTransactions } from './tools/get-transactions';
-import { getWeather } from './tools/get-weather';
-import { pushEnrollment } from './tools/push-enroll';
-import { userSettings } from './tools/system/user-settings';
-// === LAB STEP ===
-import { ragAccounts } from './tools/rag-accounts';
-// ================
-import { userInfo } from './tools/user-info';
+
+import {
+	getAccounts,
+	getContent,
+	getReferenceFile,
+	getTransactions,
+	getUserProfile,
+	getWeather,
+	transferFunds,
+	userSettings,
+} from './tools';
+
+import { pushEnrollment } from './tools/_push-enroll';
+
+// ---------------------------------------------------------------------------
+// ❌ STEP 8: Import searchTransactions tool
+// TODO
+// ---------------------------------------------------------------------------
 
 export const toolRegistry = {
-	// addExternalAccount,
 	getAccounts,
-	// getExternalAccounts,
+	getContent,
+	getReferenceFile,
 	getTransactions,
+	getUserProfile,
 	getWeather,
-	userSettings,
 	pushEnrollment,
-	// === LAB STEP ===
-	ragAccounts,
-	// ================
-	userInfo,
+	transferFunds,
+	userSettings,
+	// ---------------------------------------------------------------------------
+	// ❌ STEP 9: Add searchTransactions tool
+	// TODO
+	// ---------------------------------------------------------------------------
 } satisfies ToolSet;

@@ -1,12 +1,12 @@
 import { getChatHistory } from '@/lib/api/chat/get-chat';
 import { getUser } from '@/lib/auth0';
-import { APIError } from '@/lib/errors';
 import { getSearchParams } from '@/lib/utils/get-search-params';
 import { type NextRequest, NextResponse } from 'next/server';
 
 interface GetChatsParams extends ApiQueryParams {
-	grouped?: 'true' | 'false';
+	grouped?: boolean;
 }
+// Fetches chat history [for sidebar].
 export async function GET(request: NextRequest) {
 	try {
 		console.log('fetching chat history...');
@@ -31,6 +31,8 @@ export async function GET(request: NextRequest) {
 
 		return NextResponse.json(data);
 	} catch (error: unknown) {
+		const { APIError } = await import('@/lib/errors');
+
 		if (error instanceof APIError) {
 			return error.toResponse();
 		}

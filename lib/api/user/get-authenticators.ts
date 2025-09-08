@@ -1,5 +1,4 @@
 import ManagementClient from '@/lib/auth0/management-client';
-import { getCacheKey } from '@/lib/utils';
 import { unstable_cache } from 'next/cache';
 
 async function fetchAuthenticators(id: string) {
@@ -10,6 +9,8 @@ async function fetchAuthenticators(id: string) {
 
 export async function getAuthenticators({ userId, key, tags }: ActionOptions) {
 	if (!key) {
+		const { getCacheKey } = await import('@/lib/utils');
+
 		key = getCacheKey({ userId, resource: ['authenticators'] });
 	}
 

@@ -34,6 +34,7 @@ declare global {
 		| 'password';
 
 	interface UserProfile extends GetUsers200ResponseOneOfInner {
+		displayName?: string;
 		custom_metadata?: Partial<Omit<Settings, 'createdAt' | 'updatedAt' | 'id'>>;
 	}
 }

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { WaitingMessage } from '../util/loader';
+import { Loader } from '@/components/ui/ai-elements/loader';
 import { PromptUserContainer } from '../util/prompt-user-container';
 import type { FederatedConnectionAuthProps } from './FederatedConnectionAuthProps';
 
@@ -94,7 +94,11 @@ export function EnsureAPIAccessPopup({
 	}, [connection, requiredScopes, returnTo, authorizePath]);
 
 	if (isLoading) {
-		return <WaitingMessage />;
+		return (
+			<span>
+				<Loader /> Waiting for you to complete authentication...
+			</span>
+		);
 	}
 
 	return (

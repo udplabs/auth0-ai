@@ -1,10 +1,5 @@
 import { toolRegistry } from '@/lib/ai/tool-registry';
-import type {
-	Chat as DBChat,
-	Prisma,
-	Stream,
-	Suggestion,
-} from '@/lib/db/generated/prisma';
+import type { Chat as ChatModel, Prisma } from '@/lib/db/generated/prisma';
 
 import type {
 	UIMessage as AIMessage,
@@ -15,13 +10,12 @@ import type {
 
 declare global {
 	namespace Chat {
-		interface UIChat extends DBChat {
+		interface UIChat extends ChatModel {
 			title?: string;
 			userId?: string;
 			createdAt: string;
 			updatedAt: string;
 			messages?: Chat.UIMessage[];
-			streams?: Chat.UIStream[];
 		}
 
 		type DataPart = { type: 'append-message'; message: string };
@@ -35,6 +29,8 @@ declare global {
 			isDownVoted?: boolean;
 			chatId: string;
 			userId?: string;
+			labStep?: string;
+			isFirstMessage?: string;
 		}
 
 		type UIMessage = AIMessage<
@@ -56,7 +52,7 @@ declare global {
 		interface RequestHints {
 			userId?: string;
 			geolocation: UIGeolocation;
-			settings?: UISettings;
+			settings?: Partial<UISettings>;
 		}
 		interface ListChatsByUserIdResult extends PaginatedResults {
 			chats: Chat.UIChat[];
@@ -79,10 +75,6 @@ declare global {
 			lastWeek: T[];
 			lastMonth: T[];
 			older: T[];
-		}
-		interface UIStream extends Stream {
-			createdAt?: string;
-			updatedAt?: string;
 		}
 	}
 }

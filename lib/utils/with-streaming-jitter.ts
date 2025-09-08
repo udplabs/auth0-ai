@@ -1,13 +1,35 @@
 import type { InferUIMessageChunk, UIMessage, UIMessageStreamWriter } from 'ai';
 
 type JitterOptions = {
-	baseMs?: number; // average delay per chunk
-	jitterPct?: number; // +/- percentage jitter (0.0–1.0)
-	pauseChance?: number; // probability of a longer pause per chunk (0–1)
-	pauseMs?: [number, number]; // range for long pauses
-	spikeEvery?: number; // every N chunks, add a spike delay
-	spikeMs?: [number, number]; // range for spike delays
-	seed?: number; // optional deterministic seed
+	/**
+	 * Base delay in milliseconds for each chunk.
+	 */
+	baseMs?: number;
+	/**
+	 * +/- Jitter percentage to apply to the base delay.
+	 * @example 0.5
+	 */
+	jitterPct?: number;
+	/**
+	 * Probability of a longer pause per chunk (0–1).
+	 */
+	pauseChance?: number;
+	/**
+	 * Range for long pauses.
+	 */
+	pauseMs?: [number, number];
+	/**
+	 * Every N chunks, add a spike delay.
+	 */
+	spikeEvery?: number;
+	/**
+	 * Range for spike delays.
+	 */
+	spikeMs?: [number, number];
+	/**
+	 * Optional deterministic seed.
+	 */
+	seed?: number;
 };
 
 // Basic sleep
@@ -50,10 +72,10 @@ export function withStreamingJitter<
 
 function createJitter(opts: JitterOptions = {}) {
 	const {
-		baseMs = 40,
+		baseMs = 300,
 		jitterPct = 0.5,
 		pauseChance = 0.03,
-		pauseMs = [224, 632],
+		pauseMs = [224, 532],
 		spikeEvery = 32,
 		spikeMs = [124, 332],
 		seed,

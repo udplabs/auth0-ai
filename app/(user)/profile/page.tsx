@@ -17,7 +17,9 @@ export default async function ProfilePage() {
 	const { tokenSet, user } = (await getSession()) || {};
 
 	if (!user?.sub) {
-		return <div>User not found</div>;
+		const { redirect } = await import('next/navigation');
+
+		redirect('/');
 	}
 
 	return (

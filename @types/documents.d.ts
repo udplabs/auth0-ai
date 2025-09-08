@@ -1,10 +1,13 @@
+// @types/documents.d.ts
 declare global {
 	namespace Documents {
 		interface Document {
 			id: string;
+			userId: string;
 			pageContent: string;
 			createdAt: string;
-			updatedAt: string;
+			expiresAt?: string;
+			lastSyncedAt?: string;
 			metadata: Documents.Metadata;
 		}
 		interface DocumentWithScore extends Documents.Document {
@@ -13,18 +16,34 @@ declare global {
 		interface DocumentWithEmbedding extends Documents.Document {
 			embedding: Documents.Embedding;
 		}
-		interface Metadata extends Record<string, unknown> {
-			accountId?: string;
-			transactionId?: string;
+		interface Metadata
+			extends Partial<
+					Pick<
+						Accounts.Transaction,
+						| 'accountId'
+						| 'date'
+						| 'amount'
+						| 'type'
+						| 'categoryId'
+						| 'categoryName'
+						| 'budgetCategory'
+						| 'budgetSubcategory'
+						| 'payee'
+						| 'isExternal'
+						| 'externalConnectionId'
+						| 'externalConnectionName'
+						| 'currencyCode'
+					>
+				>,
+				Record<string, unknown> {
 			accountType?: string;
-			customerId?: string;
 			modelId?: string;
+			transactionId?: Accounts.Transaction['id'];
 		}
 		type Embedding = number[];
 
 		interface CreateDocumentInput extends Documents.Document {
 			createdAt?: string;
-			updatedAt?: string;
 			embedding?: Documents.Embedding;
 		}
 	}

@@ -20,6 +20,7 @@ next-env.d.ts
 # misc
 .DS_Store
 *.pem
+*.local
 
 # debug
 npm-debug.log*
@@ -36,9 +37,10 @@ yarn-error.log*
 # turbo
 .turbo
 
-.env
+.env.*
 .vercel
-.env*.local
+.env.local
+!.sample.env.local
 
 # Playwright
 /test-results/

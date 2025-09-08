@@ -1,11 +1,13 @@
+'use server';
+
 import { convertToUI } from '@/lib/utils/db-converter';
-import type { Message } from '../../generated/prisma';
+import type { Message as MessageModel } from '../../generated/prisma';
 import { prisma } from '../../prisma/client';
 
 export async function getMessagesByChatId(
 	chatId: string
 ): Promise<Chat.UIMessage[]> {
-	return convertToUI<Message[], Chat.UIMessage[]>(
+	return convertToUI<MessageModel[], Chat.UIMessage[]>(
 		await prisma.message.findMany({
 			where: { chatId },
 			orderBy: { createdAt: 'asc' },
@@ -18,5 +20,5 @@ export async function getMessageById(id: string): Promise<Chat.UIMessage> {
 		where: { id },
 	});
 
-	return convertToUI<Message, Chat.UIMessage>(message);
+	return convertToUI<MessageModel, Chat.UIMessage>(message);
 }

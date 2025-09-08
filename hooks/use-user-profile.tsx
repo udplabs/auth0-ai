@@ -44,6 +44,8 @@ export const useUserProfile = () => {
 		onSuccess,
 	});
 
+	const displayName = data?.nickname || data?.name;
+
 	const updateUserProfile = useCallback(
 		async (updateData: UserUpdate) => {
 			if (!data || !KEY) return;
@@ -133,7 +135,10 @@ export const useUserProfile = () => {
 	}
 
 	return {
-		data,
+		data: {
+			...data,
+			displayName,
+		},
 		isLoading,
 		isAuthenticated,
 		mutate,

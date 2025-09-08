@@ -1,24 +1,24 @@
-import { type Chat as DBChat } from '@/lib/db/generated/prisma';
+'use server';
+
+import type { Chat as ChatModel } from '@/lib/db/generated/prisma';
 import { APIError } from '@/lib/errors';
-import { groupItemsByDate } from '@/lib/utils';
 import { convertToUI } from '@/lib/utils/db-converter';
 import { prisma } from '../../prisma/client';
 
 interface GetChatByIdOptions {
 	userId?: string;
 	includeMessages?: boolean;
-	includeStreams?: boolean;
 }
 
 export async function getChatById(
 	id: string,
 	options: GetChatByIdOptions = {}
 ): Promise<Chat.UIChat | undefined> {
-	const { userId, includeMessages = false, includeStreams = false } = options;
+	const { userId, includeMessages = false } = options;
 
 	const chat = await prisma.chat.findUnique({
 		where: { id },
-		include: { messages: includeMessages, streams: includeStreams },
+		include: { messages: includeMessages },
 	});
 
 	if (chat !== null) {
@@ -29,7 +29,7 @@ export async function getChatById(
 			);
 		}
 
-		return convertToUI<DBChat, Chat.UIChat>(chat);
+		return convertToUI<ChatModel, Chat.UIChat>(chat);
 	}
 }
 
@@ -46,7 +46,7 @@ export async function getChatByMessageId(messageId: string, userId?: string) {
 		);
 	}
 
-	return convertToUI<DBChat, Chat.UIChat>(message.chat);
+	return convertToUI<ChatModel, Chat.UIChat>(message.chat);
 }
 
 export interface ListChatsParams extends PaginatedOptions {
@@ -88,9 +88,11 @@ export async function listChatsByUserId(
 		}),
 	]);
 
-	const uiChats = chats.map(convertToUI<DBChat, Chat.UIChat>);
+	const uiChats = chats.map(convertToUI<ChatModel, Chat.UIChat>);
 
 	if (grouped) {
+		const { groupItemsByDate } = await import('@/lib/utils');
+
 		return groupItemsByDate(uiChats);
 	}
 

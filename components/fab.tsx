@@ -6,14 +6,13 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from '@/components/ui/popover';
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { useAccounts } from '@/hooks/use-accounts';
+import { cn } from '@/lib/utils';
 import {
 	BugOffIcon,
 	EyeIcon,
+	FileStackIcon,
+	LockIcon,
 	RotateCcwIcon,
 	WandSparkles,
 	WrenchIcon,
@@ -31,7 +30,13 @@ const handleVectorSummary = async () => {
 	await fetch('/api/accounts/db?count=true');
 };
 
+const handleEmbeddingsBuild = async () => {
+	await fetch('/api/accounts', { method: 'DELETE' });
+};
+
 export const FAB = () => {
+	const { resetPermissions, mutate } = useAccounts();
+
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
@@ -44,82 +49,81 @@ export const FAB = () => {
 				sideOffset={16}
 				align='end'
 				alignOffset={8}
-				className='rounded-2xl border-none bg-transparent pe-0 shadow-none'
+				className={cn(
+					'rounded-2xl border-none bg-transparent pe-0 shadow-none',
+					'bg-background/10 supports-[backdrop-filter]:bg-background/30 backdrop-blur-md'
+				)}
 			>
-				<div className='flex flex-col-reverse items-end gap-y-2'>
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								className='h-8 w-8 rounded-full bg-green-500 p-4'
-								onClick={() => handleVectorReInit()}
-							>
-								<WandSparkles className='h-5 w-5' />
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent
-							align='end'
-							side='left'
-							className='border-none bg-transparent shadow-none'
+				<div className='z-99 flex flex-col-reverse items-end gap-y-2'>
+					<div className='flex items-center gap-2'>
+						Initialize Vector Store
+						<Button
+							variant='success'
+							className='h-8 w-8 rounded-full p-4'
+							onClick={() => handleVectorReInit()}
 						>
-							Initialize Vector Store
-						</TooltipContent>
-					</Tooltip>
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								className='h-8 w-8 rounded-full p-4'
-								onClick={() => handleVectorReset()}
-								variant='destructive'
-							>
-								<RotateCcwIcon className='h-5 w-5' />
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent
-							align='end'
-							side='left'
-							className='border-none bg-transparent shadow-none'
+							<WandSparkles className='h-5 w-5' />
+						</Button>
+					</div>
+					<div className='flex items-center gap-2'>
+						Regenerate Embeddings
+						<Button
+							className='h-8 w-8 rounded-full p-4'
+							onClick={() => {
+								handleEmbeddingsBuild()
+									.then(() => {
+										mutate();
+									})
+									.finally(() => handleVectorReset());
+							}}
+							variant='warning'
 						>
-							Reset Vector Store
-						</TooltipContent>
-					</Tooltip>
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								className='h-8 w-8 rounded-full p-4'
-								onClick={() => handleVectorSummary()}
-							>
-								<EyeIcon className='h-5 w-5' />
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent
-							align='end'
-							side='left'
-							className='border-none bg-transparent shadow-none'
+							<FileStackIcon className='h-5 w-5' />
+						</Button>
+					</div>
+					<div className='flex items-center gap-2'>
+						Reset Vector Store
+						<Button
+							className='h-8 w-8 rounded-full p-4'
+							onClick={() => handleVectorReset()}
+							variant='destructive'
 						>
-							Get Vector Store Summary
-						</TooltipContent>
-					</Tooltip>
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								className='h-8 w-8 rounded-full p-4'
-								variant='destructive'
-								onClick={() => {
-									localStorage.removeItem('first-message');
-									redirect('/chat');
-								}}
-							>
-								<BugOffIcon className='h-5 w-5' />
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent
-							align='end'
-							side='left'
-							className='border-none bg-transparent shadow-none'
+							<RotateCcwIcon className='h-5 w-5' />
+						</Button>
+					</div>
+					<div className='flex items-center gap-2'>
+						Get Vector Store Summary
+						<Button
+							className='h-8 w-8 rounded-full p-4'
+							variant='success'
+							onClick={() => handleVectorSummary()}
 						>
-							Reset 'first-message'
-						</TooltipContent>
-					</Tooltip>
+							<EyeIcon className='h-5 w-5' />
+						</Button>
+					</div>
+					<div className='flex items-center gap-2'>
+						Reset 'first-message'
+						<Button
+							className='h-8 w-8 rounded-full p-4'
+							variant='destructive'
+							onClick={() => {
+								localStorage.removeItem('first-message');
+								redirect('/chat');
+							}}
+						>
+							<BugOffIcon className='h-5 w-5' />
+						</Button>
+					</div>
+					<div className='flex items-center gap-2'>
+						Reset Account Permissions
+						<Button
+							className='h-8 w-8 rounded-full p-4'
+							variant='destructive'
+							onClick={() => resetPermissions()}
+						>
+							<LockIcon className='h-5 w-5' />
+						</Button>
+					</div>
 				</div>
 			</PopoverContent>
 		</Popover>

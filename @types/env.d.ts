@@ -150,6 +150,6 @@ namespace NodeJS {
 		 *
 		 * @readonly
 		 */
-		readonly OPENAI_API_KEY: string;
+		readonly OPENAI_API_KEY?: string;
 	}
 }

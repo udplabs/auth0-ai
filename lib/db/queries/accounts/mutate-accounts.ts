@@ -1,6 +1,11 @@
-import { convertToDB, convertToUI } from '@/lib/utils/db-converter';
-import { uniqBy } from 'lodash-es';
-import { Account, Prisma, Transaction } from '../../generated/prisma';
+'use server';
+
+import {
+	Account as AccountModel,
+	Prisma,
+	Transaction as TransactionModel,
+	Transfer as TransferModel,
+} from '../../generated/prisma';
 import { prisma } from '../../prisma/client';
 
 export async function saveAccounts(
@@ -55,6 +60,7 @@ async function saveAccountsAndTransactions(
 			transactions.push(...tx);
 		}
 	}
+	const { convertToDB, convertToUI } = await import('@/lib/utils/db-converter');
 
 	// 2) Convert to DB format
 	// This is necessary to ensure the data is in the correct format for Prisma
@@ -62,6 +68,8 @@ async function saveAccountsAndTransactions(
 		Accounts.CreateAccountInput[],
 		Prisma.AccountCreateManyInput[]
 	>(accounts);
+
+	const { uniqBy } = await import('lodash-es');
 
 	const dbTransactions = convertToDB<
 		Accounts.CreateTransactionInput[],
@@ -72,7 +80,7 @@ async function saveAccountsAndTransactions(
 		data: dbAccounts,
 	});
 
-	const uiAccounts = convertToUI<Account[], Accounts.Account[]>(
+	const uiAccounts = convertToUI<AccountModel[], Accounts.Account[]>(
 		createdAccounts
 	);
 
@@ -83,12 +91,63 @@ async function saveAccountsAndTransactions(
 		});
 
 		// 3) Convert transactions to UI format
-		const uiTransactions = convertToUI<Transaction[], Accounts.Transaction[]>(
-			createdTransactions
-		);
+		const uiTransactions = convertToUI<
+			TransactionModel[],
+			Accounts.Transaction[]
+		>(createdTransactions);
 
 		return { accounts: uiAccounts, transactions: uiTransactions };
 	}
 
 	return { accounts: uiAccounts, transactions: [] };
+}
+
+export async function updateBalances(transfer: TransferModel) {
+	const { fromAccountId, toAccountId, amount } = transfer;
+
+	const fromAccount = await prisma.account.findUnique({
+		where: { id: fromAccountId },
+	});
+	const toAccount = await prisma.account.findUnique({
+		where: { id: toAccountId },
+	});
+
+	await prisma.$transaction([
+		prisma.account.update({
+			where: { id: fromAccountId },
+			data: {
+				balance: { decrement: amount },
+				...(fromAccount?.type === 'deposit' && {
+					availableBalance: { decrement: amount },
+				}),
+			},
+		}),
+		prisma.account.update({
+			where: { id: toAccountId },
+			data: {
+				balance: { increment: amount },
+				...(toAccount?.type === 'deposit' && {
+					availableBalance: { increment: amount },
+				}),
+				...(toAccount?.type === 'loan' && {
+					balanceDue: Math.max(0, (toAccount?.balanceDue || 0) - amount),
+				}),
+			},
+		}),
+	]);
+}
+
+export async function deleteAccountData(userId: string) {
+	// Delete Documents
+	await prisma.document.deleteMany({
+		where: { userId },
+	});
+	// Delete Transactions
+	await prisma.transaction.deleteMany({
+		where: { customerId: userId },
+	});
+	// Delete Accounts
+	await prisma.account.deleteMany({
+		where: { customerId: userId },
+	});
 }

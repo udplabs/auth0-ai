@@ -1,10 +1,10 @@
 import { createDocumentsWithEmbeddings } from '@/lib/ai/rag/create-documents';
 import { LocalVectorStore } from '@/lib/ai/rag/vector-store';
 import { saveAccountsAndReturnSeparate } from '@/lib/db/queries/accounts';
-import { deleteDocuments, saveDocuments } from '@/lib/db/queries/documents';
+import { saveDocuments } from '@/lib/db/queries/documents';
 import { fakerEN as faker } from '@faker-js/faker';
 import { ulid } from 'ulid';
-import { getSampleData } from '../queries/mock';
+import { deleteSampleDocuments, getSampleData } from '../queries/mock';
 
 // Should not be used outside of this function.
 const sampleUserIds = [
@@ -38,6 +38,14 @@ export async function createMockAccounts(userId: string) {
 		account.customerId = userId;
 		accounts.push(account);
 
+		if (account?.lastSyncedAt) {
+			delete account.lastSyncedAt;
+		}
+
+		if (account?.expiresAt) {
+			delete account.expiresAt;
+		}
+
 		// Filter transactions for this account and assign new IDs
 		const accountTransactions = sampleTransactions.filter(
 			(tx) => tx.accountId === originalAccountId
@@ -55,11 +63,27 @@ export async function createMockAccounts(userId: string) {
 			);
 			const transactionDocument = sampleDocuments[transactionDocumentIndex];
 
+			if (transaction?.lastSyncedAt) {
+				delete transaction.lastSyncedAt;
+			}
+
+			if (transaction?.expiresAt) {
+				delete transaction.expiresAt;
+			}
+
 			if (transactionDocument) {
 				transactionDocument.id = transaction.id;
 				transactionDocument.metadata.accountId = account.id;
 				transactionDocument.metadata.transactionId = transaction.id;
 				transactionDocument.metadata.customerId = userId;
+
+				if (transactionDocument?.lastSyncedAt) {
+					delete transactionDocument.lastSyncedAt;
+				}
+
+				if (transactionDocument?.expiresAt) {
+					delete transactionDocument.expiresAt;
+				}
 
 				transactionDocuments.push(transactionDocument);
 			} else {
@@ -81,9 +105,7 @@ export async function createMockAccounts(userId: string) {
 		await saveAccountsAndReturnSeparate(accounts, transactions);
 
 	// Dynamically load to prevent initialization before env is ready.
-	const { createOwnerPermissions } = await import(
-		'@/lib/auth0/fga/permissions'
-	);
+	const { createOwnerPermissions } = await import('@/lib/auth0/fga/utils');
 	// Set permissions for the created accounts
 	await createOwnerPermissions(
 		userId,
@@ -117,8 +139,8 @@ export async function generateMockEmbeddings() {
 		// Embeddings should be empty. If not, overwrite it.
 		// Deletes ALL sample documents!
 		if (_documents.length > 0) {
-			await deleteDocuments();
+			await deleteSampleDocuments();
 		}
-		await createDocumentsWithEmbeddings(transactions);
+		await createDocumentsWithEmbeddings(transactions, 'sample');
 	}
 }

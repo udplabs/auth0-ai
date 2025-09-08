@@ -8,17 +8,32 @@ import {
 	CardTitle,
 	type CardProps,
 } from '@/components/ui/card';
+import { useAccounts } from '@/hooks/use-accounts';
 import { startCase } from 'lodash-es';
 import { CurrencyField, DateField } from './ui';
 
+interface AccountDetailsCardProps extends CardProps {
+	accountId: string;
+	CardContentProps?: CardProps;
+	CardDescriptionProps?: CardProps;
+	CardHeaderProps?: CardProps;
+	CardTitleProps?: CardProps;
+}
+
 export const AccountDetailsCard = ({
-	data,
+	accountId,
 	CardContentProps,
 	CardDescriptionProps,
 	CardHeaderProps,
 	CardTitleProps,
 	...props
 }: AccountDetailsCardProps) => {
+	const { data: accounts = [] } = useAccounts();
+
+	const account = accounts.find((a) => a.id === accountId);
+
+	if (!account) return null;
+
 	const {
 		balance,
 		displayName,
@@ -27,11 +42,11 @@ export const AccountDetailsCard = ({
 		number,
 		openedDate,
 		subType,
-	} = data || {};
+	} = account || {};
 
-	const availableBalance = (data as Accounts.Account<'deposit'>)
+	const availableBalance = (account as Accounts.Account<'deposit'>)
 		?.availableBalance;
-	const creditLimit = (data as Accounts.Account<'credit'>)?.creditLimit;
+	const creditLimit = (account as Accounts.Account<'credit'>)?.creditLimit;
 
 	return (
 		<Card {...props}>
@@ -66,54 +81,54 @@ export const AccountDetailsCard = ({
 						<div className='grid grid-cols-2 gap-2 pt-2'>
 							<p className='text-sm'>Account Type:</p>
 							<p className='text-sm font-medium'>{startCase(subType)}</p>
-							{'dividendRate' in data && (
+							{'dividendRate' in account && (
 								<>
 									<p className='text-sm'>Dividend Rate:</p>
 									<p className='text-sm font-medium'>
-										{data.dividendRate ?? 0}%
+										{account.dividendRate ?? 0}%
 									</p>
 									<p className='text-sm'>Dividends YTD:</p>
 									<p className='text-sm font-medium'>
 										<CurrencyField {...{ currencyCode }}>
-											{data.interestYTD}
+											{account.interestYTD}
 										</CurrencyField>
 									</p>
 								</>
 							)}
-							{'balanceDue' in data && (
+							{'balanceDue' in account && (
 								<>
 									<p className='text-sm'>Amount Due:</p>
 									<p className='text-sm font-medium'>
 										<CurrencyField {...{ currencyCode }}>
-											{data.balanceDue}
+											{account.balanceDue}
 										</CurrencyField>
 									</p>
 									<p className='text-sm'>Due By:</p>
 									<p className='text-sm font-medium'>
-										<DateField>{data.dueDate}</DateField>
+										<DateField>{account.dueDate}</DateField>
 									</p>
 									<p className='text-sm'>Next Payment Date:</p>
 									<p className='text-sm font-medium'>
-										<DateField>{data.nextPaymentDate}</DateField>
+										<DateField>{account.nextPaymentDate}</DateField>
 									</p>
 									<p className='text-sm'>Last Payment Date:</p>
 									<p className='text-sm font-medium'>
-										<DateField>{data?.lastPaymentDate}</DateField>
+										<DateField>{account.lastPaymentDate}</DateField>
 									</p>
 								</>
 							)}
-							{'originalPrincipal' in data && (
+							{'originalPrincipal' in account && (
 								<>
 									<p className='text-sm'>Original Principal:</p>
 									<p className='text-sm font-medium'>
 										<CurrencyField {...{ currencyCode }}>
-											{data?.originalPrincipal}
+											{account?.originalPrincipal}
 										</CurrencyField>
 									</p>
 									<p className='text-sm'>Current Principal:</p>
 									<p className='text-sm font-medium'>
 										<CurrencyField {...{ currencyCode }}>
-											{data?.currentPrincipal}
+											{account?.currentPrincipal}
 										</CurrencyField>
 									</p>
 								</>
@@ -130,11 +145,3 @@ export const AccountDetailsCard = ({
 		</Card>
 	);
 };
-
-interface AccountDetailsCardProps extends CardProps {
-	data: Accounts.Account;
-	CardContentProps?: CardProps;
-	CardDescriptionProps?: CardProps;
-	CardHeaderProps?: CardProps;
-	CardTitleProps?: CardProps;
-}
