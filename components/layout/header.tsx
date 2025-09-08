@@ -82,6 +82,16 @@ export function Header({
 							</Button>
 						</>
 					)}
+					{user && showIcons && (
+						<>
+							<Button
+								className='order-1 h-[34px]'
+								href='/auth/logout'
+							>
+								Log Out
+							</Button>
+						</>
+					)}
 					<ModeToggle
 						className='order-2'
 						variant='dropdown'
