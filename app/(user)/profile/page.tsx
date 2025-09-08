@@ -6,7 +6,6 @@ import {
 } from '@/components/features/user-profile';
 import { Header } from '@/components/layout/header';
 import { getSession } from '@/lib/auth0';
-import { redirect } from 'next/navigation';
 
 import type { Metadata } from 'next';
 
@@ -18,8 +17,9 @@ export default async function ProfilePage() {
 	const { tokenSet, user } = (await getSession()) || {};
 
 	if (!user?.sub) {
+		const { redirect } = await import('next/navigation');
+
 		redirect('/');
-		return;
 	}
 
 	return (

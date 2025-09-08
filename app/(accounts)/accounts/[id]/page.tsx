@@ -2,7 +2,6 @@ import { AccountDetailsCard } from '@/components/features/accounts/account-detai
 import { TransactionsList } from '@/components/features/accounts/transactions-list';
 import { Header } from '@/components/layout/header';
 import { getUser } from '@/lib/auth0';
-import { redirect } from 'next/navigation';
 
 import type { Metadata } from 'next';
 
@@ -19,6 +18,7 @@ export default async function AccountDetailsPage({
 	const user = await getUser(false);
 
 	if (!user?.sub) {
+		const { redirect } = await import('next/navigation');
 		redirect('/');
 	}
 
