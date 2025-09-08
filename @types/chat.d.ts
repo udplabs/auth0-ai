@@ -29,6 +29,8 @@ declare global {
 			isDownVoted?: boolean;
 			chatId: string;
 			userId?: string;
+			labStep?: string;
+			isFirstMessage?: string;
 		}
 
 		type UIMessage = AIMessage<
@@ -50,7 +52,7 @@ declare global {
 		interface RequestHints {
 			userId?: string;
 			geolocation: UIGeolocation;
-			settings?: UISettings;
+			settings?: Partial<UISettings>;
 		}
 		interface ListChatsByUserIdResult extends PaginatedResults {
 			chats: Chat.UIChat[];
