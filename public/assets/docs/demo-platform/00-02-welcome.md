@@ -1,5 +1,5 @@
 ## Premise
-You’re a developer at *Bank Zero*. Your task: wire an AI assistant into your banking UI without leaking sensitive data, enforce per‑account permissions with FGA, augment user interactions with RAG, and (coming soon!) require human approval for sensitive actions via async auth (CIBA) and Rich Authorization Requests.
+You’re a developer at *the bAInk*, a fancy new digital-only financial institution. Your task: wire an AI assistant into your banking UI without leaking sensitive data, enforce per‑account permissions with FGA, augment user interactions with RAG, and (coming soon!) require human approval for sensitive actions via async auth (CIBA) and Rich Authorization Requests.
 
 **Meet AIya.** AIya is the dev{camp} guide living inside your app. Ask for things like:
 
@@ -19,7 +19,6 @@ You’re a developer at *Bank Zero*. Your task: wire an AI assistant into your b
 > - *Never* paste secrets or production data into the chat prompt.
 >
 > - By continuing you agree to the sharing of any/all content/information generated with or by the LLM (***including the content of chat messages***) within the learning application.
->
 
 ## Objective
 
@@ -48,7 +47,7 @@ You should be comfortable with:
 **Recommended tooling**
 
 * **Node.js ≥ 20**
-* **pnpm ≥ 9** (we use patched code + lockfile consistency) *<span style='color: red; font-variant: small-caps'>← Required</span>*
+* **pnpm ≥ 9** (*we use patched code + lockfile consistency*) *<span style='color: red; font-variant: small-caps'>← Required</span>* <span style='font-size: 10px; font-variant: small=caps'>[Install](https://pnpm.io/installation)</span>
 * **git** and a **GitHub** account
 * A modern browser (Chrome recommended)
 
