@@ -129,14 +129,16 @@ export function ChatProvider({
 	const { mutate: refreshChatHistory } = useChatHistory();
 	const { data: user, isAuthenticated } = useUserProfile();
 
-	const chat = useMemo(
-		() =>
-			createChat(
-				{ id, messages, ...options },
-				{ ...(isNewChat ? { refreshChatHistory } : {}) }
-			),
-		[id, messages]
-	);
+	const chatRef = useRef<AIChat<Chat.UIMessage>>();
+
+	if (!chatRef.current || chatRef.current.id !== id) {
+		chatRef.current = createChat(
+			{ id, messages, ...options },
+			{ ...(isNewChat ? { refreshChatHistory } : {}) }
+		);
+	}
+
+	const chat = chatRef.current;
 
 	const introSentRef = useRef(false);
 	useEffect(() => {
@@ -164,11 +166,9 @@ export function ChatProvider({
 		}
 	}, [id, isAuthenticated, chatId, chat]);
 
+	const isFirstLogin = user?.logins_count <= 1;
 	const authMessageSentRef = useRef(false);
-
 	useEffect(() => {
-		const isFirstLogin = user?.logins_count <= 1;
-
 		console.log('id:', id);
 		console.log('user:', user);
 		console.log('isFirstLogin:', isFirstLogin);
@@ -195,7 +195,7 @@ export function ChatProvider({
 			}),
 		});
 		authMessageSentRef.current = true;
-	}, [id, user, chat, chatId]);
+	}, [id, user, chat, isFirstLogin, chatId]);
 
 	const value = useMemo<ChatContextValue>(
 		() => ({ chat: chat as unknown as AIChat<Chat.UIMessage> }),
