@@ -1,7 +1,5 @@
 'use server';
 
-import { convertToDB, convertToUI } from '@/lib/utils/db-converter';
-import { uniqBy } from 'lodash-es';
 import {
 	Account as AccountModel,
 	Prisma,
@@ -62,6 +60,7 @@ async function saveAccountsAndTransactions(
 			transactions.push(...tx);
 		}
 	}
+	const { convertToDB, convertToUI } = await import('@/lib/utils/db-converter');
 
 	// 2) Convert to DB format
 	// This is necessary to ensure the data is in the correct format for Prisma
@@ -69,6 +68,8 @@ async function saveAccountsAndTransactions(
 		Accounts.CreateAccountInput[],
 		Prisma.AccountCreateManyInput[]
 	>(accounts);
+
+	const { uniqBy } = await import('lodash-es');
 
 	const dbTransactions = convertToDB<
 		Accounts.CreateTransactionInput[],

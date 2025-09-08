@@ -2,7 +2,6 @@
 
 import type { Chat as ChatModel } from '@/lib/db/generated/prisma';
 import { APIError } from '@/lib/errors';
-import { groupItemsByDate } from '@/lib/utils';
 import { convertToUI } from '@/lib/utils/db-converter';
 import { prisma } from '../../prisma/client';
 
@@ -92,6 +91,8 @@ export async function listChatsByUserId(
 	const uiChats = chats.map(convertToUI<ChatModel, Chat.UIChat>);
 
 	if (grouped) {
+		const { groupItemsByDate } = await import('@/lib/utils');
+
 		return groupItemsByDate(uiChats);
 	}
 

@@ -1,4 +1,3 @@
-import { getChatById, listChatsByUserId } from '@/lib/db/queries/chat';
 import { getCacheKey } from '@/lib/utils';
 import { unstable_cache } from 'next/cache';
 
@@ -72,7 +71,9 @@ export async function getChat({
 	tags,
 }: GetChatOptions) {
 	// Derive default cache key if caller omitted.
-	if (!key) key = chatKey({ userId, id });
+	if (!key) {
+		key = chatKey({ userId, id });
+	}
 
 	// Seed default tag list if none provided.
 	if (!tags || tags.length === 0) {
@@ -85,6 +86,8 @@ export async function getChat({
 
 	// Ensure uniqueness (avoid duplicate tags).
 	tags = [...new Set(tags)];
+
+	const { getChatById } = await import('@/lib/db/queries/chat');
 
 	const getCachedChat = unstable_cache(
 		() => getChatById(id, { userId, includeMessages }),
@@ -135,6 +138,8 @@ export async function getChatHistory({
 
 	// Ensure uniqueness (avoid duplicate tags).
 	tags = [...new Set(tags)];
+
+	const { listChatsByUserId } = await import('@/lib/db/queries/chat');
 
 	const getCachedChatHistory = unstable_cache(
 		() => listChatsByUserId(userId, { page, pageSize, grouped }),

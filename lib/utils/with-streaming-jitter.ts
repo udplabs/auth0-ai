@@ -72,7 +72,7 @@ export function withStreamingJitter<
 
 function createJitter(opts: JitterOptions = {}) {
 	const {
-		baseMs = 500,
+		baseMs = 300,
 		jitterPct = 0.5,
 		pauseChance = 0.03,
 		pauseMs = [224, 532],

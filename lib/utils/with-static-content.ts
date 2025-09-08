@@ -1,8 +1,6 @@
 import { upsertSettings } from '@/lib/db/queries/settings';
 import type { UIMessage, UIMessageStreamWriter } from 'ai';
-import { ulid } from 'ulid';
-import { getContentById } from '../db/queries/content';
-import { chunk } from './chunking';
+
 import { getLastPart } from './get-last-part';
 import { withStreamingJitter } from './with-streaming-jitter';
 
@@ -77,6 +75,7 @@ export function withStaticContent<
 
 		const { writer: dataStream } = options;
 
+		const { getContentById } = await import('../db/queries/content');
 		const { textData } = contentId
 			? (await getContentById(contentId)) || {}
 			: {};
@@ -85,11 +84,14 @@ export function withStaticContent<
 			// We have custom content!
 			// Stream baby! Stream!
 
+			const { ulid } = await import('ulid');
+
 			const id = ulid();
 			const jitterStream = withStreamingJitter(dataStream);
 
 			jitterStream.write({ type: 'text-start', id });
 
+			const { chunk } = await import('./chunking');
 			const chunks = chunk(textData, 'paragraphs');
 
 			for (const delta of chunks) {

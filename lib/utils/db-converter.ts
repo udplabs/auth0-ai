@@ -137,6 +137,11 @@ export function convertToUI<DB = any, UI = any>(dbItem: DB): UI {
 					continue;
 				}
 
+				// Remove Sample data fields
+				if (['lastSyncedAt', 'expiresAt'].includes(key)) {
+					continue;
+				}
+
 				// Direct assignment for all other types
 				uiItem[key] = value;
 			}

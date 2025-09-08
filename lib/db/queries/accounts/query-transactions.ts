@@ -6,7 +6,6 @@ import {
 	Transaction as TransactionModel,
 } from '../../generated/prisma';
 import { prisma } from '../../prisma/client';
-import { getAccountsByUserId } from './query-accounts';
 
 export async function getTransactionsByAccountId(
 	accountId: string
@@ -24,6 +23,8 @@ export async function getTransactionsByAccountId(
 export async function getTransactionsByUserId(
 	userId: string
 ): Promise<Accounts.Transaction[]> {
+	const { getAccountsByUserId } = await import('./query-accounts');
+
 	const accounts = await getAccountsByUserId(userId, true);
 
 	return accounts.flatMap(({ transactions = [] }) => transactions);

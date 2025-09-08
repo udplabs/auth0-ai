@@ -4,17 +4,29 @@ import {
 	Prisma,
 	SampleDocument as SampleDocumentModel,
 } from '@/lib/db/generated/prisma';
-import { convertToUI } from '@/lib/utils/db-converter';
 import { neon } from '../neon/client';
 import { prisma } from '../prisma/client';
+
+type SampleAccount = Accounts.Account & {
+	lastSyncedAt?: Date;
+	expiresAt?: Date;
+};
+type SampleTransaction = Accounts.Transaction & {
+	lastSyncedAt?: Date;
+	expiresAt?: Date;
+};
+type SampleDocument = Documents.DocumentWithEmbedding & {
+	lastSyncedAt?: Date;
+	expiresAt?: Date;
+};
 
 // Looks up locally first.
 // If not found, fetches remotely and stores locally.
 // This solves for if the local database is wiped.
 export async function getSampleData(userId: string): Promise<{
-	accounts: Accounts.Account[];
-	transactions: Accounts.Transaction[];
-	documents: Documents.DocumentWithEmbedding[];
+	accounts: SampleAccount[];
+	transactions: SampleTransaction[];
+	documents: SampleDocument[];
 }> {
 	const lastSyncedAt = new Date();
 	const expiresAt = new Date(lastSyncedAt.getTime() + 1000 * 60 * 30); // 30 minutes
@@ -45,10 +57,6 @@ export async function getSampleData(userId: string): Promise<{
 				});
 			}),
 		]);
-
-		await prisma.sampleAccount.createMany({
-			data: remoteAccounts,
-		});
 
 		localSampleAccounts = await prisma.sampleAccount.findMany({
 			where: { customerId: userId },
@@ -123,13 +131,14 @@ export async function getSampleData(userId: string): Promise<{
 		});
 	}
 
+	const { convertToUI } = await import('@/lib/utils/db-converter');
+
 	return {
 		accounts: convertToUI(localSampleAccounts),
 		transactions: convertToUI(localSampleTransactions),
-		documents: convertToUI<
-			SampleDocumentModel[],
-			Documents.DocumentWithEmbedding[]
-		>(localSampleDocuments),
+		documents: convertToUI<SampleDocumentModel[], SampleDocument[]>(
+			localSampleDocuments
+		),
 	};
 }
 

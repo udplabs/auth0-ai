@@ -27,6 +27,13 @@ function getMimeType(mimeType: string) {
 	return MimeType[dbMimeType];
 }
 
+function getContentPlacement(contentPlacement: string) {
+	const dbContentPlacement = contentPlacement
+		.replace('/', '_')
+		.toUpperCase() as ContentPlacement;
+	return ContentPlacement[dbContentPlacement];
+}
+
 function getUIMimeType(mimeType: MimeType | null) {
 	if (mimeType !== null) {
 		return mimeType.replace('_', '/').toLowerCase() as Content.UIMimeType;
@@ -61,7 +68,7 @@ function buildQuery({
 			AND.push({ mimeType: { equals: getMimeType(query) } });
 		} else if (key === 'labStep') {
 			AND.push({
-				labStep: { equals: query.replace('_', '-').replace(' ', '-') },
+				labStep: { equals: query.replace('_', '-').toLowerCase() },
 			});
 		}
 	}
@@ -72,7 +79,9 @@ function buildQuery({
 		}
 
 		if (contentPlacement) {
-			AND.push({ contentPlacement: { equals: contentPlacement } });
+			AND.push({
+				contentPlacement: { equals: getContentPlacement(contentPlacement) },
+			});
 		}
 	}
 
@@ -180,6 +189,7 @@ export async function getStepGuides(
 		key: 'labStep',
 		query,
 		contentType: 'guide/step',
+		contentPlacement: 'labs',
 	});
 }
 

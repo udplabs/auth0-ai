@@ -1,5 +1,4 @@
 import { getAccountPermissions } from '@/lib/auth0/fga/get-account-permissions';
-import { createMockAccounts } from '@/lib/db/mock/mock-accounts';
 import { getAccountsByUserId } from '@/lib/db/queries/accounts';
 
 export async function getAccounts(userId: string, includeTransactions = false) {
@@ -7,6 +6,7 @@ export async function getAccounts(userId: string, includeTransactions = false) {
 	let data = await getAccountsByUserId(userId, includeTransactions);
 
 	if (data.length === 0) {
+		const { createMockAccounts } = await import('@/lib/db/mock/mock-accounts');
 		// Did not find data. Create mock data.
 		data = await createMockAccounts(userId);
 	}
