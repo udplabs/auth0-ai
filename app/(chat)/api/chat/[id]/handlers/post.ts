@@ -25,11 +25,9 @@
  * - Consider unique threadID per run if resumable streams reintroduced.
  * - Consider reintroducing resumable streams.
  */
-
 import { openai } from '@/lib/ai/openai';
 import { getSystemPrompts } from '@/lib/ai/prompts/system-prompt';
 import { toolRegistry } from '@/lib/ai/tool-registry';
-import { APIError } from '@/lib/errors';
 import { withStaticContent } from '@/lib/utils';
 import { setAIContext } from '@auth0/ai-vercel';
 import { geolocation } from '@vercel/functions';
@@ -95,6 +93,12 @@ export async function POST(
 			requestHints: {
 				geolocation: geolocation(request),
 				userId,
+				settings: {
+					currentLabStep:
+						uiMessages.findLast(
+							(m) => m.role === 'user' && m.metadata?.labStep !== undefined
+						)?.metadata?.labStep || 'step-02',
+				},
 			},
 		});
 
@@ -107,7 +111,7 @@ export async function POST(
 						model: openai('gpt-5-nano'),
 						system: systemPrompts,
 						messages: modelMessages,
-						// temperature: 0, // deterministic mode candidate
+						temperature: 0.2, // deterministic mode
 						stopWhen: (ctx) => {
 							// Custom stop logic: either tool produced hasOwnUI OR step count exceeded.
 							const { steps } = ctx;
@@ -182,6 +186,8 @@ export async function POST(
 		// 7. Respond with SSE (UI consumption).
 		return new Response(stream.pipeThrough(new JsonToSseTransformStream()));
 	} catch (error) {
+		const { APIError } = await import('@/lib/errors');
+
 		console.log('=== POST error ===');
 		console.log(error);
 		if (error instanceof ZodError) {

@@ -8,6 +8,8 @@ export const UIMessageMetadataSchema = z.object({
 	isDownVoted: z.boolean().optional(),
 	chatId: z.string(),
 	userId: z.string().optional(),
+	labStep: z.string().optional(),
+	isFirstMessage: z.string().optional(),
 });
 
 const MessageSchema = z.object({

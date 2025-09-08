@@ -1,24 +1,21 @@
 model RemoteSettings {
-  id             String      @id
+  id             String   @id
   currentLabStep String
   labMeta        String?
   preferences    String?
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  appInstanceId  String      @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  appInstanceId  String?
   nextLabStep    String?
-  appInstance    AppInstance @relation(fields: [appInstanceId], references: [id])
 
   @@index([appInstanceId])
 }
 
 model AppInstance {
-  id               String          @id @default(uuid())
+  id               String  @id @default(uuid())
   auth0ClientId    String?
   auth0Domain      String?
   hashedInstanceId String?
-  Chats            RemoteChat[]
-  Settings         RemoteSettings?
 
   @@index([auth0ClientId])
   @@index([auth0Domain])

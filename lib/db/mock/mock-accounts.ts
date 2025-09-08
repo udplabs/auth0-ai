@@ -38,6 +38,14 @@ export async function createMockAccounts(userId: string) {
 		account.customerId = userId;
 		accounts.push(account);
 
+		if (account?.lastSyncedAt) {
+			delete account.lastSyncedAt;
+		}
+
+		if (account?.expiresAt) {
+			delete account.expiresAt;
+		}
+
 		// Filter transactions for this account and assign new IDs
 		const accountTransactions = sampleTransactions.filter(
 			(tx) => tx.accountId === originalAccountId
@@ -55,11 +63,27 @@ export async function createMockAccounts(userId: string) {
 			);
 			const transactionDocument = sampleDocuments[transactionDocumentIndex];
 
+			if (transaction?.lastSyncedAt) {
+				delete transaction.lastSyncedAt;
+			}
+
+			if (transaction?.expiresAt) {
+				delete transaction.expiresAt;
+			}
+
 			if (transactionDocument) {
 				transactionDocument.id = transaction.id;
 				transactionDocument.metadata.accountId = account.id;
 				transactionDocument.metadata.transactionId = transaction.id;
 				transactionDocument.metadata.customerId = userId;
+
+				if (transactionDocument?.lastSyncedAt) {
+					delete transactionDocument.lastSyncedAt;
+				}
+
+				if (transactionDocument?.expiresAt) {
+					delete transactionDocument.expiresAt;
+				}
 
 				transactionDocuments.push(transactionDocument);
 			} else {
