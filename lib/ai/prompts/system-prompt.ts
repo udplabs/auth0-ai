@@ -1,20 +1,11 @@
-import { sortBy } from 'lodash-es';
-// import { financialAnalysisPrompt } from './financial-analysis-prompt';
-import { upsertSettings } from '@/lib/db/queries/settings';
-import { getGeolocationPrompt } from './geolocation-prompt';
-import { getUserPrompt } from './user-prompt';
-
-import {
-	getSystemPrompts as getDBSystemPrompts,
-	getStepPrompts,
-} from '@/lib/db/queries/content';
-
 export async function getSystemPrompts({
 	requestHints: { settings, ...hints },
 }: {
 	requestHints: Chat.RequestHints;
 }) {
 	if (!settings && hints?.userId) {
+		const { upsertSettings } = await import('@/lib/db/queries/settings');
+
 		settings = await upsertSettings({ id: hints.userId });
 	}
 
@@ -33,43 +24,76 @@ export async function getRequestPromptFromHints({
 }: Chat.RequestHints) {
 	const prompts = [];
 
+	const { getUserPrompt } = await import('@/lib/ai/prompts/user-prompt');
+
 	if (userId) {
 		prompts.push(await getUserPrompt(userId));
 	}
 
 	if (geolocation) {
+		const { getGeolocationPrompt } = await import(
+			'@/lib/ai/prompts/geolocation-prompt'
+		);
+
 		prompts.push(getGeolocationPrompt(geolocation));
 	}
 
 	return prompts;
 }
 
-async function getPrompts(settings?: UISettings) {
-	const systemPrompts = await getDBSystemPrompts();
+async function getPrompts(settings?: Partial<UISettings>) {
+	const { sortBy } = await import('@/lib/utils');
 
+	const { getSystemPrompts: getDBSystemPrompts } = await import(
+		'@/lib/db/queries/content'
+	);
+	const systemPrompts = sortBy(await getDBSystemPrompts(), 'name');
+
+	console.log('=== found', systemPrompts.length, 'system prompts ===');
+
+	// Defaulting to Step 2 as it is the first step
+	// User will not be authenticated and will not have settings
 	const { currentLabStep, nextLabStep } = settings || {};
 
 	const labStep =
 		nextLabStep && currentLabStep != nextLabStep ? nextLabStep : currentLabStep;
 
 	if (labStep) {
-		const stepPrompts = await getStepPrompts(labStep);
+		const { getStepPrompts, getStepGuides } = await import(
+			'@/lib/db/queries/content'
+		);
+		const stepPrompts = sortBy(await getStepPrompts(labStep), 'name');
+
+		console.log('=== found', stepPrompts.length, 'step prompts ===');
+
 		systemPrompts.push(...stepPrompts);
+
+		const guidePrompts = sortBy(await getStepGuides(labStep), 'name');
+
+		console.log('=== found', guidePrompts.length, 'guides ===');
+
+		systemPrompts.push(...guidePrompts);
 	}
 
-	const orderedPrompts = sortBy(systemPrompts, ['name']);
 	const prompts = [];
 
-	if (orderedPrompts.length > 0) {
-		for (const prompt of orderedPrompts) {
-			const { textData, name, mimeType } = prompt;
-			if (mimeType?.toUpperCase().startsWith('TEXT_')) {
+	if (systemPrompts.length > 0) {
+		for (const prompt of systemPrompts) {
+			const { textData, name, contentType, mimeType } = prompt;
+			if (mimeType?.toUpperCase().startsWith('TEXT')) {
 				console.log(`loading prompt: ${name}`);
+
+				if (contentType === 'guide/step') {
+					// Wrap guide so AIya knows it's the guide
+					prompts.push(
+						`\n\n===== LAB GUIDE: ${name} =====\n\n${textData}\n\n====================`
+					);
+				}
 				prompts.push(textData);
 			}
 		}
 	}
 
-	console.log('loaded prompts:', prompts.length);
+	console.log('loaded', prompts.length, 'prompts');
 	return prompts;
 }
