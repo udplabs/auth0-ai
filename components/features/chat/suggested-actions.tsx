@@ -13,7 +13,6 @@ import {
 	type CollapsibleProps,
 	type CollapsibleTriggerProps,
 } from '@/components/ui/collapsible';
-import { useUserProfile } from '@/hooks';
 import { cn } from '@/lib/utils/utils';
 import { motion } from 'framer-motion';
 import { ChevronUpIcon as ArrowIcon } from 'lucide-react';
@@ -37,23 +36,7 @@ export function SuggestedActions({
 	onSubmit,
 	...props
 }: SuggestedActionsProps) {
-	const { isAuthenticated } = useUserProfile();
-
 	const suggestedActions: SuggestedActions[] = [
-		{
-			label: 'Send first message',
-			suggestion: 'Hi AIya! This is my first message.',
-			preSubmitAction: () => localStorage.setItem('first-message-sent', 'true'),
-		},
-		...(isAuthenticated
-			? [
-					{
-						label: 'Send auth message',
-						suggestion:
-							"Hi AIya! I have successfully authenticated. What's next?",
-					},
-				]
-			: []),
 		{ suggestion: 'What is FGA for RAG?' },
 		{ suggestion: 'What is Async Authorization?' },
 		{ suggestion: 'What is Auth0 Token Vault?' },
