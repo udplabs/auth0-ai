@@ -1,4 +1,3 @@
-import { APIError } from '@/lib/errors';
 import type { UserUpdate } from 'auth0';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -16,14 +15,8 @@ export async function GET() {
 
 		return NextResponse.json(data);
 	} catch (error) {
-		console.log('API error:', error);
-		if (error instanceof APIError) {
-			return error.toResponse();
-		}
-		return new APIError(
-			'server_error:api',
-			error instanceof Error ? error.message : String(error)
-		).toResponse();
+		const { handleApiError } = await import('@/lib/errors');
+		return handleApiError(error);
 	}
 }
 
@@ -49,11 +42,7 @@ export async function PATCH(request: NextRequest) {
 
 		return NextResponse.json({ data });
 	} catch (error: unknown) {
-		console.log('API error: ', error);
-		if (error instanceof APIError) {
-			return error.toResponse();
-		}
-
-		return new APIError('server_error:api', error).toResponse();
+		const { handleApiError } = await import('@/lib/errors');
+		return handleApiError(error);
 	}
 }

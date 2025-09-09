@@ -31,12 +31,7 @@ export async function GET(request: NextRequest) {
 
 		return NextResponse.json(data);
 	} catch (error: unknown) {
-		const { APIError } = await import('@/lib/errors');
-
-		if (error instanceof APIError) {
-			return error.toResponse();
-		}
-		console.error(error);
-		return new APIError(error).toResponse();
+		const { handleApiError } = await import('@/lib/errors');
+		return handleApiError(error);
 	}
 }

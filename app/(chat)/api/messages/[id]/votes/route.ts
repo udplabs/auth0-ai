@@ -1,6 +1,5 @@
 import { getUser } from '@/lib/auth0';
 import { voteMessage } from '@/lib/db/queries/chat/mutate-messages';
-import { APIError } from '@/lib/errors';
 import { type NextRequest, NextResponse } from 'next/server';
 
 // Handles up/down voting a message.
@@ -15,6 +14,7 @@ export async function PATCH(
 		const { id } = await params;
 
 		if (!id) {
+			const { APIError } = await import('@/lib/errors');
 			throw new APIError('bad_request:vote', 'Message Id is required.');
 		}
 
@@ -25,6 +25,7 @@ export async function PATCH(
 
 		return NextResponse.json({ data });
 	} catch (error: unknown) {
+		const { APIError } = await import('@/lib/errors');
 		if (error instanceof APIError) {
 			if (error.type === 'unauthorized') {
 				// Don't expose 'unauthorized' errors as they may leak information

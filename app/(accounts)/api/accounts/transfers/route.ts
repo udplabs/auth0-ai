@@ -22,14 +22,14 @@
  * - Idempotency: accept an Idempotency-Key header to avoid duplicate transfers on retries.
  */
 
-import { getUser } from '@/lib/auth0';
 import { createTransfer } from '@/lib/db/queries/accounts/mutate-transactions';
-import { APIError } from '@/lib/errors';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
 	try {
+		const { getUser } = await import('@/lib/auth0');
+
 		// 1. Auth: fails (throws) if session invalid.
 		const user = await getUser();
 
@@ -38,6 +38,8 @@ export async function POST(request: NextRequest) {
 		const body = (await request.json()) as Transfers.CreateTransactionInput;
 
 		if (!body) {
+			const { APIError } = await import('@/lib/errors');
+
 			// Defensive: request.json() would normally throw if invalid JSON.
 			throw new APIError('bad_request:api', 'Invalid request body.');
 		}
@@ -57,15 +59,7 @@ export async function POST(request: NextRequest) {
 		// 6. Success response: minimal JSON (could wrap in { id: transferId } for extensibility).
 		return NextResponse.json(transferId);
 	} catch (error: unknown) {
-		// Log for server diagnostics. Avoid logging sensitive values.
-		console.log(error);
-
-		// Known domain / validation error with structured response.
-		if (error instanceof APIError) {
-			return error.toResponse();
-		}
-
-		// Wrap unknown exceptions to avoid leaking internals.
-		return new APIError(error).toResponse();
+		const { handleApiError } = await import('@/lib/errors');
+		return handleApiError(error);
 	}
 }

@@ -234,3 +234,12 @@ function getStatusCodeByType(type: Errors.Type) {
 			return 500;
 	}
 }
+
+export function handleApiError(error: unknown) {
+	console.log(error);
+	if (error instanceof APIError) {
+		return error.toResponse();
+	}
+
+	return new APIError(error).toResponse();
+}

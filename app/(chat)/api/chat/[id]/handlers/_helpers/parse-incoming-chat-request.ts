@@ -1,6 +1,5 @@
 import { saveChatAction } from '@/app/(chat)/api/actions';
 import { getUser } from '@/lib/auth0';
-import { APIError } from '@/lib/errors';
 import { z } from 'zod';
 import { PostRequestBodySchema } from './schemas';
 
@@ -70,6 +69,8 @@ export async function parseIncomingChatRequest(
 
 	// Guard: cannot send both single message and array simultaneously.
 	if (message && _messages.length > 0) {
+		const { APIError } = await import('@/lib/errors');
+
 		throw new APIError(
 			'bad_request:chat',
 			'Either message or messages must be provided. Not both.'

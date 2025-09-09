@@ -1,7 +1,6 @@
 import { chatKey } from '@/lib/api/chat/get-chat';
 import { getUser } from '@/lib/auth0';
 import { deleteChatById } from '@/lib/db/queries/chat/mutate-chats';
-import { APIError } from '@/lib/errors';
 import { revalidateTag } from 'next/cache';
 
 import type { NextRequest } from 'next/server';
@@ -20,6 +19,7 @@ export async function DELETE(
 		const { id } = await context.params;
 
 		if (!id) {
+			const { APIError } = await import('@/lib/errors');
 			throw new APIError('bad_request:api');
 		}
 
@@ -31,6 +31,8 @@ export async function DELETE(
 
 		return Response.json(null, { status: 201 });
 	} catch (error: unknown) {
+		const { APIError } = await import('@/lib/errors');
+
 		if (error instanceof APIError) {
 			if (error.type === 'unauthorized') {
 				// Don't expose 'unauthorized' errors as they may leak information

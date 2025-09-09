@@ -1,5 +1,4 @@
 import { getUser } from '@/lib/auth0';
-import { APIError } from '@/lib/errors';
 import { NextRequest } from 'next/server';
 
 // Helper to sync user content with the database
@@ -23,12 +22,8 @@ export async function POST() {
 
 		return new Response(null, { status: 201 });
 	} catch (error: unknown) {
-		console.log('API error: ', error);
-		if (error instanceof APIError) {
-			return error.toResponse();
-		}
-
-		return new APIError('server_error:api', error).toResponse();
+		const { handleApiError } = await import('@/lib/errors');
+		return handleApiError(error);
 	}
 }
 
@@ -40,6 +35,7 @@ export async function PATCH(request: NextRequest) {
 		const { id, ...settings } = (await request.json()) as UICreateSettingsInput;
 
 		if (user.sub !== id) {
+			const { APIError } = await import('@/lib/errors');
 			throw new APIError('unauthorized:api', 'Invalid user ID');
 		}
 
@@ -49,11 +45,7 @@ export async function PATCH(request: NextRequest) {
 
 		return new Response(null, { status: 204 });
 	} catch (error: unknown) {
-		console.log('API error: ', error);
-		if (error instanceof APIError) {
-			return error.toResponse();
-		}
-
-		return new APIError('server_error:api', error).toResponse();
+		const { handleApiError } = await import('@/lib/errors');
+		return handleApiError(error);
 	}
 }
