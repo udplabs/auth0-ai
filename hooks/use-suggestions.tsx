@@ -29,6 +29,24 @@ export const useSuggestions = (): UseSuggestionsResponse => {
 			shouldShow: labStep && labStep === 'step-05',
 		},
 		{
+			label: 'Show me the `RELATIONS` code',
+			suggestion: `Show me the code for \`lib/auth0/fga/get-account-permissions.ts\` STEP 2`,
+			variant: 'default',
+			shouldShow: labStep && labStep === 'step-05',
+		},
+		{
+			label: 'Show me the `checks` code',
+			suggestion: `Show me the code for \`lib/auth0/fga/get-account-permissions.ts\` STEP 3`,
+			variant: 'default',
+			shouldShow: labStep && labStep === 'step-05',
+		},
+		{
+			label: 'Show me the `output` code',
+			suggestion: `Show me the code for \`lib/auth0/fga/get-account-permissions.ts\` STEP 6`,
+			variant: 'default',
+			shouldShow: labStep && labStep === 'step-05',
+		},
+		{
 			label: 'Show me the final code',
 			suggestion: `Show me the code for ${labStep}`,
 			variant: 'default',
