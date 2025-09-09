@@ -3,7 +3,7 @@
 - Lab Guide Name: `advanced-fga-for-rag`
 - Static Aiya response: none
 - Implementation Code:
-  - `lib/auth0/fga/search-transactions.ts`
+  - `lib/ai/tools/search-transactions.ts`
   - `lib/ai/tool-registry.ts`
 - Relevant/Reference Code:
   - `lib/auth0/fga/client.ts`
@@ -12,6 +12,53 @@
   - `lib/ai/rag/create-documents.ts`
   - `lib/ai/rag/vector-store.ts`
   - `lib/db/queries/documents.ts`
+
+#### `lib/ai/tools/search-transactions.ts ` Steps
+- STEP 1
+  - Completed for them
+- STEP 2
+  - Completed for them
+- STEP 3
+  - Create the actual FGAFilter w/ the buildQuery
+  ```ts
+  const fgaRetriever = FGAFilter.create<Documents.DocumentWithScore>({
+    buildQuery: (doc) => {
+      // OPTIONAL Defensive coding: ensure metadata has expected shape.
+      // If missing, return a relation that will certainly fail.
+      const accountId = doc?.metadata?.accountId;
+
+      if (!accountId) {
+        return {
+          user: `user:${user.sub}`,
+          object: `account:__missing__`,
+          relation: 'can_view_transactions',
+        };
+      }
+
+      // You could just as easily send just this
+      return {
+        user: `user:${user.sub}`,
+        object: `account:${doc.metadata.accountId}`,
+        relation: 'can_view_transactions',
+      };
+    },
+  });
+  ```
+- STEP 4
+  - Completed for them
+- STEP 5
+  - Run results through the FGAFilter
+  ```ts
+  const authorizedResults = await fgaRetriever.filter(rawResults);
+  console.log(
+    '[searchTransactions] Authorized results:',
+    authorizedResults.length
+  );
+  ```
+- STEP 6
+  - Completed for them
+- STEP 7
+  - Completed for them
 
 Expected Outcome:
 - Implemented `fgaRetriever`

@@ -137,9 +137,10 @@ export const searchTransactions = tool<
 		// ❌ STEP 5: Apply authorization filter (core FGA step).
 		// Internally may batch; returns only documents passing the relation check.
 		// ---------------------------------------------------------------------
-		// TODO: Apply FGA filter to raw results
-		const authorizedResults: Documents.DocumentWithScore[] = [];
-		// const authorizedResults = [];
+		// TODO: Implement the actual filtering
+		// const authorizedResults: Documents.DocumentWithScore[] = await fgaRetriever.filter(...) ;
+		const authorizedResults: Documents.DocumentWithScore[] =
+			[]; /** THIS IS A PLACEHOLDER. Remove after you implement actual filtering */
 		console.log(
 			'[searchTransactions] Authorized results:',
 			authorizedResults.length
