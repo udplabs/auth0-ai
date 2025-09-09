@@ -12,6 +12,7 @@ import {
 import React, { createContext, useEffect, useMemo, useRef } from 'react';
 import { ulid } from 'ulid';
 
+import { LS_KEY_AUTH, LS_KEY_FIRST } from '@/lib/constants';
 export interface ChatContextValue {
 	chat: AIChat<Chat.UIMessage>;
 }
@@ -146,14 +147,14 @@ export function ChatProvider({
 
 		const sendFirstMessage =
 			!isAuthenticated &&
-			(localStorage.getItem('first-message-sent') ?? 'false') !== 'true';
+			(localStorage.getItem(LS_KEY_FIRST) ?? 'false') !== 'true';
 
 		if (id && sendFirstMessage) {
 			// This is the first interaction with this user/person.
 			// They might not even be authenticated!
-			// Let's kick off an introductory monologue for AIya.
+			// Let's kick off an introductory monologue for Aiya.
 			chat.sendMessage({
-				text: 'Hi AIya! This is my first message.',
+				text: 'Hi Aiya! This is my first message.',
 				metadata: {
 					chatId,
 					labStep: 'step-03',
@@ -161,7 +162,7 @@ export function ChatProvider({
 				},
 			});
 
-			localStorage.setItem('first-message-sent', 'true');
+			localStorage.setItem(LS_KEY_FIRST, 'true');
 			introSentRef.current = true;
 		}
 	}, [id, isAuthenticated, chatId, chat]);
@@ -169,17 +170,19 @@ export function ChatProvider({
 	const isFirstLogin = user?.logins_count <= 1;
 	const authMessageSentRef = useRef(false);
 	useEffect(() => {
-		console.log('id:', id);
-		console.log('user:', user);
-		console.log('isFirstLogin:', isFirstLogin);
-		console.log('authMessageSentRef:', authMessageSentRef.current);
-		if (!id || !user?.user_id || !isFirstLogin || authMessageSentRef.current)
-			return;
+		const sendAuthMessage =
+			id &&
+			user?.user_id &&
+			isFirstLogin &&
+			authMessageSentRef.current &&
+			(localStorage.getItem(LS_KEY_AUTH) ?? 'false') !== 'true';
+
+		if (!sendAuthMessage) return;
 
 		// User has authenticated successfully.
 		// Kick off the next step.
 		chat.sendMessage({
-			text: 'Hi AIya! I have successfully authenticated. What\s next?',
+			text: 'Hi Aiya! I have successfully authenticated. What\s next?',
 			metadata: {
 				chatId,
 				labStep: 'step-04',
@@ -194,6 +197,8 @@ export function ChatProvider({
 				nextLabStep: 'step-05',
 			}),
 		});
+
+		localStorage.setItem(LS_KEY_AUTH, 'true');
 		authMessageSentRef.current = true;
 	}, [id, user, chat, isFirstLogin, chatId]);
 

@@ -8,10 +8,10 @@ import {
 	type PromptInputSubmitProps,
 	type PromptInputTextareaProps,
 } from '@/components/ui/ai-elements/prompt-input';
-import { useChat } from '@/hooks';
+import { useChat, useSuggestions } from '@/hooks';
 import { cn } from '@/lib/utils';
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SuggestedActions } from './suggested-actions';
 
 export interface PromptInputProps extends AIPromptInputProps {
@@ -37,13 +37,26 @@ export const PromptInput = ({
 		sendMessage,
 		status,
 	} = useChat<Chat.UIMessage>();
+	const {
+		open: showSuggestions,
+		toggleSuggestions,
+		shouldShow,
+	} = useSuggestions();
 
 	const [input, setInput] = useState('');
 
-	const [showSuggestions, toggleSuggestions] = useState(messages?.length === 0);
+	useEffect(() => {
+		// If there is a suggestion that should be shown, show it!
+		if (
+			!showSuggestions &&
+			status === 'ready' &&
+			(shouldShow || messages.length === 0)
+		) {
+			toggleSuggestions(true);
+		}
+	}, [showSuggestions, shouldShow, status, messages.length]);
 
 	const submitAction = (value: string) => {
-		console.log('click');
 		if (!pathId || pathId !== chatId) {
 			window.history.replaceState({}, '', `/chat/${chatId}`);
 		}
