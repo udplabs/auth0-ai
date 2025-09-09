@@ -84,7 +84,7 @@ async function getPrompts(settings?: Partial<UISettings>) {
 				console.log(`loading prompt: ${name}`);
 
 				if (contentType === 'guide/step') {
-					// Wrap guide so AIya knows it's the guide
+					// Wrap guide so Aiya knows it's the guide
 					prompts.push(
 						`\n\n===== LAB GUIDE: ${name} =====\n\n${textData}\n\n====================`
 					);

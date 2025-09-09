@@ -26,9 +26,12 @@ export const getUserProfile = tool<object, Chat.Tools.Response<UserProfile>>({
 			};
 		} catch (error: unknown) {
 			console.log(error);
+
+			const { APIError } = await import('@/lib/errors');
+
 			return {
+				...new APIError(error).toJSON(),
 				status: 'error',
-				message: 'Failed to fetch user info',
 				dataCount: 0,
 			};
 		}
