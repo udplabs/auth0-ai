@@ -71,9 +71,6 @@ export async function upsertSettings(
 		},
 		create: {
 			...createData,
-			appInstance: {
-				connect: { id: appInstance.id },
-			},
 		} as Neon.RemoteSettingsCreateInput,
 	});
 
