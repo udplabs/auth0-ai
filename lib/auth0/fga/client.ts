@@ -18,12 +18,11 @@
  * 1. Install dependency
  *    `pnpm add @openfga/sdk`
  *
- * 2. Required environment variables (add to .env.local for local dev):
- *    FGA_API_URL=            # e.g. https://api.us1.fga.dev
+ * 2. Required environment variables:
  *    FGA_STORE_ID=           # Your store UUID
- *    FGA_MODEL_ID=           # (Optional) Authorization Model ID (omit to always use latest)
  *    FGA_CLIENT_ID=          # From FGA Console (Machine-to-Machine)
  *    FGA_CLIENT_SECRET=      # From FGA Console
+ *    FGA_API_URL=            # Default: https://api.us1.fga.dev
  *    FGA_API_TOKEN_ISSUER=   # Default: auth.fga.dev
  *    FGA_API_AUDIENCE=       # Default: https://api.us1.fga.dev/
  *
@@ -42,7 +41,11 @@
  *    - Using the client before env vars are loaded.
  */
 
-import { OpenFgaClient, type ClientConfiguration } from '@openfga/sdk';
+import {
+	CredentialsMethod,
+	OpenFgaClient,
+	type UserClientConfigurationParams,
+} from '@openfga/sdk';
 
 // ---------------------------------------------------------------------------
 // ✅ STEP 1: Define a (mutable) module‑level singleton reference.
@@ -51,29 +54,20 @@ import { OpenFgaClient, type ClientConfiguration } from '@openfga/sdk';
 let singleton: OpenFgaClient | null = null;
 
 // ---------------------------------------------------------------------------
-// ❌ STEP 2: Build client options (WITHOUT secrets logged).
-// You may choose to omit authorizationModelId so the SDK always uses the latest model.
-//
-// NOTE: Do NOT console.log secrets.
-// NOTE: If you are not familiar with NextJS -- be advised that ENV vars must be accessed inline as `process.env.{var}` and not via object destructuring.
-// ---------------------------------------------------------------------------
-function buildOptions() {
-	return {
-		// TODO: ... Get options from .env
-	} as ClientConfiguration;
-}
-
-// ---------------------------------------------------------------------------
-// ❌ STEP 4: Create (internal) client. Keep separate from public getter so you
+// ❌ STEP 2: Create (internal) FGA client. Keep separate from public getter so you
 // can add retries / backoff later if desired.
+
+// NOTE: If you are not familiar with NextJS -- be advised that ENV vars must be accessed inline as `process.env.{var}` and not via object destructuring.
 // ---------------------------------------------------------------------------
 export async function createClient() {
 	try {
-		const options = buildOptions();
+		const options: UserClientConfigurationParams = {
+			apiUrl: process.env.FGA_API_URL ?? 'https://api.us1.fga.dev',
+			//...
+		};
 
-		// TODO: Initialize FGA client
-
-		return null; // Return the client
+		// TODO: return instance of OpenFgaClient
+		return null;
 	} catch (error: unknown) {
 		console.warn('FGA Client initialization failed!');
 		console.warn(error);
@@ -82,7 +76,7 @@ export async function createClient() {
 }
 
 // ---------------------------------------------------------------------------
-// ✅ STEP 5: Public getter.
+// ✅ STEP 3: Export a public getter.
 //
 // Usage:
 // const fga = await getFgaClient();

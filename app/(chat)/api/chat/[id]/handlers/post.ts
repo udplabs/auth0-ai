@@ -153,7 +153,6 @@ export async function POST(
 			),
 			generateId: ulid, // Deterministic-friendly sortable IDs.
 			onFinish: async ({ messages }) => {
-				console.log('onFinish... saving', messages.length, 'messages...');
 				if (messages.length > 0) {
 					// 6. Sanitize heavy tool outputs before persistence.
 					const sanitized = messages.map((m) => {

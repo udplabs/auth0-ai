@@ -40,12 +40,11 @@
 
 import { Chat, ChatProvider } from '@/components/features/chat';
 import { getUser } from '@/lib/auth0';
-import { cookies } from 'next/headers';
 
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'AIya Chat',
+	title: 'Aiya Chat',
 };
 
 export default async function Page({
@@ -111,18 +110,6 @@ export default async function Page({
 				console.log(error);
 			}
 		}
-	}
-
-	// Determine if we should trigger a first-run content sync (cookie sentinel).
-	const cookieStore = await cookies();
-	const needsSync = !cookieStore.has('db:synced');
-
-	if (needsSync) {
-		const resp = await fetch(`${process.env.APP_BASE_URL}/api/me/settings`, {
-			method: 'POST',
-		});
-
-		if (resp.ok) console.log('db synced!');
 	}
 
 	return (

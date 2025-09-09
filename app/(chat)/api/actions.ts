@@ -50,7 +50,7 @@ export async function generateTitleFromUserMessage(
 // TODO: Finish title streaming
 // This method provides a way to dynamically generate a chat title without blocking the entire message delivery.
 // Makes for a better user experience and is a cool little feature.
-// Written by @danny-fuhriman_atko (w/ help from AIya).
+// Written by @danny-fuhriman_atko (w/ help from Aiya).
 async function streamTitle(
 	message: Chat.UIMessage,
 	dataStream: UIMessageStreamWriter<Chat.UIMessage>

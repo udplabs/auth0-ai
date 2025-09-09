@@ -62,7 +62,7 @@ export const SidebarContent = () => {
 			</SidebarGroup>
 			<SidebarGroup>
 				<div className='flex items-center justify-between'>
-					<SidebarGroupLabel>AIya Chat</SidebarGroupLabel>
+					<SidebarGroupLabel>Aiya Chat</SidebarGroupLabel>
 					<NewChatButton />
 				</div>
 				<SidebarGroupContent>
