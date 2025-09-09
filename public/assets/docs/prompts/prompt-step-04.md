@@ -1,12 +1,11 @@
 ## LAB STEP CONTEXT
 - Lab Step: `step-04`
 - Lab Guide Name: `configure-fga`
-- Static AIya response: `aiya-post-auth` (*ALREADY sent AFTER completion of Auth0 configuration in step-03*)
+- Static Aiya response: `aiya-post-auth` (*ALREADY sent AFTER completion of Auth0 configuration in step-03*)
 - Implementation Code:
   - `.env`
-  - `.env.local`
 
-FGA Model (for reference)
+##### FGA Model (for reference)
 ```
 model
 schema 1.1
@@ -47,16 +46,115 @@ type account
 
 # transaction_amount is supplied at check time (from the request).
 # transaction_limit is typically stored on a tuple (or could also be supplied contextually for coarse, account-wide rules).
-condition transfer_limit_policy(
-transaction_amount: double, transaction_limit: double
-) {
+condition transfer_limit_policy(transaction_amount: double, transaction_limit: double) {
   transaction_amount <= transaction_limit
 }
 ```
 
-Expected Outcome:
+#### `lib/auth0/fga/client.ts ` Steps
+- STEP 1
+  - Completed for them
+- STEP 2
+  - They need to pull variables from `.env` using `process.env.XXXX`.
+  - They should initiate a `new OpenFgaClient` with those variables wrapped in a `createClient` method.
+
+  ##### FINAL CODE
+  ```ts
+  export async function createClient() {
+    try {
+      const options: ClientConfiguration = {
+        apiUrl: process.env.FGA_API_URL ?? 'https://api.us1.fga.dev',
+        storeId: process.env.FGA_STORE_ID,
+        authorizationModelId: process.env.FGA_MODEL_ID,
+        credentials: {
+          method: CredentialsMethod.ClientCredentials,
+          config: {
+            apiTokenIssuer: process.env.FGA_API_TOKEN_ISSUER ?? 'auth.fga.dev',
+            apiAudience:
+              process.env.FGA_API_AUDIENCE ?? 'https://api.us1.fga.dev/',
+            clientId: process.env.FGA_CLIENT_ID,
+            clientSecret: process.env.FGA_CLIENT_SECRET,
+          },
+        },
+      };
+
+      return new OpenFgaClient(options);
+    } catch (error: unknown) {
+      console.warn('FGA Client initialization failed!');
+      console.warn(error);
+      return null;
+    }
+  }
+  ```
+- STEP 3
+  - Completed for them
+
+#### `lib/auth0/fga/get-account-permissions.ts ` Steps
+- STEP 1
+  - Completed for them
+- STEP 2
+  - Expand an array of permissions to check.
+  ```ts
+  const RELATIONS: Accounts.AccountPermissions[] = [
+		'can_view',
+		'can_view_balances',
+		'can_view_transactions',
+		'can_transfer',
+	];
+  ```
+- STEP 3
+  - Build out an array of checks to send to FGA as a batch.
+  ```ts
+  const checks = accounts.flatMap(({ id, customerId }) => {
+    return RELATIONS.map((relation) => ({
+      user: `user:${customerId}`,
+      relation,
+      object: `account:${id}`,
+    }));
+  });
+  ```
+- STEP 4
+  - Completed for them
+- STEP 5
+  - Completed for them
+- STEP 6
+  ```ts
+  const output: (Accounts.Account | null)[] = accounts.map((account) => {
+
+  const permissions = granted[account.id] ?? [];
+
+		if (!permissions.includes('can_view')) {
+			return null;
+		}
+		// Shallow copy so we don’t mutate the original.
+		const copy: any = { ...account, permissions };
+
+		// Remove sensitive fields unless user can view balances.
+		if (!permissions.includes('can_view_balances')) {
+			delete copy.balance;
+			delete copy.availableBalance;
+			delete copy.originalPrincipal;
+			delete copy.currentPrincipal;
+			delete copy.statementBalance;
+			delete copy.cashBalance;
+		}
+
+		if (copy?.transactions?.length && !permissions.includes('can_view_transactions')) {
+			delete copy.transactions;
+		}
+
+		// Helpful in the lab to see what was granted.
+		console.log('Account Permissions:', permissions);
+
+		return copy as Accounts.Account;
+	});
+  ```
+- STEP 7
+  - Completed for them.
+
+##### Expected Outcome:
 - Created an FGA store
 - Added model (copy/paste from guide)
 - Created an FGA client
-- Updated .env and .env.local w/ FGA settings
+- Updated .env w/ FGA settings
 - Should NOT be able to see account data.

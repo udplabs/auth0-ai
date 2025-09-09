@@ -2,7 +2,7 @@
 
 This guide attempts to mirror the Google codelab style: short steps, runnable code, and clear outcomes.
 
-You’ll build a **Bank Zero** demo app (Next.js / App Router) that showcases **Auth0 Auth for AI** as well as **Auth0 FGA** (fine‑grained authorization) powering **RAG** and **securing AI tools**. Your companion assistant **AIya** is available inside the app to keep you moving.
+You’ll build a demo app for ***the bAInk*** using Next.js (App Router) that showcases **Auth0 Auth for AI Agents** as well as **Auth0 FGA** (fine‑grained authorization) powering **RAG** and **securing AI tools**. Your companion AI assistant **Aiya** will be available inside the app (once you get it spun up) to help you out.
 
 # Just a few things...
 
@@ -25,7 +25,20 @@ You’ll build a **Bank Zero** demo app (Next.js / App Router) that showcases **
   > [!Caution]
   > Advises about risks or negative outcomes of certain actions.
 
-- As you work through lab steps you will be asked to write code. In some instances there will be _pseudo-code_ to guide you. In others, the code may already be partially implemented.
-  - This lab does not take a typical copy/pasta learning approach.
-  - You are encouraged to attempt to write the code *on your own* so you can *learn*.
-  - If you are struggling, just ask AIya for some hints/help. Be sure to specify the exact file you are working in. (i.e. `lib/auth0/fga/get-account-permissions.ts`)
+---
+> [!IMPORTANT]
+> *As you work through the lab steps you will be asked to write actual code.* 🙌
+>
+> This lab is designed to encourage you to *write your own code* rather than copy/paste.
+>
+> In some instances there will be *pseudo-code* to guide you. In others, the code may already be partially implemented and/or simply commented out.
+>
+> However, if you would prefer a copy/paste approach you can click the suggestion above the chat input box `Show me the code` and Aiya will provide **the final code** for you to reference.
+>
+> You can also simply type `Show me the code for step XX`.
+>
+> ![Show me the code](./assets/images/show-me-the-code.png)
+>
+> ***We encourage you to try on your own first.***
+
+---

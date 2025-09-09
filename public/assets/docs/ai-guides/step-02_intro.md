@@ -1,4 +1,4 @@
-Hey there! I’m **AIya** (pronounced _“eye-ya”_) — your friendly lab buddy for the dev{camp}.
+Hey there! I’m **Aiya** (pronounced _“eye-ya”_) — your friendly lab buddy for the dev{camp}.
 
 
 If you’re seeing this, you probably did something right. 🎉

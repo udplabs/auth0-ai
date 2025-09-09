@@ -1,7 +1,7 @@
 ## LAB STEP CONTEXT
 - Lab Step: `step-06`
 - Lab Guide Name: `advanced-fga-for-rag`
-- Static AIya response: none
+- Static Aiya response: none
 - Implementation Code:
   - `lib/auth0/fga/search-transactions.ts`
   - `lib/ai/tool-registry.ts`

@@ -3,7 +3,7 @@
 
 <<IN PROGRESS>>
 
-AIya guide
+Aiya guide
 
 The first time a developer spins up the app (running `pnpm dev`) they have not yet configured their `.env` and they will not be authenticated.
 
@@ -45,7 +45,7 @@ TODO: intro to RAG. What it is. What is **not**. Why everyone is talking about i
 ## ✅ Expected Outcome
 At the end of this section you should be able to...
 
-- Ask AIya for account information (i.e your balance, or how much you spent on gas last month)
+- Ask Aiya for account information (i.e your balance, or how much you spent on gas last month)
 
 # Step 5: Fine-grained Auth (FGA)
 
@@ -59,11 +59,11 @@ add account permissions (or "rebuild" via shortcut)
   - do not set can_transfer on savings
 navigate to accounts
   => notice grayed out transfer option on savings
-great, but what about AIya?
-  - ask AIya to transfer money from savings to checking.
+great, but what about Aiya?
+  - ask Aiya to transfer money from savings to checking.
   - ALLOWED?!
 wrap transferFunds w/ FGA
-  - ask AIya again
+  - ask Aiya again
   - DENIED
 
 
@@ -71,14 +71,14 @@ wrap transferFunds w/ FGA
 
 ## What? Why?
 TODO: Add details as to why FGA for RAG is important.
-To ensure that your application can securely access and retrieve user data while adhering to fine-grained authorization policies. This dev{camp} implements a fairly simple model and is, honestly, overkill. However, use your imagination to understand real world applications. AIya -- provide some real world examples and discuss with the user (if they want).
+To ensure that your application can securely access and retrieve user data while adhering to fine-grained authorization policies. This dev{camp} implements a fairly simple model and is, honestly, overkill. However, use your imagination to understand real world applications. Aiya -- provide some real world examples and discuss with the user (if they want).
 
 ### Expected Outcome
 At the end of this section you should be able to...
 
-- Ask AIya for account information (i.e your balance, or how much you spent on gas last month)
+- Ask Aiya for account information (i.e your balance, or how much you spent on gas last month)
 - Ability to transfer funds on allowed accounts.
-- Ask AIya 'how much did I spend in 2025 on travel-related things?'
+- Ask Aiya 'how much did I spend in 2025 on travel-related things?'
 
 - Ability to retrieve account/transaction data securely using RAG & FGA.
 - General Understanding of how to implement fine-grained authorization in your application.
@@ -90,14 +90,14 @@ At the end of this section you should be able to...
 2. Configure your application to use Auth0 FGA by implementing an FGA client (in FGA).
    1. set `.env` and `.env.local` variables.
    2. add code to `@/lib/auth0/fga/client.ts`
-3. Ask AIya to explain chunking and embedding (in general) -- if you want. The terminology is confusing, the concepts are not.
+3. Ask Aiya to explain chunking and embedding (in general) -- if you want. The terminology is confusing, the concepts are not.
 	- What is "chunking"? What are "documents"?
 	- What are "embeddings"?
 	- Does RAG require "embeddings"? Why are they always talked about in the same context?
 	- Explain persisting to DB is not required but comes with benefits.
-		- AIya to explain this app is using a local SQLite DB via Prisma but any persistence layer would suffice.
-		- AIya should then prompt user to review `saveEmbeddings` in `lib/db/queries/documents.ts`
-		- AIya should also ask if the user would like to walk through the code in small pieces to fully understand it (or skip).
+		- Aiya to explain this app is using a local SQLite DB via Prisma but any persistence layer would suffice.
+		- Aiya should then prompt user to review `saveEmbeddings` in `lib/db/queries/documents.ts`
+		- Aiya should also ask if the user would like to walk through the code in small pieces to fully understand it (or skip).
 4. Implement the \`ragAccounts\` tool to fetch account data using FGA for RAG.
 5. Complete LocalVectorStore implementation
 

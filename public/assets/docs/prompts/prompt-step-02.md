@@ -1,7 +1,7 @@
 ## LAB STEP CONTEXT
 - Lab Step: `step-02`
 - Lab Guide Name: `get-setup`
-- Static AIya response: `aiya-intro`
+- Static Aiya response: `aiya-intro`
 - Implementation code: none
 - Reference Code:
   - `package.json`
