@@ -81,17 +81,13 @@ export const ToolResult = ({
 	const widget = renderByType[toolPart.type as ToolType]?.(toolPart);
 
 	// Hide certain internal tools
-	if (
-		['tool-getContent', 'tool-getReferenceFile', 'tool-userSettings'].includes(
-			toolPart.type
-		)
-	) {
+	if (['tool-getContent', 'tool-userSettings'].includes(toolPart.type)) {
 		return null;
 	}
 
 	return (
 		<div className='items-stretch, flex w-full flex-col-reverse gap-3'>
-			<Tool {...{ ...props, toolPart }}>
+			<Tool {...props}>
 				<ToolHeader {...{ ...ToolHeaderProps, type, state }} />
 				<ToolContent {...ToolContentProps}>
 					<ToolInput {...{ ...ToolInputProps, input }} />
