@@ -8,7 +8,7 @@ import {
 	type PromptInputSubmitProps,
 	type PromptInputTextareaProps,
 } from '@/components/ui/ai-elements/prompt-input';
-import { useChat, useSuggestions } from '@/hooks';
+import { useChat, useChatHistory, useSuggestions } from '@/hooks';
 import { cn } from '@/lib/utils';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -28,6 +28,7 @@ export const PromptInput = ({
 	...props
 }: PromptInputProps) => {
 	const { id: _id } = useParams<{ id?: string | string[] }>();
+	const { newChat } = useChatHistory();
 
 	const pathId = _id && Array.isArray(_id) ? _id[0] : _id;
 
@@ -58,7 +59,7 @@ export const PromptInput = ({
 
 	const submitAction = (value: string) => {
 		if (!pathId || pathId !== chatId) {
-			window.history.replaceState({}, '', `/chat/${chatId}`);
+			newChat(chatId);
 		}
 
 		if (value.trim()) {
