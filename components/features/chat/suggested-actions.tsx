@@ -39,16 +39,20 @@ export function SuggestedActions({
 	onSubmit,
 	...props
 }: SuggestedActionsProps) {
-	const { open = _open, suggestedActions } = useSuggestions();
+	const { open = _open, labStep, suggestedActions } = useSuggestions();
 
 	suggestedActions.push(
 		...[
 			{ suggestion: 'What is FGA for RAG?' },
+			...(labStep >= 3
+				? [
+						{ suggestion: 'Show me my accounts' },
+						{ suggestion: 'Show me my transactions' },
+					]
+				: []),
+			{ suggestion: 'What am I supposed to be doing?' },
 			{ suggestion: 'What is Async Authorization?' },
 			{ suggestion: 'What is Auth0 Token Vault?' },
-			{ suggestion: 'What am I supposed to be doing?' },
-			{ suggestion: 'Show me my accounts' },
-			{ suggestion: 'Show me my transactions' },
 			{ suggestion: "What's the forecast for Las Vegas?" },
 		]
 	);
