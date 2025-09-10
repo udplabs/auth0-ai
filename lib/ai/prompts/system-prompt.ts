@@ -1,11 +1,19 @@
+import { getGeolocationPrompt } from '@/lib/ai/prompts/geolocation-prompt';
+import { getUserPrompt } from '@/lib/ai/prompts/user-prompt';
+import {
+	getSystemPrompts as getDBSystemPrompts,
+	getStepGuides,
+	getStepPrompts,
+} from '@/lib/db/queries/content';
+import { upsertSettings } from '@/lib/db/queries/settings';
+import { sortBy } from '@/lib/utils';
+
 export async function getSystemPrompts({
 	requestHints: { settings, ...hints },
 }: {
 	requestHints: Chat.RequestHints;
 }) {
 	if (!settings && hints?.userId) {
-		const { upsertSettings } = await import('@/lib/db/queries/settings');
-
 		settings = await upsertSettings({ id: hints.userId });
 	}
 
@@ -24,17 +32,11 @@ export async function getRequestPromptFromHints({
 }: Chat.RequestHints) {
 	const prompts = [];
 
-	const { getUserPrompt } = await import('@/lib/ai/prompts/user-prompt');
-
 	if (userId) {
 		prompts.push(await getUserPrompt(userId));
 	}
 
 	if (geolocation) {
-		const { getGeolocationPrompt } = await import(
-			'@/lib/ai/prompts/geolocation-prompt'
-		);
-
 		prompts.push(getGeolocationPrompt(geolocation));
 	}
 
@@ -42,11 +44,6 @@ export async function getRequestPromptFromHints({
 }
 
 async function getPrompts(settings?: Partial<UISettings>) {
-	const { sortBy } = await import('@/lib/utils');
-
-	const { getSystemPrompts: getDBSystemPrompts } = await import(
-		'@/lib/db/queries/content'
-	);
 	const systemPrompts = sortBy(await getDBSystemPrompts(), 'name');
 
 	console.log('=== found', systemPrompts.length, 'system prompts ===');
@@ -59,9 +56,6 @@ async function getPrompts(settings?: Partial<UISettings>) {
 		nextLabStep && currentLabStep != nextLabStep ? nextLabStep : currentLabStep;
 
 	if (labStep) {
-		const { getStepPrompts, getStepGuides } = await import(
-			'@/lib/db/queries/content'
-		);
 		const stepPrompts = sortBy(await getStepPrompts(labStep), 'name');
 
 		console.log('=== found', stepPrompts.length, 'step prompts ===');

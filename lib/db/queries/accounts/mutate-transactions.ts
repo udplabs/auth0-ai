@@ -1,5 +1,6 @@
 'use server';
-
+import { prisma } from '@/lib/db/prisma/client';
+import { updateBalances } from './mutate-accounts';
 interface CreateTransferInput extends Transfers.TransactionCreateInput {
 	fromAccountId: string;
 	toAccountId: string;
@@ -18,8 +19,6 @@ export async function createTransfer(data: CreateTransferInput) {
 		description = `Transfer from ${fromAccountNumber} to ${toAccountNumber}`,
 		...tx
 	} = data;
-
-	const { prisma } = await import('../../prisma/client');
 
 	const transfer = await prisma.transfer.create({
 		data: {
@@ -57,8 +56,6 @@ export async function createTransfer(data: CreateTransferInput) {
 			},
 		],
 	});
-
-	const { updateBalances } = await import('./mutate-accounts');
 
 	await updateBalances(transfer);
 

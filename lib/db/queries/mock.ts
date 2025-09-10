@@ -1,11 +1,9 @@
 'use server';
 
-import {
+import type {
 	Prisma,
 	SampleDocument as SampleDocumentModel,
 } from '@/lib/db/generated/prisma';
-import { neon } from '../neon/client';
-import { prisma } from '../prisma/client';
 
 type SampleAccount = Accounts.Account & {
 	lastSyncedAt?: Date;
@@ -28,6 +26,12 @@ export async function getSampleData(userId: string): Promise<{
 	transactions: SampleTransaction[];
 	documents: SampleDocument[];
 }> {
+	const [{ prisma }, { neon }, { convertToUI }] = await Promise.all([
+		import('@/lib/db/prisma/client'),
+		import('@/lib/db/neon/client'),
+		import('@/lib/utils/db-converter'),
+	]);
+
 	const lastSyncedAt = new Date();
 	const expiresAt = new Date(lastSyncedAt.getTime() + 1000 * 60 * 30); // 30 minutes
 
@@ -131,8 +135,6 @@ export async function getSampleData(userId: string): Promise<{
 		});
 	}
 
-	const { convertToUI } = await import('@/lib/utils/db-converter');
-
 	return {
 		accounts: convertToUI(localSampleAccounts),
 		transactions: convertToUI(localSampleTransactions),
@@ -143,6 +145,10 @@ export async function getSampleData(userId: string): Promise<{
 }
 
 export async function deleteSampleDocuments() {
+	const [{ prisma }, { neon }] = await Promise.all([
+		import('@/lib/db/prisma/client'),
+		import('@/lib/db/neon/client'),
+	]);
 	// Delete local
 	await prisma.sampleDocument.deleteMany();
 	// Delete remote

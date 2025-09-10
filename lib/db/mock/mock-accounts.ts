@@ -1,10 +1,4 @@
-import { createDocumentsWithEmbeddings } from '@/lib/ai/rag/create-documents';
 import { LocalVectorStore } from '@/lib/ai/rag/vector-store';
-import { saveAccountsAndReturnSeparate } from '@/lib/db/queries/accounts';
-import { saveDocuments } from '@/lib/db/queries/documents';
-import { fakerEN as faker } from '@faker-js/faker';
-import { ulid } from 'ulid';
-import { deleteSampleDocuments, getSampleData } from '../queries/mock';
 
 // Should not be used outside of this function.
 const sampleUserIds = [
@@ -17,7 +11,23 @@ const sampleUserIds = [
 export async function createMockAccounts(userId: string) {
 	console.log('Creating mock accounts for user:', userId);
 
+	const { fakerEN: faker } = await import('@faker-js/faker');
+
 	const sampleUserId = faker.helpers.arrayElement(sampleUserIds);
+
+	const [
+		{ getSampleData },
+		{ ulid },
+		{ createOwnerPermissions },
+		{ saveAccountsAndReturnSeparate },
+		{ saveDocuments },
+	] = await Promise.all([
+		import('@/lib/db/queries/mock'),
+		import('ulid'),
+		import('@/lib/auth0/fga/utils'),
+		import('@/lib/db/queries/accounts'),
+		import('@/lib/db/queries/documents'),
+	]);
 
 	const {
 		accounts: sampleAccounts = [],
@@ -104,8 +114,6 @@ export async function createMockAccounts(userId: string) {
 	const { accounts: createdAccounts, transactions: createdTransactions } =
 		await saveAccountsAndReturnSeparate(accounts, transactions);
 
-	// Dynamically load to prevent initialization before env is ready.
-	const { createOwnerPermissions } = await import('@/lib/auth0/fga/utils');
 	// Set permissions for the created accounts
 	await createOwnerPermissions(
 		userId,
@@ -130,6 +138,14 @@ export async function createMockAccounts(userId: string) {
 
 // This should be a one-time function but you never know
 export async function generateMockEmbeddings() {
+	const [
+		{ deleteSampleDocuments, getSampleData },
+		{ createDocumentsWithEmbeddings },
+	] = await Promise.all([
+		import('../queries/mock'),
+		import('@/lib/ai/rag/create-documents'),
+	]);
+
 	for (const sampleUserId of sampleUserIds) {
 		console.log('Generating mock embeddings for user:', sampleUserId);
 
@@ -141,6 +157,7 @@ export async function generateMockEmbeddings() {
 		if (_documents.length > 0) {
 			await deleteSampleDocuments();
 		}
+
 		await createDocumentsWithEmbeddings(transactions, 'sample');
 	}
 }

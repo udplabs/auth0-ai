@@ -42,9 +42,11 @@
  *  - Allow filter predicates (e.g., by accountId) pre‑scoring.
  */
 
+import { openai } from '@/lib/ai/openai';
 import { getAllTransactions } from '@/lib/db/queries/accounts';
 import { getDocuments } from '@/lib/db/queries/documents';
 import { cosineSimilarity, embed } from 'ai';
+import { createDocumentsWithEmbeddings } from './create-documents';
 
 export class LocalVectorStore {
 	/**
@@ -130,10 +132,6 @@ export class LocalVectorStore {
 		);
 
 		if (transactionsWithoutEmbedding.length > 0) {
-			const { createDocumentsWithEmbeddings } = await import(
-				'./create-documents'
-			);
-
 			console.log('Creating documents for new transactions...');
 			const docs = await createDocumentsWithEmbeddings(
 				transactionsWithoutEmbedding
@@ -190,8 +188,6 @@ export class LocalVectorStore {
 	 * - O(n) scan; fine for small dev sets, not scalable for large corpora.
 	 */
 	static async search(query: string, limit = 200) {
-		const { openai } = await import('@/lib/ai/openai');
-
 		const model = openai.textEmbedding('text-embedding-3-small');
 
 		// Embed the query.

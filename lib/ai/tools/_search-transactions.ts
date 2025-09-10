@@ -1,4 +1,5 @@
 // lib/ai/tools/search-transactions.ts
+// THIS IS FINAL CODE
 import { tool } from 'ai';
 import { z } from 'zod';
 import { DocumentWithScoreSchema, ToolResponseSchema } from '../schemas';
@@ -102,9 +103,9 @@ export const searchTransactions = tool<
 
 				// TODO: Return a valid response
 				return {
-					user: ``,
-					object: ``,
-					relation: '',
+					user: `user:${user.sub}`,
+					object: `account:${doc.metadata.accountId}`,
+					relation: 'can_view_transactions',
 				};
 			},
 		});
@@ -138,9 +139,8 @@ export const searchTransactions = tool<
 		// Internally may batch; returns only documents passing the relation check.
 		// ---------------------------------------------------------------------
 		// TODO: Implement the actual filtering
-		// const authorizedResults: Documents.DocumentWithScore[] = await fgaRetriever.filter(...) ;
-		const authorizedResults: Documents.DocumentWithScore[] =
-			[]; /** THIS IS A PLACEHOLDER. Remove after you implement actual filtering */
+		const authorizedResults = await fgaRetriever.filter(rawResults);
+
 		console.log(
 			'[searchTransactions] Authorized results:',
 			authorizedResults.length

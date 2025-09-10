@@ -1,24 +1,28 @@
-import ManagementClient from '@/lib/auth0/management-client';
+import { auth0Management } from '@/lib/auth0';
+import { upsertSettings } from '@/lib/db/queries/settings';
+import { APIError } from '@/lib/errors';
+import { getCacheKey } from '@/lib/utils';
 import { unstable_cache } from 'next/cache';
 
 async function fetchUserProfile(id: string): Promise<UserProfile> {
-	const auth0Management = new ManagementClient();
+	try {
+		console.log('fetching profile...');
 
-	console.log('fetching profile...');
+		const { data: user } = await auth0Management.users.get({ id });
 
-	const { data: user } = await auth0Management.users.get({ id });
+		const custom_metadata = await upsertSettings({ id: user.user_id });
 
-	const { upsertSettings } = await import('@/lib/db/queries/settings');
-
-	const custom_metadata = await upsertSettings({ id: user.user_id }, false);
-
-	return { ...user, custom_metadata };
+		return { ...user, custom_metadata };
+	} catch (error: unknown) {
+		throw new APIError(
+			'server_error:api',
+			error instanceof Error ? error?.message : `Fetch profile failed for ${id}`
+		);
+	}
 }
 
 export async function getUserProfile({ userId, key, tags }: ActionOptions) {
 	if (!key) {
-		const { getCacheKey } = await import('@/lib/utils');
-
 		key = getCacheKey({ userId, resource: ['profile'] });
 	}
 
@@ -28,14 +32,10 @@ export async function getUserProfile({ userId, key, tags }: ActionOptions) {
 
 	tags = [...new Set(tags)];
 
-	const getCachedUserProfile = unstable_cache(
-		() => fetchUserProfile(userId),
+	const cached = unstable_cache(() => fetchUserProfile(userId), tags, {
+		revalidate: 150,
 		tags,
-		{
-			revalidate: 150,
-			tags,
-		}
-	);
+	});
 
-	return getCachedUserProfile();
+	return cached();
 }

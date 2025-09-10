@@ -1,5 +1,6 @@
 import { getTransactions } from '@/lib/api/accounts';
 import { getUser } from '@/lib/auth0';
+import { handleApiError } from '@/lib/errors';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -15,7 +16,6 @@ export async function GET(
 
 		return NextResponse.json(data);
 	} catch (error: unknown) {
-		const { handleApiError } = await import('@/lib/errors');
 		return handleApiError(error);
 	}
 }

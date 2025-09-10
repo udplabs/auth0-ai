@@ -22,7 +22,7 @@ export const getStepCode = tool<
 
 	If no step is provided then the tool will fetch the last known step.
 
-	Present the value of \`data.textData\` to the end user.
+	Present the value of \`textData\` to the end user.
 	`.trim(),
 	inputSchema,
 	outputSchema,

@@ -1,6 +1,6 @@
+import { getContentById } from '@/lib/db/queries/content';
 import { upsertSettings } from '@/lib/db/queries/settings';
 import type { UIMessage, UIMessageStreamWriter } from 'ai';
-
 import { getLastPart } from './get-last-part';
 import { withStreamingJitter } from './with-streaming-jitter';
 
@@ -16,7 +16,7 @@ export interface WithStaticContentOptions<
 // It fetches prompt content remotely -- cool, right?
 // This gives the lab the ability to be dynamic and bend to our will 😈.
 // This can/should be improved!
-// But, for now, it'll do, donkey. It'll do.
+// But, for now, it'll do, 🫏. It'll do.
 export function withStaticContent<
 	UI_MESSAGE extends UIMessage = Chat.UIMessage,
 >(
@@ -24,9 +24,11 @@ export function withStaticContent<
 	{ userId, messages, ...config }: WithStaticContentOptions<UI_MESSAGE>
 ) {
 	return async (options: { writer: UIMessageStreamWriter<UI_MESSAGE> }) => {
-		const settings =
-			config?.userSettings ||
-			(userId ? await upsertSettings({ id: userId }) : undefined);
+		let settings = config?.userSettings;
+
+		if (!settings && userId) {
+			settings = await upsertSettings({ id: userId });
+		}
 
 		let onFinish: () => Promise<void> | void = () => {};
 
@@ -36,11 +38,13 @@ export function withStaticContent<
 			messages.length === 1 ? messages[0] : messages[messages.length - 1];
 
 		const lastPart = getLastPart(lastMessage);
+		const lastPartUpper =
+			lastPart?.type === 'text' ? lastPart.text.toUpperCase() : '';
 
 		let contentId: string | null = null;
 
 		if (lastPart?.type === 'text') {
-			if (lastPart.text.toUpperCase().includes('MY FIRST MESSAGE')) {
+			if (lastPartUpper.includes('MY FIRST MESSAGE')) {
 				console.log('returning intro...');
 				contentId = '01K3VDGK1XKJR87HZZS1JY57HJ';
 				onFinish = async () => {
@@ -56,7 +60,7 @@ export function withStaticContent<
 					}
 				};
 			} else if (
-				lastPart.text.toUpperCase().includes('SUCCESSFULLY AUTHENTICATED') &&
+				lastPartUpper.includes('SUCCESSFULLY AUTHENTICATED') &&
 				userId
 			) {
 				console.log('returning post auth...');
@@ -75,45 +79,41 @@ export function withStaticContent<
 
 		const { writer: dataStream } = options;
 
-		const { getContentById } = await import('../db/queries/content');
 		const { textData } = contentId
 			? (await getContentById(contentId)) || {}
 			: {};
 
-		if (textData) {
-			// We have custom content!
-			// Stream baby! Stream!
-
-			const { ulid } = await import('ulid');
-
-			const id = ulid();
-			const jitterStream = withStreamingJitter(dataStream);
-
-			jitterStream.write({ type: 'text-start', id });
-
-			const { chunk } = await import('./chunking');
-			const chunks = chunk(textData, 'paragraphs');
-
-			for (const delta of chunks) {
-				jitterStream.write({
-					type: 'text-delta',
-					delta,
-					id,
-				});
-			}
-
-			jitterStream.write({ type: 'text-end', id });
-
-			await jitterStream.flush();
-
-			if (onFinish) {
-				console.log('calling withStaticContent onFinish...');
-				await onFinish();
-			}
-			// Return otherwise the model will ruin the experience.
-			return;
+		if (!textData) {
+			return await fn(options);
 		}
 
-		await fn(options);
+		// We have custom content!
+		// Stream baby! Stream!
+
+		const [{ ulid }, { chunk }] = await Promise.all([
+			import('ulid'),
+			import('./chunking'),
+		]);
+
+		const id = ulid();
+		const jitterStream = withStreamingJitter(dataStream);
+
+		jitterStream.write({ type: 'text-start', id });
+
+		const chunks = chunk(textData, 'paragraphs');
+
+		for (const delta of chunks) {
+			jitterStream.write({
+				type: 'text-delta',
+				delta,
+				id,
+			});
+		}
+
+		jitterStream.write({ type: 'text-end', id });
+
+		await jitterStream.flush();
+
+		await onFinish?.();
 	};
 }

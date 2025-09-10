@@ -1,14 +1,16 @@
 'use server';
 
 import { type Chat as ChatModel, Prisma } from '@/lib/db/generated/prisma';
+import { APIError } from '@/lib/errors';
+import { convertToDB } from '@/lib/utils';
 import { neon } from '../../neon/client';
 import { prisma } from '../../prisma/client';
+import { saveAppInstance } from '../settings';
+import { deleteMessagesByChatId, saveMessages } from './mutate-messages';
 import { getChatById } from './query-chats';
 
 export async function saveChat(input: Chat.CreateChatInput) {
 	const { messages = [], ...chat } = input;
-
-	const { convertToDB } = await import('@/lib/utils/db-converter');
 
 	const convertedChat = convertToDB<
 		Chat.CreateChatInput,
@@ -26,7 +28,6 @@ export async function saveChat(input: Chat.CreateChatInput) {
 	// Internal mechanism to keep Neon in sync with main
 	await upsertRemoteChat(dbChat);
 
-	const { saveMessages } = await import('./mutate-messages');
 	// Upsert messages separately
 	// Will also update remote db so must be run after remote chat write
 	await saveMessages(messages);
@@ -38,8 +39,6 @@ export async function saveChat(input: Chat.CreateChatInput) {
 
 async function upsertRemoteChat(chat: ChatModel) {
 	const { id, title, userId } = chat;
-
-	const { saveAppInstance } = await import('../settings');
 
 	const { id: appInstanceId } = await saveAppInstance();
 	await neon.$transaction(async (tx) => {
@@ -71,8 +70,6 @@ export async function deleteChatById(
 		includeMessages: true,
 	});
 
-	const { APIError } = await import('@/lib/errors');
-
 	if (!_chat) {
 		throw new APIError('not_found:chat');
 	}
@@ -87,8 +84,6 @@ export async function deleteChatById(
 	}
 
 	if (messages.length) {
-		const { deleteMessagesByChatId } = await import('./mutate-messages');
-
 		await deleteMessagesByChatId(chatId);
 	}
 

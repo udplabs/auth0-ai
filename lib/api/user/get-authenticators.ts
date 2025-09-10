@@ -1,16 +1,23 @@
-import ManagementClient from '@/lib/auth0/management-client';
+import { auth0Management } from '@/lib/auth0/management-client';
+import { APIError } from '@/lib/errors';
+import { getCacheKey } from '@/lib/utils';
 import { unstable_cache } from 'next/cache';
 
 async function fetchAuthenticators(id: string) {
-	const auth0Management = new ManagementClient();
-
-	return await auth0Management.getFactors(id);
+	try {
+		return await auth0Management.getFactors(id);
+	} catch (error: unknown) {
+		throw new APIError(
+			'server_error:api',
+			error instanceof Error
+				? error?.message
+				: `Fetch authenticators failed for ${id}`
+		);
+	}
 }
 
 export async function getAuthenticators({ userId, key, tags }: ActionOptions) {
 	if (!key) {
-		const { getCacheKey } = await import('@/lib/utils');
-
 		key = getCacheKey({ userId, resource: ['authenticators'] });
 	}
 
@@ -20,14 +27,10 @@ export async function getAuthenticators({ userId, key, tags }: ActionOptions) {
 
 	tags = [...new Set(tags)];
 
-	const getCachedAuthenticators = unstable_cache(
-		() => fetchAuthenticators(userId),
+	const cached = unstable_cache(() => fetchAuthenticators(userId), tags, {
+		revalidate: 150,
 		tags,
-		{
-			revalidate: 150,
-			tags,
-		}
-	);
+	});
 
-	return getCachedAuthenticators();
+	return cached();
 }

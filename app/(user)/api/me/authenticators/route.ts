@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { getAuthenticators } from '@/lib/api/user';
 import { getUser } from '@/lib/auth0';
-
+import { handleApiError } from '@/lib/errors';
 // Get user authenticators
 export async function GET() {
 	try {
@@ -13,7 +13,6 @@ export async function GET() {
 
 		return NextResponse.json(data);
 	} catch (error) {
-		const { handleApiError } = await import('@/lib/errors');
 		return handleApiError(error);
 	}
 }
