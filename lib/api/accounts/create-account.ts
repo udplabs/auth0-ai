@@ -1,6 +1,3 @@
-import { createOwnerPermissions } from '@/lib/auth0/fga/utils';
-import { saveAccountsAndReturnSeparate } from '@/lib/db/queries/accounts';
-
 interface CreateAccountsOptions {
 	userId: string;
 	accounts: Accounts.CreateAccountInput[];
@@ -33,10 +30,14 @@ export async function createAccounts({
 	transactions = [],
 	createEmbeddings = false,
 }: CreateAccountsOptions) {
+	const { saveAccountsAndReturnSeparate } = await import(
+		'@/lib/db/queries/accounts'
+	);
 	// 1) Save accounts and transactions to DB
 	const { accounts: newAccounts, transactions: newTransactions } =
 		await saveAccountsAndReturnSeparate(accounts, transactions);
 
+	const { createOwnerPermissions } = await import('@/lib/auth0/fga/utils');
 	// 2) Write permissions
 	await createOwnerPermissions(
 		userId,

@@ -7,9 +7,11 @@ import {
 	PopoverTrigger,
 } from '@/components/ui/popover';
 import { useAccounts } from '@/hooks/use-accounts';
+import { LS_KEY_AUTH, LS_KEY_FIRST } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import {
 	BugOffIcon,
+	CirclePowerIcon,
 	EyeIcon,
 	FileStackIcon,
 	LockIcon,
@@ -102,16 +104,29 @@ export const FAB = () => {
 						</Button>
 					</div>
 					<div className='flex items-center gap-2'>
-						Reset 'first-message'
+						Resend 'first-message'
 						<Button
 							className='h-8 w-8 rounded-full p-4'
 							variant='destructive'
 							onClick={() => {
-								localStorage.removeItem('first-message');
+								localStorage.removeItem(LS_KEY_FIRST);
 								redirect('/chat');
 							}}
 						>
 							<BugOffIcon className='h-5 w-5' />
+						</Button>
+					</div>
+					<div className='flex items-center gap-2'>
+						Resend 'authenticated-message'
+						<Button
+							className='h-8 w-8 rounded-full p-4'
+							variant='destructive'
+							onClick={() => {
+								localStorage.removeItem(LS_KEY_AUTH);
+								redirect('/chat');
+							}}
+						>
+							<CirclePowerIcon className='h-5 w-5' />
 						</Button>
 					</div>
 					<div className='flex items-center gap-2'>

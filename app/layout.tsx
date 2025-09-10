@@ -21,6 +21,7 @@
 
 import { FAB } from '@/components/fab';
 import { AppSidebar } from '@/components/layout/app-sidebar';
+import { Bootstrap } from '@/components/layout/bootstrap';
 import { SWRProvider, ThemeProvider } from '@/components/providers';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
@@ -32,7 +33,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
 	metadataBase: new URL('https://ai.auth.rocks'),
-	title: 'AIya -- Your Personal Banking Assistant',
+	title: 'Aiya -- Your Personal Banking Assistant',
 	description:
 		'a developer lab (dev{camp}) designed to help developers build a Personal Banking Assistant -- powered by Auth0, Vercel, and OpenAI.',
 };
@@ -87,7 +88,8 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
 	// Read cookie to restore sidebar state (cookie value 'true' => open).
 	const cookieStore = await cookies();
-	const isCollapsed = cookieStore.get('sidebar:state')?.value !== 'true';
+	const isCollapsed =
+		cookieStore.get('sidebar:state')?.value == 'true' || false;
 
 	return (
 		<html
@@ -126,6 +128,7 @@ export default async function RootLayout({
 								<FAB />
 							</div>
 						</SidebarProvider>
+						<Bootstrap />
 					</SWRProvider>
 				</ThemeProvider>
 			</body>

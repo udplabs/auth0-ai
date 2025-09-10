@@ -3,8 +3,7 @@ import { ManagementClient } from 'auth0';
 import { concat, orderBy } from 'lodash-es';
 
 import type { ManagementClientOptionsWithClientSecret as ManagementClientOptions } from 'auth0';
-
-export default class Auth0ManagementClient extends ManagementClient {
+class Auth0ManagementClient extends ManagementClient {
 	domain: string;
 	clientId: string;
 	clientSecret: string;
@@ -111,3 +110,7 @@ export default class Auth0ManagementClient extends ManagementClient {
 		);
 	}
 }
+
+let _client: Auth0ManagementClient | null = null;
+
+export const auth0Management = _client || new Auth0ManagementClient();

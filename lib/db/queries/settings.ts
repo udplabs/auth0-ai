@@ -1,13 +1,14 @@
 'use server';
-
+import { createHash } from 'crypto';
+import { promises } from 'fs';
+import path from 'path';
+import { ulid } from 'ulid';
 import { Prisma as Neon } from '../generated/neon';
 import { Prisma } from '../generated/prisma';
 import { neon } from '../neon/client';
 import { prisma } from '../prisma/client';
-
 export async function upsertSettings(
-	data: UICreateSettingsInput,
-	revalidate = true
+	data: UICreateSettingsInput
 ): Promise<UISettings> {
 	const { id, ...rest } = data;
 
@@ -71,20 +72,8 @@ export async function upsertSettings(
 		},
 		create: {
 			...createData,
-			appInstance: {
-				connect: { id: appInstance.id },
-			},
 		} as Neon.RemoteSettingsCreateInput,
 	});
-
-	if (revalidate) {
-		const { revalidateTag } = await import('next/cache');
-		// Settings is returned in the user profile
-		// We need to inform the cache there has been a change.
-		// THIS IS A HACK.
-		// TODO: Implement a useSWR mutation? Something better? 🤔
-		revalidateTag('profile');
-	}
 
 	return {
 		...result,
@@ -126,12 +115,10 @@ async function getSettings(
 export async function saveAppInstance() {
 	const filename = '.app-instance.local';
 
-	const path = await import('path');
 	const filepath = path.join(process.cwd(), filename);
 
 	const exists = await fileExistsAtRoot(filepath);
 
-	const { promises } = await import('fs');
 	const { readFile, writeFile } = promises;
 
 	const localAppInstance = exists
@@ -143,8 +130,6 @@ export async function saveAppInstance() {
 	const auth0ClientId = process.env.AUTH0_CLIENT_ID || null;
 	const auth0Domain = process.env.AUTH0_DOMAIN || null;
 
-	const { ulid } = await import('ulid');
-
 	const [id = ulid(), hash] = localAppInstance
 		? localAppInstance?.split('|')
 		: [];
@@ -153,8 +138,6 @@ export async function saveAppInstance() {
 
 	if (auth0Domain !== null && auth0ClientId !== null)
 		str.push(...[auth0Domain, auth0ClientId]);
-
-	const { createHash } = await import('crypto');
 
 	const hashedInstanceId = createHash('sha1')
 		.update(str.join('|'), 'utf8')
@@ -190,7 +173,6 @@ export async function saveAppInstance() {
 
 export async function fileExistsAtRoot(filepath: string) {
 	try {
-		const { promises } = await import('fs');
 		const { access } = promises;
 
 		await access(filepath);

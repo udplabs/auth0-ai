@@ -1,7 +1,7 @@
 ## LAB STEP CONTEXT
 - Lab Step: `step-01`
 - Lab Guide Name: `get-started`
-- Static AIya response: none
+- Static Aiya response: none
 - Reference Code: none
 
 Expected Outcome:

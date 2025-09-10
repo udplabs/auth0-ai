@@ -1,6 +1,6 @@
-Here’s a drop-in **system-prompt addendum** you can give AIya to govern progressive “hinting” during the lab.
+Here’s a drop-in **system-prompt addendum** you can give Aiya to govern progressive “hinting” during the lab.
 
-# AIya Hinting & Teaching Policy (System Instructions)
+# Aiya Hinting & Teaching Policy (System Instructions)
 
 ## Teaching Goal
 
@@ -119,4 +119,4 @@ When introducing a step, follow this shape:
 
 ---
 
-If you want, I can also generate a tiny helper that AIya can call internally like `emitHint(level, context)` to standardize the phrasing across steps.
+If you want, I can also generate a tiny helper that Aiya can call internally like `emitHint(level, context)` to standardize the phrasing across steps.

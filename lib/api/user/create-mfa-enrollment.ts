@@ -1,16 +1,16 @@
-import { ManagementClient } from '@/lib/auth0';
+import { auth0Management } from '@/lib/auth0';
 
 type AuthenticatorType = 'totp' | 'sms' | 'push' | 'email';
 
+// This call is 'pure' / raw
+// Cache invalidation only occurs in API
 export const createMFAEnrollment = async (
 	user_id: string,
 	authenticator: AuthenticatorType = 'push'
 ) => {
-	const management = new ManagementClient();
-
 	const {
 		data: { ticket_url },
-	} = await management.guardian.createEnrollmentTicket({
+	} = await auth0Management.guardian.createEnrollmentTicket({
 		user_id,
 		// SDK passes through body as-is and types are not correct. Endpoint will accept.
 		// @ts-ignore

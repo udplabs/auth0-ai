@@ -1,7 +1,6 @@
 import { resetAccountPermissions } from '@/lib/api/accounts/reset-account-permissions';
 
 import { getUser } from '@/lib/auth0';
-import { APIError } from '@/lib/errors';
 
 // Handles resetting account permissions
 export async function DELETE() {
@@ -13,11 +12,8 @@ export async function DELETE() {
 		await resetAccountPermissions(user.sub);
 		return new Response(null, { status: 204 });
 	} catch (error: unknown) {
-		console.log(error);
-		if (error instanceof APIError) {
-			return error.toResponse();
-		}
+		const { handleApiError } = await import('@/lib/errors');
 
-		return new APIError(error).toResponse();
+		return handleApiError(error);
 	}
 }

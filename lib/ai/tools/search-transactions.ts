@@ -86,7 +86,28 @@ export const searchTransactions = tool<
 		//   - a non-existent relation (should yield zero docs)
 		// ---------------------------------------------------------------------
 		// TODO: Initialize FGA Filter here
-		const fgaRetriever = () => {};
+		const fgaRetriever = FGAFilter.create<Documents.DocumentWithScore>({
+			buildQuery: (doc) => {
+				// OPTIONAL Defensive coding: ensure metadata has expected shape.
+				// If missing, return a relation that will certainly fail.
+				const accountId = doc?.metadata?.accountId;
+
+				if (!accountId) {
+					return {
+						user: `user:${user.sub}`,
+						object: `account:__missing__`,
+						relation: 'can_view_transactions',
+					};
+				}
+
+				// TODO: Return a valid response
+				return {
+					user: ``,
+					object: ``,
+					relation: '',
+				};
+			},
+		});
 
 		// ---------------------------------------------------------------------
 		// ✅ STEP 4: Vector store retrieval.

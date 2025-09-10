@@ -12,6 +12,7 @@ import {
 import React, { createContext, useEffect, useMemo, useRef } from 'react';
 import { ulid } from 'ulid';
 
+import { LS_KEY_AUTH, LS_KEY_FIRST } from '@/lib/constants';
 export interface ChatContextValue {
 	chat: AIChat<Chat.UIMessage>;
 }
@@ -77,7 +78,6 @@ function createChat(
 			}
 
 			if (error instanceof APIError) {
-				console.log('I haz err...');
 				console.table(error);
 				toast({
 					type: 'error',
@@ -86,8 +86,6 @@ function createChat(
 			}
 		},
 		onFinish: (options) => {
-			console.log('=== useChat ON FINISH ===');
-
 			if (onFinish) {
 				console.warn(
 					'Custom onFinish provided! overriding default behavior...'
@@ -127,7 +125,7 @@ export function ChatProvider({
 	isNewChat,
 }: ChatProviderOptions) {
 	const { mutate: refreshChatHistory } = useChatHistory();
-	const { data: user, isAuthenticated } = useUserProfile();
+	const { data: user, isAuthenticated, updateUserSettings } = useUserProfile();
 
 	const chatRef = useRef<AIChat<Chat.UIMessage>>();
 
@@ -139,21 +137,17 @@ export function ChatProvider({
 	}
 
 	const chat = chatRef.current;
-
-	const introSentRef = useRef(false);
 	useEffect(() => {
-		if (introSentRef.current) return;
-
 		const sendFirstMessage =
 			!isAuthenticated &&
-			(localStorage.getItem('first-message-sent') ?? 'false') !== 'true';
+			(localStorage.getItem(LS_KEY_FIRST) ?? 'false') !== 'true';
 
 		if (id && sendFirstMessage) {
 			// This is the first interaction with this user/person.
 			// They might not even be authenticated!
-			// Let's kick off an introductory monologue for AIya.
+			// Let's kick off an introductory monologue for Aiya.
 			chat.sendMessage({
-				text: 'Hi AIya! This is my first message.',
+				text: 'Hi Aiya! This is my first message.',
 				metadata: {
 					chatId,
 					labStep: 'step-03',
@@ -161,40 +155,37 @@ export function ChatProvider({
 				},
 			});
 
-			localStorage.setItem('first-message-sent', 'true');
-			introSentRef.current = true;
+			localStorage.setItem(LS_KEY_FIRST, 'true');
 		}
 	}, [id, isAuthenticated, chatId, chat]);
 
 	const isFirstLogin = user?.logins_count <= 1;
-	const authMessageSentRef = useRef(false);
 	useEffect(() => {
-		console.log('id:', id);
-		console.log('user:', user);
-		console.log('isFirstLogin:', isFirstLogin);
-		console.log('authMessageSentRef:', authMessageSentRef.current);
-		if (!id || !user?.user_id || !isFirstLogin || authMessageSentRef.current)
-			return;
+		const sendAuthMessage =
+			id &&
+			user?.user_id &&
+			isFirstLogin &&
+			(localStorage.getItem(LS_KEY_AUTH) ?? 'false') !== 'true';
+
+		if (!sendAuthMessage) return;
 
 		// User has authenticated successfully.
 		// Kick off the next step.
 		chat.sendMessage({
-			text: 'Hi AIya! I have successfully authenticated. What\s next?',
+			text: 'Hi Aiya! I have successfully authenticated. What\s next?',
 			metadata: {
 				chatId,
 				labStep: 'step-04',
 			},
 		});
 
-		fetch('/api/me/settings', {
-			method: 'PATCH',
-			body: JSON.stringify({
-				id: user.id,
-				currentLabStep: 'step-04',
-				nextLabStep: 'step-05',
-			}),
+		updateUserSettings({
+			id: user.id,
+			currentLabStep: 'step-04',
+			nextLabStep: 'step-05',
 		});
-		authMessageSentRef.current = true;
+
+		localStorage.setItem(LS_KEY_AUTH, 'true');
 	}, [id, user, chat, isFirstLogin, chatId]);
 
 	const value = useMemo<ChatContextValue>(

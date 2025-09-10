@@ -24,4 +24,8 @@ declare global {
 	}
 
 	type UIGeolocation = Geo;
+
+	interface Window {
+		__dbSyncPromise?: Promise<void>;
+	}
 }

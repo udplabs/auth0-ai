@@ -1,6 +1,6 @@
 import { getChat } from '@/lib/api/chat/get-chat';
 import { getUser } from '@/lib/auth0';
-import { APIError } from '@/lib/errors';
+import { APIError, handleApiError } from '@/lib/errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -21,9 +21,6 @@ export async function GET(
 
 		return NextResponse.json({ data });
 	} catch (error: unknown) {
-		console.log(error);
-		error instanceof APIError
-			? error.toResponse()
-			: new APIError(error).toResponse();
+		return handleApiError(error);
 	}
 }

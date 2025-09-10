@@ -1,3 +1,4 @@
+import { getChatById, listChatsByUserId } from '@/lib/db/queries/chat';
 import { getCacheKey } from '@/lib/utils';
 import { unstable_cache } from 'next/cache';
 
@@ -87,15 +88,13 @@ export async function getChat({
 	// Ensure uniqueness (avoid duplicate tags).
 	tags = [...new Set(tags)];
 
-	const { getChatById } = await import('@/lib/db/queries/chat');
-
-	const getCachedChat = unstable_cache(
+	const cached = unstable_cache(
 		() => getChatById(id, { userId, includeMessages }),
 		tags,
 		{ revalidate: 150, tags } // revalidation config
 	);
 
-	return getCachedChat();
+	return cached();
 }
 
 /* ---------- Chat History (list) ---------- */
@@ -139,15 +138,13 @@ export async function getChatHistory({
 	// Ensure uniqueness (avoid duplicate tags).
 	tags = [...new Set(tags)];
 
-	const { listChatsByUserId } = await import('@/lib/db/queries/chat');
-
-	const getCachedChatHistory = unstable_cache(
+	const cached = unstable_cache(
 		() => listChatsByUserId(userId, { page, pageSize, grouped }),
 		tags,
 		{ revalidate: 300, tags }
 	);
 
-	return getCachedChatHistory();
+	return cached();
 }
 
 /* ---------- Cache Key Builder ---------- */

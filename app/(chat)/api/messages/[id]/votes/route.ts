@@ -1,7 +1,7 @@
 import { getUser } from '@/lib/auth0';
 import { voteMessage } from '@/lib/db/queries/chat/mutate-messages';
-import { APIError } from '@/lib/errors';
 import { type NextRequest, NextResponse } from 'next/server';
+import { APIError} from '@/lib/errors';
 
 // Handles up/down voting a message.
 // Probably a bette way to do this but this works for now.

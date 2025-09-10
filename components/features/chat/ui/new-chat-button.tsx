@@ -3,11 +3,9 @@ import {
 	AnimatedButtonProps,
 } from '@/components/animated-button';
 import { Button } from '@/components/ui/button';
-import { useSidebar } from '@/components/ui/sidebar';
+import { useChatHistory } from '@/hooks/use-chat-history';
 import { cn } from '@/lib/utils/utils';
 import { PlusIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { ulid } from 'ulid';
 
 export interface NewChatButtonProps
 	extends Omit<AnimatedButtonProps, 'label' | 'icon'> {
@@ -27,15 +25,9 @@ export const NewChatButton = ({
 	variant = 'ghost',
 	...props
 }: NewChatButtonProps) => {
-	const router = useRouter();
-	const { setOpenMobile } = useSidebar();
+	const { newChat } = useChatHistory();
 
-	const onClick = _onClick
-		? _onClick
-		: () => {
-				setOpenMobile(false);
-				router.replace(`/chat/${ulid()}`);
-			};
+	const onClick = _onClick ? _onClick : () => newChat();
 
 	if (animated) {
 		return (

@@ -561,11 +561,15 @@ export const ContentSchema = z.object({
 	textData: z
 		.string()
 		.optional()
-		.describe('The text of the given content if the mimeType is of `text/*`'),
+		.describe(
+			'The text of the given content if the mimeType is of `text/*`. This is the value to present to end users if present.'
+		),
 	applicationData: z
 		.json()
 		.optional()
-		.describe('The data if the mimeType is of `application/*`.'),
+		.describe(
+			'The data if the mimeType is of `application/*`. Present this value to end users if present.'
+		),
 	name: z
 		.string()
 		.describe(
@@ -592,6 +596,7 @@ export const ContentSchema = z.object({
 		),
 	contentPlacement: z
 		.enum(['aiya', 'labs', 'secret'])
+		.optional()
 		.describe(
 			'The primary presenter of the content. The platform that will be showing the content. If `aiya` this indicates that the user will consume the content in the chat dialog. If `labs` they will have consumed it via https://labs.demo.okta.com.'
 		),

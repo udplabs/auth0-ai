@@ -1,10 +1,12 @@
 'use server';
 
 import { APIError } from '@/lib/errors';
-import { convertToDB } from '@/lib/utils/db-converter';
+import { convertToDB, convertToUI } from '@/lib/utils/db-converter';
 import type { Prisma as Neon } from '../../generated/neon';
 import type { Message as MessageModel, Prisma } from '../../generated/prisma';
+import { neon } from '../../neon/client';
 import { prisma } from '../../prisma/client';
+import { getMessageById } from './query-messages';
 
 interface VoteMessageOptions {
 	userId?: string;
@@ -30,8 +32,6 @@ export async function voteMessage(
 		);
 	}
 
-	const { getMessageById } = await import('./query-messages');
-
 	return await getMessageById(id);
 }
 
@@ -46,16 +46,12 @@ export async function updateMessage(
 		data: dbMessage,
 	});
 
-	const { neon } = await import('../../neon/client');
-
 	// Remote write
 	// Internal mechanism to keep Neon in sync with main
 	await neon.remoteMessage.update({
 		where: { id: message.id },
 		data: dbMessage as Neon.RemoteMessageUpdateInput,
 	});
-
-	const { convertToUI } = await import('@/lib/utils/db-converter');
 
 	return convertToUI<MessageModel, Chat.UIMessage>(result);
 }
@@ -77,8 +73,6 @@ export async function saveMessages(messages: Chat.UIMessage[]): Promise<void> {
 			});
 		}),
 	]);
-
-	const { neon } = await import('../../neon/client');
 
 	// Remote write
 	// Internal mechanism to keep Neon in sync with main

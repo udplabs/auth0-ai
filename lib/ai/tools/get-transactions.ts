@@ -28,7 +28,8 @@ export const getTransactions = tool<
 				'@/lib/api/accounts'
 			);
 
-			const data = await getTransactionsAPI({ accountId, userId: user.sub });
+			const data =
+				(await getTransactionsAPI({ accountId, userId: user.sub })) || [];
 
 			return {
 				status: 'success',

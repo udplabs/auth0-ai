@@ -118,7 +118,7 @@ export async function getRefreshToken() {
  */
 export async function getUser(): Promise<User>;
 export async function getUser(throwError: false): Promise<User | undefined>;
-export async function getUser(throwError?: boolean): Promise<User | undefined> {
+export async function getUser(throwError = true): Promise<User | undefined> {
 	const { user } = (await getSession()) || {};
 
 	if (throwError && !user?.sub) {

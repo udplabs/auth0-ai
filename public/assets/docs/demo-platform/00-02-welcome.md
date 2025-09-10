@@ -1,14 +1,15 @@
 ## Premise
 You’re a developer at *the bAInk*, a fancy new digital-only financial institution. Your task: wire an AI assistant into your banking UI without leaking sensitive data, enforce per‑account permissions with FGA, augment user interactions with RAG, and (coming soon!) require human approval for sensitive actions via async auth (CIBA) and Rich Authorization Requests.
 
-**Meet AIya.** AIya is the dev{camp} guide living inside your app. Ask for things like:
+**Meet Aiya.** Aiya is the dev{camp} guide living inside your app. Once you get the app spun up you can utilize Aiya for things like:
 
 * `What am I supposed to be doing?`
 * `Explain step 3` to expand on the guide.
 * `hint` or `help` to get [progressively stronger] nudges
 * `explain this file: {{insert file including path}}` to summarize code you’re viewing
+* `Show me the code` to just see the final code.
 
-**How to interact.** Treat AIya like a senior pair‑programmer. Ask precise questions. If you’re blocked, paste the error + a short description of what you tried.
+**How to interact.** Treat Aiya like a senior pair‑programmer. Ask precise questions. If you’re blocked, paste the error + a short description of what you tried.
 
 
 > [!WARNING]
@@ -44,10 +45,10 @@ You should be comfortable with:
 - Next.js (App Router)
   <br><sup>[_Learn more_](https://nextjs.org/docs)</sup>
 
-**Recommended tooling**
+**Required tooling**
 
-* **Node.js ≥ 20**
-* **pnpm ≥ 9** (*we use patched code + lockfile consistency*) *<span style='color: red; font-variant: small-caps'>← Required</span>* <span style='font-size: 10px; font-variant: small=caps'>[Install](https://pnpm.io/installation)</span>
+* **Node.js ≥ 20** *<span style='color: red; font-variant: small-caps'>← Required</span>* <span style='font-size: 10px; font-variant: small=caps'>[Install Instructions](https://nodejs.org/en/download/)</span>
+* **pnpm ≥ 9** *<span style='color: red; font-variant: small-caps'>← Required</span>* <span style='font-size: 10px; font-variant: small=caps'>[Install Instructions](https://pnpm.io/installation)</span>
 * **git** and a **GitHub** account
 * A modern browser (Chrome recommended)
 
@@ -67,7 +68,10 @@ You should be comfortable with:
 
 ## What you will need
 
-- Laptop with Internet and the ability to run Node and write code natively.
+- *64-bit* Windows, Mac, or Linux Laptop with
+  - Internet;
+  - Node.js;
+  - *Disabled VPN*
 - Code editor (*VS Code recommended*).
 - Access to the [**Auth0 Demo Platform**](https://demo.okta.com) (*this one should be easy!*).
 

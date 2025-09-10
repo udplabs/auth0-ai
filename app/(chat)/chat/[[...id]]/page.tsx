@@ -40,12 +40,15 @@
 
 import { Chat, ChatProvider } from '@/components/features/chat';
 import { getUser } from '@/lib/auth0';
-import { cookies } from 'next/headers';
+import { getChatById } from '@/lib/db/queries/chat';
+import { APIError } from '@/lib/errors';
+import { redirect } from 'next/navigation';
+import { ulid } from 'ulid';
 
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'AIya Chat',
+	title: 'Aiya Chat',
 };
 
 export default async function Page({
@@ -63,12 +66,9 @@ export default async function Page({
 
 	// No id supplied → generate a new ULID and mark as new chat session.
 	if (!id) {
-		const { ulid } = await import('ulid');
-
 		id = ulid();
-		isNewChat = true;
 
-		const { redirect } = await import('next/navigation');
+		isNewChat = true;
 
 		redirect(`/chat/${id}`);
 	}
@@ -87,8 +87,6 @@ export default async function Page({
 	// If continuing an existing chat, fetch it (and its messages) from DB.
 	if (!isNewChat) {
 		try {
-			const { getChatById } = await import('@/lib/db/queries/chat');
-
 			const dbChats = await getChatById(id, {
 				userId: user?.sub,
 				includeMessages: true,
@@ -99,7 +97,6 @@ export default async function Page({
 				initialMessages.push(...messages);
 			}
 		} catch (error: unknown) {
-			const { APIError } = await import('@/lib/errors');
 			// Graceful degradation: not-found simply starts a fresh chat;
 			// unexpected errors are logged.
 			if (error instanceof APIError) {
@@ -111,18 +108,6 @@ export default async function Page({
 				console.log(error);
 			}
 		}
-	}
-
-	// Determine if we should trigger a first-run content sync (cookie sentinel).
-	const cookieStore = await cookies();
-	const needsSync = !cookieStore.has('db:synced');
-
-	if (needsSync) {
-		const resp = await fetch(`${process.env.APP_BASE_URL}/api/me/settings`, {
-			method: 'POST',
-		});
-
-		if (resp.ok) console.log('db synced!');
 	}
 
 	return (

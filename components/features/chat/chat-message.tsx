@@ -17,7 +17,6 @@ import {
 	type ResponseProps,
 } from '@/components/ui/ai-elements/response';
 import { isToolUIPart } from 'ai';
-import { memo } from 'react';
 import { ChatMessageActions } from './chat-message-actions';
 import { ChatThinkingMessage } from './chat-thinking-message';
 // Type narrowing is handled by TypeScript's control flow analysis
@@ -36,8 +35,6 @@ export interface ChatMessageProps extends React.ComponentProps<'div'> {
 	ToolResultProps?: ToolResultProps;
 }
 
-const MemoResponse = memo(Response);
-
 export const ChatMessage = ({
 	message,
 	showActions = false,
@@ -51,15 +48,12 @@ export const ChatMessage = ({
 	ToolResultProps,
 	...props
 }: ChatMessageProps) => {
-	console.groupCollapsed('==== Message ', message.id, '====');
-	console.log(JSON.stringify(message, null, 2));
-	console.groupEnd();
-
+	const isAssistant = message.role === 'assistant';
 	return (
 		<div {...props}>
 			<Message {...{ ...MessageProps, from: message.role }}>
 				<MessageContent {...MessageContentProps}>
-					{message.role === 'assistant' && (
+					{isAssistant && (
 						<ChatThinkingMessage {...{ isThinking: isLoading || isThinking }} />
 					)}
 					{(() => {
@@ -69,12 +63,12 @@ export const ChatMessage = ({
 
 							if (type === 'text') {
 								return (
-									<MemoResponse
+									<Response
 										key={key}
 										{...ResponseProps}
 									>
 										{part.text}
-									</MemoResponse>
+									</Response>
 								);
 							}
 

@@ -89,9 +89,9 @@ export const getAccounts = tool<
 			// Instead, return a safe error response with no data.
 			// The model can decide how to proceed from there.
 			return {
+				message: 'Failed to fetch accounts.',
 				...new APIError(error).toJSON(),
 				status: 'error',
-				message: 'Failed to fetch accounts.',
 				dataCount: 0,
 			};
 		}

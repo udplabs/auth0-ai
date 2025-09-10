@@ -52,10 +52,10 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0
       '@prisma/adapter-neon':
-        specifier: ^6.14.0
+        specifier: ^6.15.0
         version: 6.15.0
       '@prisma/client':
-        specifier: ^6.14.0
+        specifier: ^6.15.0
         version: 6.15.0(prisma@6.15.0(typescript@5.9.2))(typescript@5.9.2)
       '@radix-ui/react-avatar':
         specifier: ^1.1.10

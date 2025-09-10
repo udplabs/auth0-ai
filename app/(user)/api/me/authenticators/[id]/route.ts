@@ -1,7 +1,7 @@
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 
-import { getUser, ManagementClient } from '@/lib/auth0';
+import { auth0Management, getUser } from '@/lib/auth0';
 import { APIError } from '@/lib/errors';
 
 // Delete user authenticator
@@ -19,9 +19,8 @@ export async function DELETE(
 		}
 
 		const userId = user.sub;
-		const client = new ManagementClient();
 
-		await client.users.deleteAuthenticationMethod({
+		await auth0Management.users.deleteAuthenticationMethod({
 			id: userId,
 			authentication_method_id,
 		});

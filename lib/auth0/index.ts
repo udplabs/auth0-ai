@@ -1,2 +1,2 @@
 export { getRefreshToken, getSession, getUser, updateSession } from './client';
-export { default as ManagementClient } from './management-client';
+export { auth0Management } from './management-client';

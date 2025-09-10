@@ -1,12 +1,11 @@
 ## LAB STEP CONTEXT
 - Lab Step: `step-04`
 - Lab Guide Name: `configure-fga`
-- Static AIya response: `aiya-post-auth` (*ALREADY sent AFTER completion of Auth0 configuration in step-03*)
+- Static Aiya response: `aiya-post-auth` (*ALREADY sent AFTER completion of Auth0 configuration in step-03*)
 - Implementation Code:
   - `.env`
-  - `.env.local`
 
-FGA Model (for reference)
+##### FGA Model (for reference)
 ```
 model
 schema 1.1
@@ -47,16 +46,14 @@ type account
 
 # transaction_amount is supplied at check time (from the request).
 # transaction_limit is typically stored on a tuple (or could also be supplied contextually for coarse, account-wide rules).
-condition transfer_limit_policy(
-transaction_amount: double, transaction_limit: double
-) {
+condition transfer_limit_policy(transaction_amount: double, transaction_limit: double) {
   transaction_amount <= transaction_limit
 }
 ```
 
-Expected Outcome:
+##### Expected Outcome:
 - Created an FGA store
 - Added model (copy/paste from guide)
 - Created an FGA client
-- Updated .env and .env.local w/ FGA settings
+- Updated .env w/ FGA settings
 - Should NOT be able to see account data.

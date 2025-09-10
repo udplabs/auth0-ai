@@ -32,12 +32,12 @@
  * - Add ETag / caching for GET if account data stable, plus revalidation on mutations.
  */
 
-import { createAccounts, getAccounts } from '@/lib/api/accounts'; // (createAccounts unused here; remove if not needed)
+import { getAccounts } from '@/lib/api/accounts'; // (createAccounts unused here; remove if not needed)
 import { getUser } from '@/lib/auth0';
 import { deleteAllUserTuples } from '@/lib/auth0/fga/utils';
 import { generateMockEmbeddings } from '@/lib/db/mock/mock-accounts';
 import { deleteAccountData } from '@/lib/db/queries/accounts/mutate-accounts';
-import { APIError } from '@/lib/errors';
+import { handleApiError } from '@/lib/errors';
 import { type NextRequest, NextResponse } from 'next/server';
 
 // -----------------------------------------------------------------------------
@@ -52,13 +52,7 @@ export async function GET() {
 		// Success: return JSON array (shape defined by getAccounts implementation)
 		return NextResponse.json(data);
 	} catch (error: unknown) {
-		console.log(error);
-
-		if (error instanceof APIError) {
-			return error.toResponse();
-		}
-
-		return new APIError(error).toResponse();
+		return handleApiError(error);
 	}
 }
 
@@ -97,12 +91,6 @@ export async function DELETE(_request: NextRequest) {
 		// 204: success, intentionally no body
 		return new Response(null, { status: 204 });
 	} catch (error: unknown) {
-		console.log(error);
-
-		if (error instanceof APIError) {
-			return error.toResponse();
-		}
-
-		return new APIError(error).toResponse();
+		return handleApiError(error);
 	}
 }

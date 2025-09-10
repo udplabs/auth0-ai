@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils/utils';
 import { motion } from 'framer-motion';
+import { useSuggestions } from 'hooks';
 import { ChevronUpIcon as ArrowIcon } from 'lucide-react';
 
 interface SuggestedActionsProps extends Omit<CollapsibleProps, 'onSubmit'> {
@@ -24,27 +25,33 @@ interface SuggestedActionsProps extends Omit<CollapsibleProps, 'onSubmit'> {
 	CollapsibleTriggerProps?: CollapsibleTriggerProps;
 }
 
-interface SuggestedActions {
+export interface SuggestedActions {
 	label?: string;
 	suggestion: string;
+	variant?: string;
 	preSubmitAction?: () => void;
+	shouldShow?: boolean;
 }
 
 export function SuggestedActions({
-	open = true,
+	open: _open,
 	ButtonProps,
 	onSubmit,
 	...props
 }: SuggestedActionsProps) {
-	const suggestedActions: SuggestedActions[] = [
-		{ suggestion: 'What is FGA for RAG?' },
-		{ suggestion: 'What is Async Authorization?' },
-		{ suggestion: 'What is Auth0 Token Vault?' },
-		{ suggestion: 'What am I supposed to be doing?' },
-		{ suggestion: 'Show me my accounts' },
-		{ suggestion: 'Show me my transactions' },
-		{ suggestion: "What's the forecast for Las Vegas?" },
-	];
+	const { open = _open, suggestedActions } = useSuggestions();
+
+	suggestedActions.push(
+		...[
+			{ suggestion: 'What is FGA for RAG?' },
+			{ suggestion: 'What is Async Authorization?' },
+			{ suggestion: 'What is Auth0 Token Vault?' },
+			{ suggestion: 'What am I supposed to be doing?' },
+			{ suggestion: 'Show me my accounts' },
+			{ suggestion: 'Show me my transactions' },
+			{ suggestion: "What's the forecast for Las Vegas?" },
+		]
+	);
 
 	return (
 		<Collapsible {...{ open, ...props }}>
@@ -70,7 +77,7 @@ export function SuggestedActions({
 			<CollapsibleContent className='CollapsibleContent'>
 				<Suggestions className='max-w-5xl'>
 					{suggestedActions.map(
-						({ preSubmitAction, suggestion, label }, index) => (
+						({ preSubmitAction, suggestion, label, variant }, index) => (
 							<motion.div
 								key={`suggestion-${index}`}
 								{...{
@@ -79,12 +86,13 @@ export function SuggestedActions({
 									exit: { opacity: 0, y: 20 },
 									transition: { delay: 0.05 * index },
 									className: cn(
-										'first:pl-8 last:pr-16',
+										'first:pl-4 last:pr-16',
 										index > 1 ? 'hidden sm:block' : 'block'
 									),
 								}}
 							>
 								<Suggestion
+									variant={variant as ButtonProps['variant']}
 									{...{
 										onClick: () => {
 											preSubmitAction?.();

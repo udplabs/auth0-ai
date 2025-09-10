@@ -1,12 +1,12 @@
 'use server';
 
+import { getAccountsByUserId } from '@/lib/db/queries/accounts/query-accounts';
 import { convertToUI } from '@/lib/utils/db-converter';
 import {
 	Prisma,
 	Transaction as TransactionModel,
 } from '../../generated/prisma';
 import { prisma } from '../../prisma/client';
-
 export async function getTransactionsByAccountId(
 	accountId: string
 ): Promise<Accounts.Transaction[]> {
@@ -23,8 +23,6 @@ export async function getTransactionsByAccountId(
 export async function getTransactionsByUserId(
 	userId: string
 ): Promise<Accounts.Transaction[]> {
-	const { getAccountsByUserId } = await import('./query-accounts');
-
 	const accounts = await getAccountsByUserId(userId, true);
 
 	return accounts.flatMap(({ transactions = [] }) => transactions);

@@ -193,6 +193,14 @@ export async function getStepGuides(
 	});
 }
 
+export async function getStepCode(step: string) {
+	return await findAllContent({
+		key: 'labStep',
+		query: step,
+		contentType: 'reference/code',
+	});
+}
+
 // Wrapper to make initial app a bit faster
 export async function syncContent(): Promise<void> {
 	// Sync local content with remote content

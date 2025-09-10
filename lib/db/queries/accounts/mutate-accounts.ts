@@ -1,6 +1,6 @@
 'use server';
 
-import {
+import type {
 	Account as AccountModel,
 	Prisma,
 	Transaction as TransactionModel,
@@ -60,7 +60,11 @@ async function saveAccountsAndTransactions(
 			transactions.push(...tx);
 		}
 	}
-	const { convertToDB, convertToUI } = await import('@/lib/utils/db-converter');
+
+	const [{ uniqBy }, { convertToDB, convertToUI }] = await Promise.all([
+		import('lodash-es'),
+		import('@/lib/utils/db-converter'),
+	]);
 
 	// 2) Convert to DB format
 	// This is necessary to ensure the data is in the correct format for Prisma
@@ -68,8 +72,6 @@ async function saveAccountsAndTransactions(
 		Accounts.CreateAccountInput[],
 		Prisma.AccountCreateManyInput[]
 	>(accounts);
-
-	const { uniqBy } = await import('lodash-es');
 
 	const dbTransactions = convertToDB<
 		Accounts.CreateTransactionInput[],

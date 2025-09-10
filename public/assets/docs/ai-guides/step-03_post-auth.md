@@ -1,6 +1,6 @@
 ### Welcome back, *you’re in!* 🙌
 
-I’m **AIya**, in case you forgot 🤭, and I just "detected" a successful login.
+I’m **Aiya**, in case you forgot 🤭, and I just "detected" a successful login.
 
 #### ✨ Behold! ✨
 #### 🙌 _Your lab powers are now **unlocked**_ 🙌
