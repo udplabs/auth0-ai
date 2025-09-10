@@ -133,7 +133,8 @@
 			"esbuild",
 			"prisma",
 			"sharp",
-			"unrs-resolver"
+			"unrs-resolver",
+			"oxc-resolver"
 		]
 	},
 	"resolutions": {
