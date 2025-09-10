@@ -76,7 +76,7 @@ export const useSuggestions = (): UseSuggestionsResponse => {
 		},
 		{
 			label: 'Show me the final code',
-			suggestion: `Show me the code for ${labStep}`,
+			suggestion: `Show me the code for ${labStepString}`,
 			variant: 'info',
 			shouldShow: labStep >= 3,
 		},
