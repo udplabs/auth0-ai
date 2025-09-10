@@ -17,7 +17,7 @@ function dbNeedsSync(now = Date.now()) {
 }
 
 async function syncDb() {
-	await fetch('/api/me/settings', { method: 'POST ' });
+	await fetch('/api/me/settings', { method: 'POST' });
 	localStorage.setItem(SYNC_KEY, Date.now().toString());
 }
 
@@ -27,18 +27,18 @@ export const useDbSync = () => {
 	useEffect(() => {
 		if (syncInProgress.current) return;
 
-		syncInProgress.current = true;
-
 		if (!dbNeedsSync()) return;
+
+		syncInProgress.current = true;
 
 		if (!window.__dbSyncPromise) {
 			window.__dbSyncPromise = (async () => {
 				try {
 					await syncDb();
 				} finally {
-					// Leave the promise cacahed until resolved (prevents duplicate kicks)
-					delete window.__dbSyncPromise;
 					syncInProgress.current = false;
+					// Leave the promise cached until resolved (prevents duplicate kicks)
+					delete window.__dbSyncPromise;
 				}
 			})();
 		}

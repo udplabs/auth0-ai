@@ -62,7 +62,7 @@ export function Chat() {
 
 								return (
 									<ChatMessage
-										key={message.id}
+										key={`${message.id}-${i}`}
 										{...{
 											isLastMessage,
 											isLoading,
