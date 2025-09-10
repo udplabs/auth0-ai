@@ -28,6 +28,7 @@
 import { openai } from '@/lib/ai/openai';
 import { getSystemPrompts } from '@/lib/ai/prompts/system-prompt';
 import { toolRegistry } from '@/lib/ai/tool-registry';
+import { APIError } from '@/lib/errors';
 import { withStaticContent } from '@/lib/utils';
 import { setAIContext } from '@auth0/ai-vercel';
 import { geolocation } from '@vercel/functions';
@@ -94,10 +95,9 @@ export async function POST(
 				geolocation: geolocation(request),
 				userId,
 				settings: {
-					currentLabStep:
-						uiMessages.findLast(
-							(m) => m.role === 'user' && m.metadata?.labStep !== undefined
-						)?.metadata?.labStep || 'step-02',
+					currentLabStep: uiMessages.findLast(
+						(m) => m.role === 'user' && m.metadata?.labStep !== undefined
+					)?.metadata?.labStep,
 				},
 			},
 		});
@@ -185,8 +185,6 @@ export async function POST(
 		// 7. Respond with SSE (UI consumption).
 		return new Response(stream.pipeThrough(new JsonToSseTransformStream()));
 	} catch (error) {
-		const { APIError } = await import('@/lib/errors');
-
 		console.log('=== POST error ===');
 		console.log(error);
 		if (error instanceof ZodError) {

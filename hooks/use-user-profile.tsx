@@ -22,6 +22,7 @@ type UseUserProfileResponse = SWRResponse<
 > & {
 	isAuthenticated?: boolean;
 	updateUser: (data: UserUpdate) => Promise<'undone' | 'success' | void>;
+	updateUserSettings: (data: UICreateSettingsInput) => Promise<void>;
 };
 
 export const useUserProfile = () => {
@@ -45,6 +46,39 @@ export const useUserProfile = () => {
 	});
 
 	const displayName = data?.nickname || data?.name;
+
+	const updateUserSettings = useCallback(
+		async (settingsUpdate: UICreateSettingsInput) => {
+			if (!data || !KEY) return;
+
+			try {
+				const res = await fetch(`${KEY}/settings`, {
+					method: 'PATCH',
+					body: JSON.stringify(settingsUpdate),
+				});
+
+				if (!res.ok) {
+					throw new APIError(
+						'server_error:api',
+						res.statusText || 'Failed to update user settings',
+						await res.json()
+					);
+				}
+
+				mutate();
+
+				return;
+			} catch (error: unknown) {
+				const err =
+					error instanceof APIError
+						? error.toJSON()
+						: new APIError(error).toJSON();
+
+				console.log(err);
+			}
+		},
+		[mutate, data]
+	);
 
 	const updateUserProfile = useCallback(
 		async (updateData: UserUpdate) => {
@@ -143,6 +177,7 @@ export const useUserProfile = () => {
 		isAuthenticated,
 		mutate,
 		updateUser: updateUserProfile,
+		updateUserSettings,
 		...swrRest,
 	} as UseUserProfileResponse;
 };

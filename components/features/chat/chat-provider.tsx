@@ -78,7 +78,6 @@ function createChat(
 			}
 
 			if (error instanceof APIError) {
-				console.log('I haz err...');
 				console.table(error);
 				toast({
 					type: 'error',
@@ -87,8 +86,6 @@ function createChat(
 			}
 		},
 		onFinish: (options) => {
-			console.log('=== useChat ON FINISH ===');
-
 			if (onFinish) {
 				console.warn(
 					'Custom onFinish provided! overriding default behavior...'
@@ -128,7 +125,7 @@ export function ChatProvider({
 	isNewChat,
 }: ChatProviderOptions) {
 	const { mutate: refreshChatHistory } = useChatHistory();
-	const { data: user, isAuthenticated } = useUserProfile();
+	const { data: user, isAuthenticated, updateUserSettings } = useUserProfile();
 
 	const chatRef = useRef<AIChat<Chat.UIMessage>>();
 
@@ -140,11 +137,7 @@ export function ChatProvider({
 	}
 
 	const chat = chatRef.current;
-
-	const introSentRef = useRef(false);
 	useEffect(() => {
-		if (introSentRef.current) return;
-
 		const sendFirstMessage =
 			!isAuthenticated &&
 			(localStorage.getItem(LS_KEY_FIRST) ?? 'false') !== 'true';
@@ -163,18 +156,15 @@ export function ChatProvider({
 			});
 
 			localStorage.setItem(LS_KEY_FIRST, 'true');
-			introSentRef.current = true;
 		}
 	}, [id, isAuthenticated, chatId, chat]);
 
 	const isFirstLogin = user?.logins_count <= 1;
-	const authMessageSentRef = useRef(false);
 	useEffect(() => {
 		const sendAuthMessage =
 			id &&
 			user?.user_id &&
 			isFirstLogin &&
-			authMessageSentRef.current &&
 			(localStorage.getItem(LS_KEY_AUTH) ?? 'false') !== 'true';
 
 		if (!sendAuthMessage) return;
@@ -189,17 +179,13 @@ export function ChatProvider({
 			},
 		});
 
-		fetch('/api/me/settings', {
-			method: 'PATCH',
-			body: JSON.stringify({
-				id: user.id,
-				currentLabStep: 'step-04',
-				nextLabStep: 'step-05',
-			}),
+		updateUserSettings({
+			id: user.id,
+			currentLabStep: 'step-04',
+			nextLabStep: 'step-05',
 		});
 
 		localStorage.setItem(LS_KEY_AUTH, 'true');
-		authMessageSentRef.current = true;
 	}, [id, user, chat, isFirstLogin, chatId]);
 
 	const value = useMemo<ChatContextValue>(
