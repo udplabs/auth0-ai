@@ -2,7 +2,7 @@
 - Lab Step: `step-06`
 - Lab Guide Name: `advanced-fga-for-rag`
 - Static Aiya response: none
-- Implementation Code:
+- Implementation Code (show me the code):
   - `lib/ai/tools/search-transactions.ts`
   - `lib/ai/tool-registry.ts`
 - Relevant/Reference Code:
@@ -59,6 +59,47 @@
   - Completed for them
 - STEP 7
   - Completed for them
+- STEP 8 & STEP 9
+  - Add to `lib/ai/tools/tool-registry.ts`
+  ```ts
+  import type { ToolSet } from 'ai';
+
+  import {
+    getAccounts,
+    getContent,
+    getReferenceFile,
+    getStepCode,
+    getTransactions,
+    getUserProfile,
+    getWeather,
+    transferFunds,
+    userSettings,
+  } from './tools';
+
+  import { pushEnrollment } from './tools/_push-enroll';
+
+  // ---------------------------------------------------------------------------
+  // ❌ STEP 8: Import searchTransactions tool
+  import { searchTransactions } from './tools/search-transactions';
+  // ---------------------------------------------------------------------------
+
+  export const toolRegistry = {
+    getAccounts,
+    getContent,
+    getReferenceFile,
+    getStepCode,
+    getTransactions,
+    getUserProfile,
+    getWeather,
+    pushEnrollment,
+    transferFunds,
+    userSettings,
+    // ---------------------------------------------------------------------------
+    // ❌ STEP 9: Add searchTransactions tool
+    searchTransactions,
+    // ---------------------------------------------------------------------------
+  } satisfies ToolSet;
+```
 
 Expected Outcome:
 - Implemented `fgaRetriever`

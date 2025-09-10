@@ -2,7 +2,7 @@
 - Lab Step: `step-05`
 - Lab Guide Name: `setup-fga-for-rag`
 - Static Aiya response: none
-- Implementation Code:
+- Implementation Code (show me the code):
   - `lib/auth0/fga/client.ts`
   - `lib/auth0/fga/get-account-permissions.ts`
 - Relevant/Reference Code:

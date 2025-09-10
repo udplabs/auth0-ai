@@ -68,7 +68,10 @@ You should be comfortable with:
 
 ## What you will need
 
-- Laptop with Internet and the ability to run Node and write code natively.
+- *64-bit* Windows, Mac, or Linux Laptop with
+  - Internet;
+  - Node.js;
+  - *Disabled VPN*
 - Code editor (*VS Code recommended*).
 - Access to the [**Auth0 Demo Platform**](https://demo.okta.com) (*this one should be easy!*).
 
