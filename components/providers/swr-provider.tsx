@@ -6,7 +6,7 @@ import { SWRConfig } from 'swr';
 export function SWRProvider({ children }: { children: React.ReactNode }) {
 	return (
 		<SWRConfig
-			value={{ refreshInterval: 5 * 60000, fetcher, errorRetryCount: 2 }}
+			value={{ refreshInterval: 10 * 60000, fetcher, errorRetryCount: 2 }}
 		>
 			{children}
 		</SWRConfig>
