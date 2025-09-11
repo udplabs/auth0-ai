@@ -139,7 +139,7 @@ export const searchTransactions = tool<
 		// ---------------------------------------------------------------------
 		// TODO: Apply FGA filter to raw results
 		const authorizedResults: Documents.DocumentWithScore[] = [];
-		// const authorizedResults = [];
+		// const authorizedResults: Documents.DocumentWithScore[] = await fgaRetriever...
 		console.log(
 			'[searchTransactions] Authorized results:',
 			authorizedResults.length
