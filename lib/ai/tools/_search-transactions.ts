@@ -1,8 +1,17 @@
 // lib/ai/tools/search-transactions.ts
 // THIS IS FINAL CODE
+import { getUser } from '@/lib/auth0';
 import { tool } from 'ai';
 import { z } from 'zod';
 import { DocumentWithScoreSchema, ToolResponseSchema } from '../schemas';
+
+// ---------------------------------------------------------------------
+// ✅ STEP 1: Import FGA & LocalVectorStore utilities.
+// ---------------------------------------------------------------------
+import { LocalVectorStore } from '@/lib/ai/rag/vector-store';
+import { FGAFilter } from '@auth0/ai';
+
+import type { Documents } from '@/types';
 
 /**
  * Lab Exercise: Implement FGA for RAG tool `searchTransactions`
@@ -60,108 +69,115 @@ export const searchTransactions = tool<
 	outputSchema,
 	execute: async ({ query }) => {
 		console.log('[searchTransactions] called with query:', query);
+		try {
+			// ---------------------------------------------------------------------
+			// ✅ STEP 2: Auth – resolve current user (server-only).
+			// If unauthenticated, getUser() should throw (caught below).
+			// Check out the helper function for more details.
+			// ---------------------------------------------------------------------
 
-		// ---------------------------------------------------------------------
-		// ✅ STEP 1: Auth – resolve current user (server-only).
-		// If unauthenticated, getUser() should throw (caught below).
-		// Check out the helper function for more details.
-		// ---------------------------------------------------------------------
-		const { getUser } = await import('@/lib/auth0');
+			const user = await getUser();
 
-		const user = await getUser();
+			// ---------------------------------------------------------------------
+			// ❌ STEP 3: Instantiate the FGA filter.
+			// buildQuery: Given a retrieved document, produce a single auth check:
+			//   user: principal performing the search
+			//   object: the account resource tied to the transaction
+			//   relation: the permission we need to view transaction records
+			//
+			// If you want to experiment, change 'can_view_transactions' to:
+			//   - 'can_view_balances' (likely fewer docs)
+			//   - a non-existent relation (should yield zero docs)
+			// ---------------------------------------------------------------------
+			// TODO: Initialize FGA Filter here
+			const fgaRetriever = FGAFilter.create<Documents.DocumentWithScore>({
+				buildQuery: (doc) => {
+					// OPTIONAL Defensive coding: ensure metadata has expected shape.
+					// If missing, return a relation that will certainly fail.
+					const accountId = doc?.metadata?.accountId;
 
-		// ---------------------------------------------------------------------
-		// ✅ STEP 2: Lazy import FGA utilities.
-		// ---------------------------------------------------------------------
-		const { FGAFilter } = await import('@auth0/ai');
+					if (!accountId) {
+						return {
+							user: `user:${user.sub}`,
+							object: `account:__missing__`,
+							relation: 'can_view_transactions',
+						};
+					}
 
-		// ---------------------------------------------------------------------
-		// ❌ STEP 3: Instantiate the FGA filter.
-		// buildQuery: Given a retrieved document, produce a single auth check:
-		//   user: principal performing the search
-		//   object: the account resource tied to the transaction
-		//   relation: the permission we need to view transaction records
-		//
-		// If you want to experiment, change 'can_view_transactions' to:
-		//   - 'can_view_balances' (likely fewer docs)
-		//   - a non-existent relation (should yield zero docs)
-		// ---------------------------------------------------------------------
-		// TODO: Initialize FGA Filter here
-		const fgaRetriever = FGAFilter.create<Documents.DocumentWithScore>({
-			buildQuery: (doc) => {
-				// OPTIONAL Defensive coding: ensure metadata has expected shape.
-				// If missing, return a relation that will certainly fail.
-				const accountId = doc?.metadata?.accountId;
-
-				if (!accountId) {
+					// TODO: Return a valid response
 					return {
 						user: `user:${user.sub}`,
-						object: `account:__missing__`,
+						object: `account:${doc.metadata.accountId}`,
 						relation: 'can_view_transactions',
 					};
-				}
+				},
+			});
 
-				// TODO: Return a valid response
-				return {
-					user: `user:${user.sub}`,
-					object: `account:${doc.metadata.accountId}`,
-					relation: 'can_view_transactions',
-				};
-			},
-		});
+			// ---------------------------------------------------------------------
+			// ✅ STEP 4: Vector store retrieval.
+			// LocalVectorStore.init(true) forces a rebuild (dev convenience).
+			// Production: don't use a LOCAL vector store! 🤣
+			// ---------------------------------------------------------------------
 
-		// ---------------------------------------------------------------------
-		// ✅ STEP 4: Vector store retrieval.
-		// Lazy import keeps initial cold start lighter.
-		// LocalVectorStore.init(true) forces a rebuild (dev convenience).
-		// Production: don't use a LOCAL vector store! 🤣
-		// ---------------------------------------------------------------------
-		const { LocalVectorStore } = await import('@/lib/ai/rag/vector-store');
+			if (
+				LocalVectorStore.initialized === false ||
+				LocalVectorStore.count === 0
+			) {
+				console.log(
+					'[searchTransactions] Vector store not initialized – initializing...'
+				);
+				await LocalVectorStore.init(true);
+			}
 
-		if (
-			LocalVectorStore.initialized === false ||
-			LocalVectorStore.count === 0
-		) {
+			// Semantic search (K value configured inside store; adjust there).
+			const rawResults = await LocalVectorStore.search(query);
 			console.log(
-				'[searchTransactions] Vector store not initialized – initializing...'
+				'[searchTransactions] Raw semantic results:',
+				rawResults.length
 			);
-			await LocalVectorStore.init(true);
+			// ---------------------------------------------------------------------
+			// ❌ STEP 5: Apply authorization filter (core FGA step).
+			// Internally may batch; returns only documents passing the relation check.
+			// ---------------------------------------------------------------------
+			// TODO: Implement the actual filtering
+			const authorizedResults = await fgaRetriever.filter(rawResults);
+
+			console.log(
+				'[searchTransactions] Authorized results:',
+				authorizedResults.length
+			);
+
+			// ---------------------------------------------------------------------
+			// ✅ STEP 6: Validate final shape (technically optional but recommended).
+			// If any doc is malformed, this throws and is caught below → safe error.
+			// ---------------------------------------------------------------------
+			const parsed = DocumentWithScoreSchema.array().parse(authorizedResults);
+
+			// ---------------------------------------------------------------------
+			// ✅ STEP 7: Return ToolResponse wrapper.
+			// hasOwnUI could be set true if you want to suppress model text and
+			// render a custom component. Left false so model can summarize if asked.
+			// ---------------------------------------------------------------------
+			return {
+				data: parsed,
+				status: 'success',
+				message: `Found ${authorizedResults.length} transactions for user.`,
+				dataCount: authorizedResults.length,
+			};
+		} catch (error: unknown) {
+			// Normalize to your APIError -> JSON shape, but keep the ToolResponse contract
+			const { APIError } = await import('@/lib/errors');
+
+			// DO NOT THROW. Always return a valid ToolResponse.
+			// Throwing will cause the entire LLM request to fail.
+			// Instead, return a safe error response with no data.
+			// The model can decide how to proceed from there.
+			return {
+				message: 'Failed to query transactions.',
+				...new APIError(error).toJSON(),
+				status: 'error',
+				dataCount: 0,
+			};
 		}
-
-		// Semantic search (K value configured inside store; adjust there).
-		const rawResults = await LocalVectorStore.search(query);
-		console.log(
-			'[searchTransactions] Raw semantic results:',
-			rawResults.length
-		);
-		// ---------------------------------------------------------------------
-		// ❌ STEP 5: Apply authorization filter (core FGA step).
-		// Internally may batch; returns only documents passing the relation check.
-		// ---------------------------------------------------------------------
-		// TODO: Implement the actual filtering
-		const authorizedResults = await fgaRetriever.filter(rawResults);
-
-		console.log(
-			'[searchTransactions] Authorized results:',
-			authorizedResults.length
-		);
-
-		// ---------------------------------------------------------------------
-		// ✅ STEP 6: Validate final shape (technically optional but recommended).
-		// If any doc is malformed, this throws and is caught below → safe error.
-		// ---------------------------------------------------------------------
-		const parsed = DocumentWithScoreSchema.array().parse(authorizedResults);
-
-		// ---------------------------------------------------------------------
-		// ✅ STEP 7: Return ToolResponse wrapper.
-		// hasOwnUI could be set true if you want to suppress model text and
-		// render a custom component. Left false so model can summarize if asked.
-		// ---------------------------------------------------------------------
-		return {
-			data: parsed,
-			status: 'success',
-			message: `Found ${authorizedResults.length} transactions for user.`,
-			dataCount: authorizedResults.length,
-		};
 	},
 });

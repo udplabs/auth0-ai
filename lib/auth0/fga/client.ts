@@ -1,6 +1,12 @@
 // lib/auth0/fga/client.ts
 'use server';
 
+import {
+	CredentialsMethod,
+	OpenFgaClient,
+	type UserClientConfigurationParams,
+} from '@openfga/sdk';
+
 /**
  * Lab Exercise: Implement an OpenFGA client factory.
  *
@@ -41,12 +47,6 @@
  *    - Using the client before env vars are loaded.
  */
 
-import {
-	CredentialsMethod,
-	OpenFgaClient,
-	type UserClientConfigurationParams,
-} from '@openfga/sdk';
-
 // ---------------------------------------------------------------------------
 // ✅ STEP 1: Define a (mutable) module‑level singleton reference.
 // ---------------------------------------------------------------------------
@@ -62,7 +62,7 @@ let singleton: OpenFgaClient | null = null;
 export async function createClient() {
 	try {
 		const options: UserClientConfigurationParams = {
-			apiUrl: process.env.FGA_API_URL ?? 'https://api.us1.fga.dev',
+			apiUrl: process.env.FGA_API_URL,
 			//...
 		};
 
