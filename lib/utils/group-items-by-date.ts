@@ -1,5 +1,7 @@
 import { startOfToday, startOfYesterday, subMonths, subWeeks } from 'date-fns';
 
+import type { Chat } from '@/types/chat';
+
 const GROUPING_THRESHOLDS = {
 	today: startOfToday(),
 	yesterday: startOfYesterday(),

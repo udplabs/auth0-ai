@@ -1,3 +1,4 @@
+import type { Chat } from '@/types/chat';
 import type { InferUIMessageChunk, UIMessage, UIMessageStreamWriter } from 'ai';
 
 type JitterOptions = {

@@ -1,8 +1,9 @@
 // lib/ai/tools/get-accounts.ts
+import { getAccounts as getAccountsApi } from '@/lib/api/accounts';
+import { getUser } from '@/lib/auth0';
 import { tool } from 'ai';
 import { z } from 'zod';
 import { AccountSchema, ToolResponseSchema } from '../schemas';
-
 /**
  * getAccounts tool
  *
@@ -50,17 +51,11 @@ export const getAccounts = tool<
 	execute: async () => {
 		console.log('getAccounts tool called');
 		try {
-			// Defer importing the module (lazy load) until needed. This keeps AI tools "lighter."
-
 			// Resolve the authenticated user (server-only)
 			// Throws or returns a user with a stable `sub` (subject) identifier
-			const { getUser } = await import('@/lib/auth0');
 			const user = await getUser();
 
 			// Fetch accounts for the authenticated user
-			const { getAccounts: getAccountsApi } = await import(
-				'@/lib/api/accounts'
-			);
 			const data = await getAccountsApi(user.sub);
 
 			// Validate shape: ensures you return strong-typed, safe data to the model/UI

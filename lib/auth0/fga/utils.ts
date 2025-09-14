@@ -1,7 +1,9 @@
 // lib/auth0/fga/utils.ts
 // REFERENCE CODE (not part of lab)
 // Utility functions for FGA operations.
-import { getFgaClient } from './client';
+import { getFgaClient } from './_client';
+
+import type { TupleKey } from '@openfga/sdk';
 
 const fga = await getFgaClient();
 
@@ -30,11 +32,36 @@ export async function createOwnerPermissions(
 	console.log('userId:', userId, '| accountIds:', accountIds);
 
 	// Build tuples for batch write; each tuple is (user, relation, object)
-	const permissions = accountIds.map((accountId) => ({
-		user: `user:${userId}`,
-		relation: 'owner',
-		object: `account:${accountId}`,
-	}));
+	// Each account should have TWO tuples
+	// - one to grant full permission
+	// - one to grant an 'unlimited' transfer policy
+	const permissions: TupleKey[] = accountIds.flatMap((accountId) => {
+		const object = `account:${accountId}`;
+
+		return [
+			{
+				user: `user:${userId}`,
+				relation: 'owner',
+				object,
+				description: 'Grants full ownership permissions',
+			},
+			// This grants the owner w/ an 'unlimited' transfer limit by default
+			// Very rudimentary implementation -- there are more effective ways to
+			// handle this.
+			{
+				user: `${object}#owner`,
+				relation: 'transfer_limit_policy',
+				object,
+				condition: {
+					name: 'transfer_limit_policy',
+					context: {
+						// Hopefully no one wants to transfer more than this!
+						transaction_limit: '999999999999',
+					},
+				},
+			},
+		];
+	});
 
 	// Write tuples to the FGA store. Some backends may be eventually consistent,
 	// so a subsequent check might need a small delay in hard real-world setups.
@@ -75,7 +102,8 @@ export async function deleteAllUserTuples(userId: string, batchSize = 80) {
 	let continuation: string | undefined;
 	const toDelete: Array<{ user: string; relation: string; object: string }> =
 		[];
-
+	// Page through all tuples with this user as subject
+	console.log('Fetching user tuples for:', user);
 	do {
 		const res = await fga.read(
 			{
@@ -98,6 +126,7 @@ export async function deleteAllUserTuples(userId: string, batchSize = 80) {
 
 	if (toDelete.length === 0) return 0;
 
+	console.log('Deleting', toDelete.length, 'user tuples...');
 	// Chunk deletes to avoid size limits
 	for (let i = 0; i < toDelete.length; i += batchSize) {
 		const slice = toDelete.slice(i, i + batchSize);

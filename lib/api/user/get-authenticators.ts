@@ -5,6 +5,10 @@ import { unstable_cache } from 'next/cache';
 
 async function fetchAuthenticators(id: string) {
 	try {
+		if (!auth0Management) {
+			console.warn('Auth0 Management API client is not initialized.');
+			return;
+		}
 		return await auth0Management.getFactors(id);
 	} catch (error: unknown) {
 		throw new APIError(

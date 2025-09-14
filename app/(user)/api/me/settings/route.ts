@@ -2,6 +2,7 @@ import { getUser } from '@/lib/auth0';
 import { syncContent } from '@/lib/db/queries/content';
 import { upsertSettings } from '@/lib/db/queries/settings';
 import { APIError, handleApiError } from '@/lib/errors';
+import type { UICreateSettingsInput } from '@/types/settings';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';

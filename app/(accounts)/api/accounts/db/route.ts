@@ -1,3 +1,8 @@
+import { LocalVectorStore } from '@/lib/ai/rag/vector-store';
+import { APIError } from '@/lib/errors';
+import { getSearchParams } from '@/lib/utils/get-search-params';
+import { type NextRequest, NextResponse } from 'next/server';
+
 /**
  * Development Vector Store Admin Endpoints
  *
@@ -27,11 +32,6 @@
  * - Rate limit (avoid accidental hammering).
  * - Expose a richer summary (dimensions, lastUpdated) behind a verbose flag.
  */
-
-import { LocalVectorStore } from '@/lib/ai/rag/vector-store';
-import { APIError } from '@/lib/errors';
-import { getSearchParams } from '@/lib/utils/get-search-params';
-import { type NextRequest, NextResponse } from 'next/server';
 
 /**
  * GET /api/accounts/db

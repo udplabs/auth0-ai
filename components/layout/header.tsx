@@ -6,7 +6,7 @@ import { ModeToggle } from '@/components/mode-toggle';
 import { Button } from '@/components/ui/button';
 import { useSidebar } from '@/components/ui/sidebar';
 import { VercelButton } from '@/components/vercel-button';
-import { useUser } from '@auth0/nextjs-auth0';
+import { useUserProfile } from '@/hooks/use-user-profile';
 import { PiggyBankIcon } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useWindowSize } from 'usehooks-ts';
@@ -15,16 +15,18 @@ import { AnimatedButton } from '../animated-button';
 export interface HeaderProps extends React.PropsWithChildren {
 	hideSecondaryActions?: boolean;
 	label?: React.ReactNode;
+	hideLogin?: boolean;
 }
 
 export function Header({
 	children,
 	label,
+	hideLogin = false,
 	hideSecondaryActions = false,
 }: HeaderProps) {
 	const { open } = useSidebar();
 	const { width: windowWidth } = useWindowSize();
-	const { user } = useUser();
+	const { data: user } = useUserProfile();
 	const pathname = usePathname();
 
 	const showIcons = !open || windowWidth < 768;
@@ -61,37 +63,38 @@ export function Header({
 			</div>
 			{!hideSecondaryActions && (
 				<div className='order-5 flex flex-1 items-center justify-end gap-2 md:ml-auto'>
-					{!user && (
-						<>
-							<Button
-								className='order-1 h-[34px]'
-								href='/auth/login?screen_hint=signup'
-								variant='outline'
-							>
-								Sign Up
-							</Button>
-						</>
-					)}
-					{!user && showIcons && (
-						<>
-							<Button
-								className='order-1 h-[34px]'
-								href='/auth/login'
-							>
-								Log In
-							</Button>
-						</>
-					)}
-					{user && showIcons && (
-						<>
+					{(() => {
+						if (hideLogin) return null;
+
+						if (user && showIcons) {
 							<Button
 								className='order-1 h-[34px]'
 								href='/auth/logout'
 							>
 								Log Out
-							</Button>
-						</>
-					)}
+							</Button>;
+						}
+
+						return (
+							<>
+								<Button
+									className='order-1 h-[34px]'
+									href='/auth/login?screen_hint=signup'
+									variant='outline'
+								>
+									Sign Up
+								</Button>
+								{showIcons && (
+									<Button
+										className='order-1 h-[34px]'
+										href='/auth/login'
+									>
+										Log In
+									</Button>
+								)}
+							</>
+						);
+					})()}
 					<ModeToggle
 						className='order-2'
 						variant='dropdown'

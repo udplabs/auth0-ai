@@ -19,6 +19,8 @@ import {
 import { isToolUIPart } from 'ai';
 import { ChatMessageActions } from './chat-message-actions';
 import { ChatThinkingMessage } from './chat-thinking-message';
+
+import type { Chat } from '@/types/chat';
 // Type narrowing is handled by TypeScript's control flow analysis
 // The AI SDK provides proper discriminated unions for tool calls
 

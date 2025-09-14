@@ -1,7 +1,9 @@
+import type { Accounts, Documents, Transactions } from '@/types';
+
 interface CreateAccountsOptions {
 	userId: string;
 	accounts: Accounts.CreateAccountInput[];
-	transactions?: Accounts.Transaction[];
+	transactions?: Transactions.CreateTransactionInput[];
 	accountDocuments?: Documents.DocumentWithEmbedding[];
 	transactionDocuments?: Documents.DocumentWithEmbedding[];
 	createEmbeddings?: boolean;
@@ -21,7 +23,7 @@ interface CreateAccountsOptions {
  * @param options - The options for creating accounts.
  * @param {string} options.userId - The ID of the user creating the accounts.
  * @param {Accounts.Account[]} options.accounts - The accounts to create.
- * @param {Transaction[]} [options.transactions] - The transactions to create (optional).
+ * @param {Transactions.Transaction[]} [options.transactions] - The transactions to create (optional).
  * @returns The created accounts with their transactions.
  */
 export async function createAccounts({

@@ -1,3 +1,15 @@
+import { Chat, ChatProvider } from '@/components/features/chat';
+import { getUser } from '@/lib/auth0';
+import { auth0 } from '@/lib/auth0/client';
+import { getChatById } from '@/lib/db/queries/chat';
+import { APIError } from '@/lib/errors';
+import { redirect } from 'next/navigation';
+import { ulid } from 'ulid';
+
+import type { Metadata } from 'next';
+
+import type { Chat as ChatType } from '@/types/chat';
+
 /**
  * Chat Page (Server Component)
  *
@@ -38,15 +50,6 @@
  *  - Add soft limit on initial message count (truncate very long histories).
  */
 
-import { Chat, ChatProvider } from '@/components/features/chat';
-import { getUser } from '@/lib/auth0';
-import { getChatById } from '@/lib/db/queries/chat';
-import { APIError } from '@/lib/errors';
-import { redirect } from 'next/navigation';
-import { ulid } from 'ulid';
-
-import type { Metadata } from 'next';
-
 export const metadata: Metadata = {
 	title: 'Aiya Chat',
 };
@@ -82,7 +85,7 @@ export default async function Page({
 	}
 
 	// Collector for preloaded messages (if existing chat found).
-	const initialMessages: Chat.UIMessage[] = [];
+	const initialMessages: ChatType.UIMessage[] = [];
 
 	// If continuing an existing chat, fetch it (and its messages) from DB.
 	if (!isNewChat) {
@@ -119,7 +122,7 @@ export default async function Page({
 				},
 			}}
 		>
-			<Chat />
+			<Chat hideLogin={auth0 == null} />
 		</ChatProvider>
 	);
 }

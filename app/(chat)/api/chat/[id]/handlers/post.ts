@@ -53,6 +53,8 @@ import { ZodError } from 'zod';
 import { saveMessagesAction } from '../../../actions';
 import { UIMessageMetadataSchema, parseIncomingChatRequest } from './_helpers';
 
+import type { Chat } from '@/types/chat';
+
 // Narrowed tool typing for validateUIMessages.
 type AvailableTools = InferUITools<typeof toolRegistry>;
 type UseChatToolsMessage = UIMessage<
@@ -236,7 +238,7 @@ function uiEphemeralTransform<TOOLS extends ToolSet>(
 					chunk?.type === 'tool-result' &&
 					['getAccounts', 'getTransactions'].includes(chunk.toolName)
 				) {
-					const { data, ...output } = chunk.output as Chat.Tools.Response;
+					const { data, ...output } = chunk.output as Chat.ToolsResponse;
 
 					// Emit ephemeral UI event (not persisted, not fed back to model).
 					dataStream.write({

@@ -1,3 +1,5 @@
+import { getUser } from '@/lib/auth0';
+import { createTransfer } from '@/lib/db/queries/accounts/mutate-transactions';
 import { tool } from 'ai';
 import { z } from 'zod';
 import {
@@ -36,8 +38,6 @@ export const transferFunds = tool<
 		memo = null,
 	}) => {
 		try {
-			const { getUser } = await import('@/lib/auth0');
-
 			const user = await getUser();
 
 			// Check to make sure from and to accounts are not the same
@@ -48,10 +48,6 @@ export const transferFunds = tool<
 					dataCount: 0,
 				};
 			}
-
-			const { createTransfer } = await import(
-				'@/lib/db/queries/accounts/mutate-transactions'
-			);
 
 			await createTransfer({
 				fromAccountId,

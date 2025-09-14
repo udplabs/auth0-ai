@@ -2,13 +2,20 @@ import { createMockAccountsAction } from '@/app/(accounts)/actions';
 import { toast } from '@/components/toast';
 import { APIError } from '@/lib/errors';
 import { useUser } from '@auth0/nextjs-auth0';
-import type { UserUpdate } from 'auth0';
+import type { GetUsers200ResponseOneOfInner, UserUpdate } from 'auth0';
 import { useCallback } from 'react';
 import { toast as sonnerToast } from 'sonner';
 import type { Key, SWRConfiguration, SWRResponse } from 'swr';
 import useSWR from 'swr';
 
+import type { UICreateSettingsInput, UISettings } from '@/types/settings';
+
 const KEY = '/api/me';
+
+export interface UserProfile extends GetUsers200ResponseOneOfInner {
+	displayName?: string;
+	custom_metadata?: Partial<Omit<UISettings, 'createdAt' | 'updatedAt' | 'id'>>;
+}
 
 interface UserProfileSWROptions extends SWRConfiguration {
 	fallbackData: UserProfile;
@@ -23,27 +30,41 @@ type UseUserProfileResponse = SWRResponse<
 	isAuthenticated?: boolean;
 	updateUser: (data: UserUpdate) => Promise<'undone' | 'success' | void>;
 	updateUserSettings: (data: UICreateSettingsInput) => Promise<void>;
+	/**
+	 * Whether the user profile is currently being fetched.
+	 * This is derived from the SWR `isLoading`.
+	 */
+	isFetching: boolean;
+	/**
+	 * Whether the Auth0 user info is currently loaded.
+	 * This is derived from the Auth0 useUser() `isLoading`.
+	 */
+	isLoading: boolean;
 };
 
 export const useUserProfile = () => {
-	const { user, isLoading: isAuthLoading } = useUser();
+	const { user, isLoading, error: useUserError } = useUser();
 
 	const { sub: user_id, ...claims } = user || {};
 
-	const isAuthenticated = !!user_id && !isAuthLoading;
+	const isAuthenticated = !!user_id && !isLoading;
 
-	const { data, isLoading, mutate, ...swrRest } = useSWR<
-		UserProfile,
-		any,
-		Key,
-		UserProfileSWROptions
-	>(isAuthenticated ? KEY : null, {
-		fallbackData: {
-			user_id,
-			...claims,
-		} as UserProfile,
-		onSuccess,
-	});
+	const {
+		data,
+		isLoading: isFetching,
+		mutate,
+		error: swrError,
+		...swrRest
+	} = useSWR<UserProfile, any, Key, UserProfileSWROptions>(
+		isAuthenticated ? KEY : null,
+		{
+			fallbackData: {
+				user_id,
+				...claims,
+			} as UserProfile,
+			onSuccess,
+		}
+	);
 
 	const displayName = data?.nickname || data?.name;
 
@@ -173,7 +194,9 @@ export const useUserProfile = () => {
 			...data,
 			displayName,
 		},
-		isLoading,
+		error: useUserError || swrError,
+		isLoading, // from Auth0 useUser()
+		isFetching, // isLoading from SWR
 		isAuthenticated,
 		mutate,
 		updateUser: updateUserProfile,

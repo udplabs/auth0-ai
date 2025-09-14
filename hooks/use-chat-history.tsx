@@ -31,6 +31,8 @@ import type { SWRResponse } from 'swr';
 import useSWR from 'swr';
 import { ulid } from 'ulid';
 
+import type { Chat } from '@/types/chat';
+
 const key = '/api/chat?grouped=true';
 
 type UseChatHistoryResponse = SWRResponse<
@@ -101,7 +103,7 @@ export function useChatHistory() {
 			{ revalidate: false, populateCache: true }
 		);
 
-		if (redirect) router.push(`/chat/${chatId}`);
+		if (redirect) router.replace(`/chat/${chatId}`);
 	};
 
 	/**

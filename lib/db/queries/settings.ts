@@ -7,6 +7,8 @@ import { Prisma as Neon } from '../generated/neon';
 import { Prisma } from '../generated/prisma';
 import { neon } from '../neon/client';
 import { prisma } from '../prisma/client';
+
+import type { UICreateSettingsInput, UISettings } from '@/types/settings';
 export async function upsertSettings(
 	data: UICreateSettingsInput
 ): Promise<UISettings> {

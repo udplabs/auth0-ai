@@ -3,8 +3,10 @@ import { openai } from '@/lib/ai/openai';
 import { saveEmbeddings } from '@/lib/db/queries/documents';
 import { embedMany } from 'ai';
 
+import type { Documents, Transactions } from '@/types';
+
 export async function createDocumentsWithEmbeddings(
-	transactions: Accounts.Transaction[],
+	transactions: Transactions.Transaction[],
 	table: 'sample' | 'dev' = 'dev'
 ): Promise<Documents.DocumentWithEmbedding[]> {
 	console.log('creating documents...');
@@ -35,7 +37,7 @@ export async function createDocumentsWithEmbeddings(
 	return await saveEmbeddings(docs, embeddings, table);
 }
 
-function buildEmbeddingDoc(tx: Accounts.Transaction) {
+function buildEmbeddingDoc(tx: Transactions.Transaction) {
 	return {
 		id: tx.id,
 		pageContent: mkSearchText(tx),
@@ -68,7 +70,7 @@ function normalizePayee(s: string) {
 		.trim();
 }
 
-function mkSearchText(tx: Accounts.Transaction) {
+function mkSearchText(tx: Transactions.Transaction) {
 	const parts = [
 		tx.payee,
 		tx.description,

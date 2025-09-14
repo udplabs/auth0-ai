@@ -11,6 +11,8 @@ import {
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
+import type { ExternalConnection } from '@/types/accounts';
+
 interface ConnectionPickerProps extends CardProps {
 	connections: ExternalConnection[];
 	ButtonProps?: ButtonProps;

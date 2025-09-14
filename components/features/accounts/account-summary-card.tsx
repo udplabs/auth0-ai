@@ -17,6 +17,8 @@ import { memo } from 'react';
 import { useTransferModal } from '@/hooks/use-transfer-modal';
 import { AccountIcon, CurrencyField } from './ui';
 
+import type { Accounts } from '@/types';
+
 export interface AccountSummaryCardProps extends CardProps {
 	account: Accounts.Account;
 	CardContentProps?: CardProps;

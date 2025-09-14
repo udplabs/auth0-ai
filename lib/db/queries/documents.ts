@@ -9,6 +9,8 @@ import { convertToUI } from '@/lib/utils/db-converter';
 import { neon } from '../neon/client';
 import { prisma } from '../prisma/client';
 
+import type { Documents } from '@/types';
+
 export async function saveEmbeddings(
 	documents: Documents.CreateDocumentInput[],
 	embeddings: Documents.Embedding[],

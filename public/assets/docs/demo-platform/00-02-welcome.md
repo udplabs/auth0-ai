@@ -34,7 +34,24 @@ By the end, you will:
 
 ## Prerequisites
 
-You should be comfortable with:
+### You must have the following:
+  - *64-bit* Windows, Mac, or Linux Laptop with
+    - Internet;
+    - Node.js;
+    - *Disabled VPN*
+  - Code editor (*VS Code recommended*).
+    > [!WARNING]
+    > Web IDEs *may* work, but are not tested. Local dev is strongly recommended.
+  - Access to the [**Auth0 Demo Platform**](https://demo.okta.com) (*this one should be easy!*).
+
+  > [!CAUTION]
+  > ***Required tooling***
+  >
+  > * **Node.js ≥ 20** *<span style='color: red; font-variant: small-caps'>← Required</span>* <span style='font-size: 10px; font-variant: small=caps'>[Install Instructions](https://nodejs.org/en/download/)</span>
+  > * **pnpm ≥ 9** *<span style='color: red; font-variant: small-caps'>← Required</span>* <span style='font-size: 10px; font-variant: small=caps'>[Install Instructions](https://pnpm.io/installation)</span>
+  > * A modern browser (Chrome recommended)
+
+### You should be comfortable with:
 
 - Web fundamentals (HTML, CSS, JavaScript/TypeScript)
 - Service/back‑end basics (HTTP, REST)
@@ -44,13 +61,6 @@ You should be comfortable with:
   <br><sup>[_Learn more_](https://openfga.dev/docs/authorization-concepts)</sup>
 - Next.js (App Router)
   <br><sup>[_Learn more_](https://nextjs.org/docs)</sup>
-
-**Required tooling**
-
-* **Node.js ≥ 20** *<span style='color: red; font-variant: small-caps'>← Required</span>* <span style='font-size: 10px; font-variant: small=caps'>[Install Instructions](https://nodejs.org/en/download/)</span>
-* **pnpm ≥ 9** *<span style='color: red; font-variant: small-caps'>← Required</span>* <span style='font-size: 10px; font-variant: small=caps'>[Install Instructions](https://pnpm.io/installation)</span>
-* **git** and a **GitHub** account
-* A modern browser (Chrome recommended)
 
 > [!IMPORTANT]
 >
@@ -65,21 +75,3 @@ You should be comfortable with:
 - [**Auth0 FGA**](https://auth0.com/fine-grained-authorization): model + tuples to gate which *documents/accounts* an identity can access.
 - **Async Auth (CIBA)**: decoupled approval for sensitive actions (e.g., high‑value transfer). *<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>*
 - **Token Vault**: calling 3P APIs (Google Calendar) via Auth0 AI without handling user secrets directly. *<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>*
-
-## What you will need
-
-- *64-bit* Windows, Mac, or Linux Laptop with
-  - Internet;
-  - Node.js;
-  - *Disabled VPN*
-- Code editor (*VS Code recommended*).
-- Access to the [**Auth0 Demo Platform**](https://demo.okta.com) (*this one should be easy!*).
-
-> [!CAUTION]
-> Web IDEs *may* work, but are not tested. Local dev is strongly recommended.
-
-
-- Installed (*and usable*) software
-  - `git` <span style='font-size: 10px; font-variant: small=caps'>[Install](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)</span>
-  - Node.js <span style='font-size: 10px; font-variant: small=caps'>[Install](https://nodejs.org/en/download/)</span>
-  - `pnpm` <span style='font-size: 10px; font-variant: small=caps'>[Install](https://pnpm.io/installation)</span> *<span style='color: red; font-variant: small-caps'>← Required. Do not use other package managers.</span>*

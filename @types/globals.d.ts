@@ -1,4 +1,3 @@
-import type { Settings } from '@/lib/db/generated/prisma';
 import type { Geo } from '@vercel/functions';
 declare global {
 	interface PaginatedOptions {
@@ -10,17 +9,6 @@ declare global {
 		pageSize: number;
 		total: number;
 		totalPages: number;
-	}
-
-	interface UISettings extends Settings {
-		createdAt: string;
-		updatedAt: string;
-	}
-
-	interface UICreateSettingsInput extends Partial<UISettings> {
-		id: string;
-		createdAt?: string | Date;
-		updatedAt?: string | Date;
 	}
 
 	type UIGeolocation = Geo;

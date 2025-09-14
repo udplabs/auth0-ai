@@ -1,6 +1,9 @@
 // lib/auth0/fga/get-account-permissions.ts
 // FINAL CODE
-import { getFgaClient } from './client';
+import { getFgaClient } from './_client';
+
+import type { Accounts } from '@/types';
+import type { ClientBatchCheckItem } from '@openfga/sdk';
 
 const fga = await getFgaClient();
 
@@ -75,6 +78,9 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 		'can_view_balances',
 		'can_view_transactions',
 		'can_transfer',
+		// Note we are NOT asking `can_transfer_funds`
+		// That is a permission we check for at the time
+		// of an actual transfer request.
 	];
 
 	// ---------------------------------------------------------------------------
@@ -82,11 +88,14 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 	// Ask: “Does user:<customerId> have <relation> on account:<id>?”
 	// ---------------------------------------------------------------------------
 	const checks = accounts.flatMap(({ id, customerId }) => {
-		return RELATIONS.map((relation) => ({
-			user: `user:${customerId}`,
-			relation,
-			object: `account:${id}`,
-		}));
+		return RELATIONS.map(
+			(relation) =>
+				({
+					user: `user:${customerId}`,
+					relation,
+					object: `account:${id}`,
+				}) as ClientBatchCheckItem
+		);
 	});
 
 	// ---------------------------------------------------------------------------

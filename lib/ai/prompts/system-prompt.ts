@@ -8,6 +8,8 @@ import {
 import { upsertSettings } from '@/lib/db/queries/settings';
 import { sortBy } from '@/lib/utils';
 
+import type { Chat, UISettings } from '@/types';
+
 export async function getSystemPrompts({
 	requestHints: { settings, ...hints },
 }: {

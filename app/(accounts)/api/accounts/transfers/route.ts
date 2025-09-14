@@ -1,3 +1,10 @@
+import { getUser } from '@/lib/auth0';
+import { createTransfer } from '@/lib/db/queries/accounts/mutate-transactions';
+import { APIError, handleApiError } from '@/lib/errors';
+import { revalidateTag } from 'next/cache';
+import { type NextRequest, NextResponse } from 'next/server';
+
+import type { Transfers } from '@/types';
 /**
  * POST /api/accounts/transfers
  *
@@ -22,14 +29,8 @@
  * - Idempotency: accept an Idempotency-Key header to avoid duplicate transfers on retries.
  */
 
-import { createTransfer } from '@/lib/db/queries/accounts/mutate-transactions';
-import { revalidateTag } from 'next/cache';
-import { type NextRequest, NextResponse } from 'next/server';
-
 export async function POST(request: NextRequest) {
 	try {
-		const { getUser } = await import('@/lib/auth0');
-
 		// 1. Auth: fails (throws) if session invalid.
 		const user = await getUser();
 
@@ -38,8 +39,6 @@ export async function POST(request: NextRequest) {
 		const body = (await request.json()) as Transfers.CreateTransactionInput;
 
 		if (!body) {
-			const { APIError } = await import('@/lib/errors');
-
 			// Defensive: request.json() would normally throw if invalid JSON.
 			throw new APIError('bad_request:api', 'Invalid request body.');
 		}
@@ -59,7 +58,6 @@ export async function POST(request: NextRequest) {
 		// 6. Success response: minimal JSON (could wrap in { id: transferId } for extensibility).
 		return NextResponse.json(transferId);
 	} catch (error: unknown) {
-		const { handleApiError } = await import('@/lib/errors');
 		return handleApiError(error);
 	}
 }

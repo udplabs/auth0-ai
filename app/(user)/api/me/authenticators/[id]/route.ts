@@ -1,5 +1,5 @@
 import { revalidateTag } from 'next/cache';
-import { type NextRequest, NextResponse } from 'next/server';
+import { type NextRequest } from 'next/server';
 
 import { auth0Management, getUser } from '@/lib/auth0';
 import { APIError } from '@/lib/errors';
@@ -10,6 +10,14 @@ export async function DELETE(
 	{ params }: { params: Promise<ApiPathParams> }
 ) {
 	try {
+		if (!auth0Management) {
+			console.warn('Auth0 Management API client is not initialized.');
+			return new Response(null, {
+				status: 501,
+				statusText: 'Auth0 Management API client is not yet initialized.',
+			});
+		}
+
 		const { id: authentication_method_id } = await params;
 
 		const user = await getUser();
@@ -27,7 +35,7 @@ export async function DELETE(
 
 		revalidateTag('authenticators');
 
-		return NextResponse.json({}, { status: 204 });
+		return new Response(null, { status: 204 });
 	} catch (error) {
 		console.log('API error:', error);
 		if (error instanceof APIError) {

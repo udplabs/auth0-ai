@@ -6,6 +6,8 @@ import {
 } from '@ai-sdk/react';
 import { useContext } from 'react';
 
+import type { Chat } from '@/types/chat';
+
 export function useChat<UI_MESSAGE extends UIMessage = Chat.UIMessage>() {
 	const context = useContext(ChatContext);
 

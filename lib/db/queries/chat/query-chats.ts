@@ -1,9 +1,11 @@
 'use server';
 
-import type { Chat as ChatModel } from '@/lib/db/generated/prisma';
+import type { Chat as ChatModel, Prisma } from '@/lib/db/generated/prisma';
 import { APIError } from '@/lib/errors';
 import { convertToUI, groupItemsByDate } from '@/lib/utils';
 import { prisma } from '../../prisma/client';
+
+import type { Chat } from '@/types/chat';
 
 interface GetChatByIdOptions {
 	userId?: string;
@@ -56,6 +58,10 @@ export interface ListGroupedChatsParams extends PaginatedOptions {
 	grouped: boolean;
 }
 
+interface ListChatsByUserIdResult extends PaginatedResults {
+	chats: Chat.UIChat[];
+}
+
 export async function listChatsByUserId(
 	userId: string,
 	options?: ListGroupedChatsParams
@@ -63,11 +69,11 @@ export async function listChatsByUserId(
 export async function listChatsByUserId(
 	userId: string,
 	options?: ListChatsParams
-): Promise<Chat.ListChatsByUserIdResult>;
+): Promise<ListChatsByUserIdResult>;
 export async function listChatsByUserId(
 	userId: string,
 	options?: ListChatsParams | ListGroupedChatsParams
-): Promise<Chat.ListChatsByUserIdResult | Chat.GroupedItems<Chat.UIChat>> {
+): Promise<ListChatsByUserIdResult | Chat.GroupedItems<Chat.UIChat>> {
 	const { page = 1, pageSize = 20, grouped = false } = options || {};
 
 	const skip = (page - 1) * pageSize;

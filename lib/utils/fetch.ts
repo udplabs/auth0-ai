@@ -1,4 +1,4 @@
-import { APIError } from '@/lib/errors';
+import { APIError, type Errors } from '@/lib/errors';
 
 export const fetcher = async (url: string) => {
 	if (url.startsWith('config:')) return null;

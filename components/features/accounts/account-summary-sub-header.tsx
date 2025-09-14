@@ -15,7 +15,7 @@ export const AccountSummarySubHeader = ({
 	const { data: accounts = [] } = useAccounts();
 
 	const totalBalance = accounts?.reduce(
-		(sum, account) => sum + account.balance,
+		(sum, account) => sum + (account?.balance ?? 0),
 		0
 	);
 	return (

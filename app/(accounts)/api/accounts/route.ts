@@ -1,4 +1,11 @@
 // app/(accounts)/api/accounts/route.ts
+import { getAccounts } from '@/lib/api/accounts';
+import { getUser } from '@/lib/auth0';
+import { deleteAllUserTuples } from '@/lib/auth0/fga/utils';
+import { generateMockEmbeddings } from '@/lib/db/mock/mock-accounts';
+import { deleteAccountData } from '@/lib/db/queries/accounts/mutate-accounts';
+import { handleApiError } from '@/lib/errors';
+import { type NextRequest, NextResponse } from 'next/server';
 /**
  * Accounts API
  *
@@ -31,14 +38,6 @@
  * - Return a status object after DELETE (counts of deleted / recreated resources) instead of 204.
  * - Add ETag / caching for GET if account data stable, plus revalidation on mutations.
  */
-
-import { getAccounts } from '@/lib/api/accounts'; // (createAccounts unused here; remove if not needed)
-import { getUser } from '@/lib/auth0';
-import { deleteAllUserTuples } from '@/lib/auth0/fga/utils';
-import { generateMockEmbeddings } from '@/lib/db/mock/mock-accounts';
-import { deleteAccountData } from '@/lib/db/queries/accounts/mutate-accounts';
-import { handleApiError } from '@/lib/errors';
-import { type NextRequest, NextResponse } from 'next/server';
 
 // -----------------------------------------------------------------------------
 // GET /api/accounts

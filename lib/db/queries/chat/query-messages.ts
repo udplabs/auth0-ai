@@ -4,6 +4,7 @@ import { convertToUI } from '@/lib/utils/db-converter';
 import type { Message as MessageModel } from '../../generated/prisma';
 import { prisma } from '../../prisma/client';
 
+import type { Chat } from '@/types/chat';
 export async function getMessagesByChatId(
 	chatId: string
 ): Promise<Chat.UIMessage[]> {

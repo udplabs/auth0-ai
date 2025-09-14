@@ -36,6 +36,37 @@
 
 import { NextResponse } from 'next/server';
 
+export namespace Errors {
+	export type Code = `${Type}:${Surface}`;
+	export type Type =
+		| 'bad_request'
+		| 'unauthorized'
+		| 'forbidden'
+		| 'not_found'
+		| 'rate_limit'
+		| 'server_error'
+		| 'unknown'
+		| 'offline';
+	export type Surface =
+		| 'chat'
+		| 'auth'
+		| 'api'
+		| 'stream'
+		| 'database'
+		| 'history'
+		| 'unknown'
+		| 'vote';
+
+	export type Visibility = 'response' | 'log' | 'none';
+
+	export interface Response {
+		code: string;
+		message: string;
+		cause?: string;
+		details?: any;
+	}
+}
+
 /**
  * Map a surface domain to an output visibility policy.
  * 'log'    → hide specific error details in HTTP response (generic message shown).
@@ -134,7 +165,7 @@ export class APIError extends Error {
 	 * - If visibility = 'log': log internals & return generic user-safe payload.
 	 * - Else: return structured error including code + message + cause + details.
 	 */
-	public toJSON(): { error: Errors.ErrorResponse; status: number } {
+	public toJSON(): { error: Errors.Response; status: number } {
 		const code: Errors.Code = `${this.type}:${this.surface}`;
 		const visibility = getErrorVisibility(this.surface);
 

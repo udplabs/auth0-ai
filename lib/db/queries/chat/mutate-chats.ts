@@ -9,6 +9,8 @@ import { saveAppInstance } from '../settings';
 import { deleteMessagesByChatId, saveMessages } from './mutate-messages';
 import { getChatById } from './query-chats';
 
+import type { Chat } from '@/types/chat';
+
 export async function saveChat(input: Chat.CreateChatInput) {
 	const { messages = [], ...chat } = input;
 

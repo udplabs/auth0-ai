@@ -7,6 +7,7 @@ import {
 	type SidebarHeaderProps as UISidebarHeaderProps,
 	useSidebar,
 } from '@/components/ui/sidebar';
+import { useTheme } from 'next-themes';
 import Link from 'next/link';
 
 export interface SidebarHeaderProps extends UISidebarHeaderProps {
@@ -17,6 +18,8 @@ export function SidebarHeader({
 	SidebarMenuProps,
 	...props
 }: SidebarHeaderProps) {
+	const theme = useTheme();
+
 	const { setOpenMobile } = useSidebar();
 
 	return (
@@ -29,7 +32,10 @@ export function SidebarHeader({
 					}}
 					className='flex flex-row items-center gap-3'
 				>
-					<Logo className='w-full pe-5' />
+					<Logo
+						className='w-full pe-5'
+						{...{ dark: theme.resolvedTheme === 'dark' }}
+					/>
 				</Link>
 			</SidebarMenu>
 		</UISidebarHeader>

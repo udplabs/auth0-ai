@@ -1,7 +1,7 @@
+import { findAllContent, findFirstContent } from '@/lib/db/queries/content';
 import { tool } from 'ai';
 import { z } from 'zod';
 import { ContentSchema, ToolResponseSchema } from '../../schemas';
-
 const inputSchema = z
 	.object({
 		key: z
@@ -52,10 +52,6 @@ export const getContent = tool<
 	outputSchema,
 	execute: async ({ find = 'first', ...params }) => {
 		try {
-			const { findFirstContent, findAllContent } = await import(
-				'@/lib/db/queries/content'
-			);
-
 			if (find === 'all') {
 				const content = (await findAllContent(params)) || [];
 
