@@ -1,11 +1,17 @@
+import type { UserProfile } from '@/hooks/use-user-profile';
 import { auth0Management } from '@/lib/auth0';
 import { upsertSettings } from '@/lib/db/queries/settings';
 import { APIError } from '@/lib/errors';
 import { getCacheKey } from '@/lib/utils';
 import { unstable_cache } from 'next/cache';
 
-async function fetchUserProfile(id: string): Promise<UserProfile> {
+async function fetchUserProfile(id: string): Promise<UserProfile | undefined> {
 	try {
+		if (!auth0Management) {
+			console.warn('Auth0 Management API client is not initialized.');
+			return;
+		}
+
 		console.log('fetching profile...');
 
 		const { data: user } = await auth0Management.users.get({ id });

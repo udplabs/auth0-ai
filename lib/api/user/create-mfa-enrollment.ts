@@ -8,6 +8,10 @@ export const createMFAEnrollment = async (
 	user_id: string,
 	authenticator: AuthenticatorType = 'push'
 ) => {
+	if (!auth0Management) {
+		console.warn('Auth0 Management API client is not initialized.');
+		return;
+	}
 	const {
 		data: { ticket_url },
 	} = await auth0Management.guardian.createEnrollmentTicket({

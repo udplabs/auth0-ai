@@ -2,6 +2,11 @@ import { auth0 } from '@/lib/auth0/client';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
+	if (!auth0) {
+		console.warn('Auth0 client is not initialized. Follow the lab guide!');
+		return;
+	}
+
 	const authRes = await auth0.middleware(request); // Always run this first
 
 	const { pathname } = request.nextUrl;

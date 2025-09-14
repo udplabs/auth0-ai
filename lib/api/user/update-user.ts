@@ -1,3 +1,4 @@
+import type { UserProfile } from '@/hooks/use-user-profile';
 import { auth0Management } from '@/lib/auth0';
 import { APIError } from '@/lib/errors';
 import type { UserUpdate } from 'auth0';
@@ -7,8 +8,13 @@ import type { UserUpdate } from 'auth0';
 export const updateUser = async (
 	id: string,
 	data: UserUpdate
-): Promise<UserProfile> => {
+): Promise<UserProfile | undefined> => {
 	try {
+		if (!auth0Management) {
+			console.warn('Auth0 Management API client is not initialized.');
+			return;
+		}
+
 		const { data: user } = await auth0Management.users.update({ id }, data);
 
 		return user;

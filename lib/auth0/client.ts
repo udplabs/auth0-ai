@@ -31,26 +31,15 @@ import { Auth0Client } from '@auth0/nextjs-auth0/server';
 import type { SessionData, User } from '@auth0/nextjs-auth0/types';
 import { APIError } from '../errors';
 
-// Dummy default values are set for this demo only.
-// Do NOT use defaults like these in production apps.
 /**
  * Server-side Auth0 client used to read/update the session.
  *
+ * Implementation using `getAuth0Client()` for demo purposes only.
  * Notes
  * - authorizationParameters.scope includes offline_access so a refresh token may be issued.
  * - appBaseUrl must match your deployed URL in production.
  */
-export const auth0 = new Auth0Client({
-	domain: process.env.AUTH0_DOMAIN || 'your-domain.auth0app.com',
-	clientId: process.env.AUTH0_CLIENT_ID || '998877665544',
-	clientSecret: process.env.AUTH0_CLIENT_SECRET || '1234567890',
-	secret: process.env.AUTH0_SECRET || '987654321987654321',
-	authorizationParameters: {
-		audience: process.env.AUTH0_AUDIENCE, // e.g. https://your-api.example.com
-		scope: 'openid profile email offline_access',
-	},
-	appBaseUrl: process.env.AUTH0_BASE_URL || 'http://localhost:3000',
-});
+export const auth0 = getAuth0Client();
 
 // =========== The following are helper functions/wrappers around ===========
 // =========== auth0 methods to avoid exposing `auth0` directly.  ===========
@@ -62,6 +51,9 @@ export const auth0 = new Auth0Client({
  * - After refreshing tokens or modifying custom session properties.
  */
 export async function updateSession(session: SessionData) {
+	if (!auth0) {
+		return;
+	}
 	await auth0.updateSession(session);
 }
 
@@ -77,6 +69,9 @@ export async function getSession(throwError: true): Promise<SessionData>;
 export async function getSession(
 	throwError?: boolean
 ): Promise<SessionData | null> {
+	if (!auth0) {
+		return null;
+	}
 	const session = await auth0.getSession();
 
 	if (throwError && !session) {
@@ -100,11 +95,13 @@ export async function getRefreshToken() {
 
 	const { tokenSet } = (await getSession()) || {};
 
-	const result = tokenSet?.refreshToken;
+	if (tokenSet?.refreshToken) {
+		const result = tokenSet?.refreshToken;
 
-	console.debug('getRefreshToken result:', result);
+		console.debug('getRefreshToken result:', result);
 
-	return result;
+		return result;
+	}
 }
 
 /**
@@ -119,6 +116,10 @@ export async function getRefreshToken() {
 export async function getUser(): Promise<User>;
 export async function getUser(throwError: false): Promise<User | undefined>;
 export async function getUser(throwError = true): Promise<User | undefined> {
+	if (!auth0) {
+		return;
+	}
+
 	const { user } = (await getSession()) || {};
 
 	if (throwError && !user?.sub) {
@@ -129,3 +130,38 @@ export async function getUser(throwError = true): Promise<User | undefined> {
 }
 
 //===============================================
+
+/**
+ *
+ * Helper function to help the demo app.
+ * This permits the app to run without Auth0 being configured yet.
+ *
+ * WE DO NOT ADVISE DOING THIS IN PRODUCTION!
+ *
+ * This is only for development purposes.
+ */
+function getAuth0Client() {
+	const domain = process.env.AUTH0_DOMAIN;
+	const clientId = process.env.AUTH0_CLIENT_ID;
+	const clientSecret = process.env.AUTH0_CLIENT_SECRET;
+	const secret = process.env.AUTH0_SECRET;
+	const authorizationParameters = {
+		audience: process.env.AUTH0_AUDIENCE, // e.g. https://your-api.example.com
+		scope: 'openid profile email offline_access',
+	};
+	const appBaseUrl = process.env.AUTH0_BASE_URL || 'http://localhost:3000';
+
+	if (!(domain && clientId && clientSecret && secret)) {
+		console.warn('Auth0 client not yet initialized. Follow the lab guide!');
+		return null;
+	}
+
+	return new Auth0Client({
+		domain,
+		clientId,
+		clientSecret,
+		secret,
+		authorizationParameters,
+		appBaseUrl,
+	});
+}

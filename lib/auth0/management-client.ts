@@ -3,6 +3,29 @@ import { ManagementClient } from 'auth0';
 import { concat, orderBy } from 'lodash-es';
 
 import type { ManagementClientOptionsWithClientSecret as ManagementClientOptions } from 'auth0';
+
+export interface Factor {
+	id?: string;
+	enrolled?: boolean;
+	type: FactorType;
+	displayName?: string;
+	createdAt?: string;
+	enrolledAt?: string;
+	lastAuthAt?: string;
+}
+
+export type FactorType =
+	| 'totp'
+	| 'recovery-code'
+	| 'sms'
+	| 'push'
+	| 'email'
+	| 'push'
+	| 'phone'
+	| 'webauthn-roaming'
+	| 'webauthn-platform'
+	| 'passkey'
+	| 'password';
 class Auth0ManagementClient extends ManagementClient {
 	domain: string;
 	clientId: string;
@@ -113,4 +136,28 @@ class Auth0ManagementClient extends ManagementClient {
 
 let _client: Auth0ManagementClient | null = null;
 
-export const auth0Management = _client || new Auth0ManagementClient();
+export const auth0Management = getAuth0ManagementClient();
+
+function getAuth0ManagementClient() {
+	const domain =
+		process.env.AUTH0_MANAGEMENT_API_DOMAIN || process.env.AUTH0_DOMAIN;
+	const clientId =
+		process.env.AUTH0_MANAGEMENT_API_CLIENT_ID || process.env.AUTH0_CLIENT_ID;
+	const clientSecret =
+		process.env.AUTH0_MANAGEMENT_API_CLIENT_SECRET ||
+		process.env.AUTH0_CLIENT_SECRET;
+
+	if (!domain || !clientId || !clientSecret) {
+		console.warn('Auth0 Management API client is not initialized.');
+		return null;
+	}
+
+	if (!_client) {
+		_client = new Auth0ManagementClient({
+			domain,
+			clientId,
+			clientSecret,
+		});
+	}
+	return _client;
+}
