@@ -1,4 +1,4 @@
-import { getAccountPermissions } from '@/lib/auth0/fga/get-account-permissions';
+import { getAccountPermissions } from '@/lib/auth0/fga/_get-account-permissions';
 import { getAccountsByUserId } from '@/lib/db/queries/accounts';
 
 export async function getAccounts(userId: string, includeTransactions = false) {

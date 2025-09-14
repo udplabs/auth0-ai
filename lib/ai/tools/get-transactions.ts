@@ -1,3 +1,5 @@
+import { getTransactions as getTransactionsAPI } from '@/lib/api/accounts';
+import { getUser } from '@/lib/auth0';
 import { tool } from 'ai';
 import { z } from 'zod';
 import { ToolResponseSchema, TransactionSchema } from '../schemas';
@@ -19,14 +21,7 @@ export const getTransactions = tool<
 		console.log('getTransactions called....');
 
 		try {
-			const { getUser } = await import('@/lib/auth0');
-
 			const user = await getUser();
-
-			// Dynamically import to avoid circular dependencies
-			const { getTransactions: getTransactionsAPI } = await import(
-				'@/lib/api/accounts'
-			);
 
 			const data =
 				(await getTransactionsAPI({ accountId, userId: user.sub })) || [];

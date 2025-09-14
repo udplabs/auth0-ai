@@ -1,3 +1,4 @@
+import { findFirstContent } from '@/lib/db/queries/content';
 import { tool } from 'ai';
 import { z } from 'zod';
 import { ContentSchema, ToolResponseSchema } from '../../schemas';
@@ -25,8 +26,6 @@ export const getReferenceFile = tool<
 	outputSchema,
 	execute: async ({ filename }) => {
 		try {
-			const { findFirstContent } = await import('@/lib/db/queries/content');
-
 			const content = await findFirstContent({
 				key: 'filename',
 				query: filename.startsWith('src/')

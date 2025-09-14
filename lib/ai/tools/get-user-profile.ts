@@ -1,20 +1,20 @@
+import { getUserProfile as getUserProfileApi } from '@/lib/api/user';
+import { getUser } from '@/lib/auth0';
 import { tool } from 'ai';
 import { z } from 'zod';
 
-export const getUserProfile = tool<object, Chat.Tools.Response<UserProfile>>({
+import type { UserProfile } from '@/hooks/use-user-profile';
+import type { Chat } from '@/types/chat';
+
+export const getUserProfile = tool<object, Chat.ToolsResponse<UserProfile>>({
 	description: 'Get information about the current logged in user.',
 	inputSchema: z.object({}),
 	name: 'getUserProfile',
 	execute: async () => {
 		try {
-			const { getUser } = await import('@/lib/auth0');
-
 			const user = await getUser();
 
-			// Wait to import until needed
-			const { getUserProfile } = await import('@/lib/api/user');
-
-			const data = await getUserProfile({ userId: user.sub });
+			const data = await getUserProfileApi({ userId: user.sub });
 
 			return {
 				status: 'success',

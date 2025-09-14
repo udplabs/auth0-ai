@@ -1,3 +1,6 @@
+import { getUserProfile } from '@/lib/api/user/get-user-profile';
+import { getUser } from '@/lib/auth0/client';
+import { getStepCode as getStepCodeQuery } from '@/lib/db/queries/content';
 import { tool } from 'ai';
 import { z } from 'zod';
 import { ContentSchema, ToolResponseSchema } from '../../schemas';
@@ -28,12 +31,6 @@ export const getStepCode = tool<
 	outputSchema,
 	execute: async ({ labStep }) => {
 		try {
-			const { getStepCode } = await import('@/lib/db/queries/content');
-			const { getUser } = await import('@/lib/auth0/client');
-			const { getUserProfile } = await import(
-				'@/lib/api/user/get-user-profile'
-			);
-
 			if (!labStep) {
 				// Don't throw
 				// Content can be retrieved without a user
@@ -43,12 +40,12 @@ export const getStepCode = tool<
 					const { custom_metadata } =
 						(await getUserProfile({ userId: user.sub })) || {};
 
-					labStep = custom_metadata?.labStep;
+					labStep = custom_metadata?.currentLabStep;
 				}
 			}
 
 			if (labStep) {
-				const content = await getStepCode(labStep);
+				const content = await getStepCodeQuery(labStep);
 
 				return {
 					data: content ? z.array(ContentSchema).parse(content) : undefined,

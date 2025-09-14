@@ -1,3 +1,5 @@
+import { getUser } from '@/lib/auth0';
+import { upsertSettings } from '@/lib/db/queries/settings';
 import { tool } from 'ai';
 import { z } from 'zod';
 import { SettingsSchema, ToolResponseSchema } from '../../schemas';
@@ -21,16 +23,12 @@ export const userSettings = tool<
 	outputSchema,
 	execute: async ({
 		currentLabStep = 'step-0',
-		nextLabStep = null,
-		labMeta = null,
+		nextLabStep,
+		labMeta,
 		userId: user_id,
 	}) => {
 		try {
-			const { getUser } = await import('@/lib/auth0');
-
 			const userId = !user_id ? (await getUser()).sub : user_id;
-
-			const { upsertSettings } = await import('@/lib/db/queries/settings');
 
 			const settings = await upsertSettings({
 				id: userId,
