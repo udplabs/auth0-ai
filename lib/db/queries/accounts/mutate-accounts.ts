@@ -8,16 +8,18 @@ import type {
 } from '../../generated/prisma';
 import { prisma } from '../../prisma/client';
 
+import type { Accounts, Transactions } from '@/types';
+
 export async function saveAccounts(
 	accounts: Accounts.CreateAccountInput[],
-	transactions: Accounts.CreateTransactionInput[]
+	transactions: Transactions.CreateTransactionInput[]
 ): Promise<void> {
 	await saveAccountsAndTransactions(accounts, transactions);
 }
 
 export async function saveAccountsAndReturnCombined(
 	accounts: Accounts.CreateAccountInput[],
-	transactions?: Accounts.CreateTransactionInput[]
+	transactions?: Transactions.CreateTransactionInput[]
 ): Promise<Accounts.Account[]> {
 	const { accounts: uiAccounts, transactions: uiTransactions } =
 		await saveAccountsAndTransactions(accounts, transactions);
@@ -38,17 +40,27 @@ export async function saveAccountsAndReturnCombined(
 	return combinedAccounts;
 }
 
+interface AccountsSeparatedResponse {
+	accounts: Accounts.AccountWithoutTransactions[];
+	transactions: Transactions.Transaction[];
+}
+
+interface AccountsSeparatedInput {
+	accounts: Accounts.CreateAccountInput[];
+	transactions?: Transactions.CreateTransactionInput[];
+}
+
 export async function saveAccountsAndReturnSeparate(
 	accounts: Accounts.CreateAccountInput[],
-	transactions?: Accounts.CreateTransactionInput[]
-): Promise<Accounts.SeparatedResponse> {
+	transactions?: Transactions.CreateTransactionInput[]
+): Promise<AccountsSeparatedResponse> {
 	return await saveAccountsAndTransactions(accounts, transactions);
 }
 
 async function saveAccountsAndTransactions(
 	accounts: Accounts.CreateAccountInput[],
-	transactions: Accounts.CreateTransactionInput[] = []
-): Promise<Accounts.SeparatedResponse> {
+	transactions: Transactions.CreateTransactionInput[] = []
+): Promise<AccountsSeparatedResponse> {
 	const _accounts: Accounts.CreateAccountInput[] = [];
 
 	// 1) Check for nested transactions and separate them if present
@@ -74,7 +86,7 @@ async function saveAccountsAndTransactions(
 	>(accounts);
 
 	const dbTransactions = convertToDB<
-		Accounts.CreateTransactionInput[],
+		Transactions.CreateTransactionInput[],
 		Prisma.TransactionCreateManyInput[]
 	>(uniqBy(transactions, 'id'));
 
@@ -95,7 +107,7 @@ async function saveAccountsAndTransactions(
 		// 3) Convert transactions to UI format
 		const uiTransactions = convertToUI<
 			TransactionModel[],
-			Accounts.Transaction[]
+			Transactions.Transaction[]
 		>(createdTransactions);
 
 		return { accounts: uiAccounts, transactions: uiTransactions };

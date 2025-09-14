@@ -12,6 +12,8 @@ import { useAccounts } from '@/hooks/use-accounts';
 import { startCase } from 'lodash-es';
 import { CurrencyField, DateField } from './ui';
 
+import type { Accounts } from '@/types';
+
 interface AccountDetailsCardProps extends CardProps {
 	accountId: string;
 	CardContentProps?: CardProps;

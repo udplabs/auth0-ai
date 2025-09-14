@@ -1,6 +1,8 @@
 import type { InferUITools, TextPart, UIMessage, UIMessagePart } from 'ai';
 import { toolRegistry } from '../ai/tool-registry';
 
+import type { Chat } from '@/types/chat';
+
 /**
  * Returns the first/last matching part from the provided message.
  * - Handles messages without parts.

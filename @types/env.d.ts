@@ -94,7 +94,7 @@ namespace NodeJS {
 		 * @default `https://api.us1.fga.dev``
 		 * @readonly
 		 */
-		readonly FGA_API_URL?: string;
+		readonly FGA_API_URL: string;
 		/**
 		 * The Store ID for your FGA store
 		 *
@@ -109,7 +109,7 @@ namespace NodeJS {
 		 * @readonly
 		 * @default `auth.fga.dev` (for US1 region)
 		 */
-		readonly FGA_API_TOKEN_ISSUER?: string;
+		readonly FGA_API_TOKEN_ISSUER: string;
 		/**
 		 * The API Audience for your FGA store
 		 * Get this from your store settings in the dashboard, refer to ["How to get your API Keys"](https://docs.fga.dev/integration/getting-your-api-keys)

@@ -11,6 +11,8 @@ import { useUser } from '@auth0/nextjs-auth0';
 import { startCase } from 'lodash-es';
 import { useParams } from 'next/navigation';
 import { SidebarHistoryItem } from './sidebar-history-item';
+
+import type { Chat } from '@/types/chat';
 export function SidebarHistory() {
 	const { setOpenMobile } = useSidebar();
 	const { id: _id } = useParams<{ id: string }>();
@@ -78,7 +80,9 @@ export function SidebarHistory() {
 	const groups = Object.keys(chats);
 
 	return groups.map((group) => {
-		const items = chats[group as keyof Chat.GroupedItems<Chat.UIChat>];
+		const items = chats[
+			group as keyof Chat.GroupedItems<Chat.UIChat>
+		] as Chat.UIChat[];
 
 		if (items.length > 0) {
 			return (

@@ -4,6 +4,8 @@ import { APIError } from '@/lib/errors';
 import { z } from 'zod';
 import { PostRequestBodySchema } from './schemas';
 
+import type { Chat } from '@/types/chat';
+
 type PostRequestBody = z.infer<typeof PostRequestBodySchema>;
 
 /**

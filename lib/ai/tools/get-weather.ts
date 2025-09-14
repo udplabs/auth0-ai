@@ -1,9 +1,12 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 
+import type { WeatherAtLocationData } from '@/components/gen-ai/weather';
+import type { Chat } from '@/types/chat';
+
 export const getWeather = tool<
 	{ latitude: number; longitude: number },
-	Chat.Tools.Response<WeatherAtLocationData>
+	Chat.ToolsResponse<WeatherAtLocationData>
 >({
 	description: 'Get the current weather at a location',
 	inputSchema: z.object({

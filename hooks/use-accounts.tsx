@@ -2,6 +2,8 @@ import type { SWRResponse } from 'swr';
 import useSWR from 'swr';
 import { useUserProfile } from './use-user-profile';
 
+import type { Accounts } from '@/types';
+
 const KEY = '/api/accounts';
 
 type UseAccountsResponse = SWRResponse<Accounts.Account[]> & {

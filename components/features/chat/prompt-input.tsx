@@ -14,6 +14,8 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { SuggestedActions } from './suggested-actions';
 
+import type { Chat } from '@/types/chat';
+
 export interface PromptInputProps extends AIPromptInputProps {
 	ContainerProps?: React.ComponentProps<'div'>;
 	PromptInputTextareaProps?: PromptInputTextareaProps;

@@ -1,5 +1,7 @@
 import { APIError } from '@/lib/errors';
 
+import type { Chat } from '@/types/chat';
+
 const dateFields = [
 	'openedDate',
 	'closedDate',

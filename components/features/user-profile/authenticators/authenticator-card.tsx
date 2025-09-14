@@ -28,8 +28,9 @@ import {
 	TbBinary as TotpIcon,
 } from 'react-icons/tb';
 
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils';
 
+import type { Factor, FactorType } from '@/lib/auth0/management-client';
 import type { IconType } from 'react-icons/lib';
 
 export const AuthenticatorCard = ({

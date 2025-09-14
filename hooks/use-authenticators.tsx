@@ -8,6 +8,8 @@ import { useCallback } from 'react';
 import { toast as sonnerToast } from 'sonner';
 import useSWR from 'swr';
 
+import type { Factor } from '@/lib/auth0/management-client';
+
 const key = '/api/me/authenticators';
 
 /**

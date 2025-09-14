@@ -15,7 +15,10 @@ import { ToolUIPart } from 'ai';
 import { CodeBlock } from '../ui/ai-elements/code-block';
 import { AccountSummary } from './account-summary';
 import { ChatActionCard } from './chat-action-card';
-import { Weather } from './weather';
+import { Weather, type WeatherAtLocationData } from './weather';
+
+import type { UserProfile } from '@/hooks/use-user-profile';
+import type { Accounts, Chat } from '@/types';
 
 export type ToolPart = ToolUIPart;
 
@@ -75,7 +78,7 @@ export const ToolResult = ({
 	}
 
 	const { input, type } = toolPart;
-	const output = toolPart?.output as unknown as Chat.Tools.Response;
+	const output = toolPart?.output as unknown as Chat.ToolsResponse;
 	const errorText = output?.error?.message;
 	const state = !!errorText ? 'output-error' : toolPart?.state;
 	const widget = renderByType[toolPart.type as ToolType]?.(toolPart);

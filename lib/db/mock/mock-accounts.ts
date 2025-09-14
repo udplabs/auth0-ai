@@ -1,5 +1,7 @@
 import { LocalVectorStore } from '@/lib/ai/rag/vector-store';
 
+import type { Accounts, Documents, Transactions } from '@/types';
+
 // Should not be used outside of this function.
 const sampleUserIds = [
 	'sample|01K22R2CS4VSAP5KKNDY87XC8E',
@@ -36,7 +38,7 @@ export async function createMockAccounts(userId: string) {
 	} = await getSampleData(sampleUserId);
 
 	const accounts: Accounts.Account[] = [];
-	const transactions: Accounts.Transaction[] = [];
+	const transactions: Transactions.Transaction[] = [];
 	const transactionDocuments: Documents.DocumentWithEmbedding[] = [];
 
 	// Generate new IDs for accounts, transactions, and embeddings

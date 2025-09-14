@@ -12,9 +12,11 @@ import {
 import React, { createContext, useEffect, useMemo, useRef } from 'react';
 import { ulid } from 'ulid';
 
+import type { Chat as ChatType } from '@/types/chat';
+
 import { LS_KEY_AUTH, LS_KEY_FIRST } from '@/lib/constants';
 export interface ChatContextValue {
-	chat: AIChat<Chat.UIMessage>;
+	chat: AIChat<ChatType.UIMessage>;
 }
 
 export const ChatContext = createContext<ChatContextValue | undefined>(
@@ -22,8 +24,8 @@ export const ChatContext = createContext<ChatContextValue | undefined>(
 );
 
 interface CreateChatOptions
-	extends Omit<ChatInit<Chat.UIMessage>, 'transport'> {
-	transport?: HttpChatTransportInitOptions<Chat.UIMessage>;
+	extends Omit<ChatInit<ChatType.UIMessage>, 'transport'> {
+	transport?: HttpChatTransportInitOptions<ChatType.UIMessage>;
 }
 
 export interface ChatProviderOptions extends React.PropsWithChildren {
@@ -52,9 +54,9 @@ function createChat(
 		prepareSendMessagesRequest,
 		prepareReconnectToStreamRequest,
 		...transportOptions
-	} = transport || ({} as HttpChatTransportInitOptions<Chat.UIMessage>);
+	} = transport || ({} as HttpChatTransportInitOptions<ChatType.UIMessage>);
 
-	return new AIChat<Chat.UIMessage>({
+	return new AIChat<ChatType.UIMessage>({
 		...chatOptions,
 		id,
 		generateId,
@@ -127,7 +129,7 @@ export function ChatProvider({
 	const { mutate: refreshChatHistory } = useChatHistory();
 	const { data: user, isAuthenticated, updateUserSettings } = useUserProfile();
 
-	const chatRef = useRef<AIChat<Chat.UIMessage>>();
+	const chatRef = useRef<AIChat<ChatType.UIMessage>>();
 
 	if (!chatRef.current || chatRef.current.id !== id) {
 		chatRef.current = createChat(
@@ -189,7 +191,7 @@ export function ChatProvider({
 	}, [id, user, chat, isFirstLogin, chatId]);
 
 	const value = useMemo<ChatContextValue>(
-		() => ({ chat: chat as unknown as AIChat<Chat.UIMessage> }),
+		() => ({ chat: chat as unknown as AIChat<ChatType.UIMessage> }),
 		[chat]
 	);
 

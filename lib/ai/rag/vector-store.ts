@@ -1,3 +1,10 @@
+import { openai } from '@/lib/ai/openai';
+import { getAllTransactions } from '@/lib/db/queries/accounts';
+import { getDocuments } from '@/lib/db/queries/documents';
+import { cosineSimilarity, embed } from 'ai';
+import { createDocumentsWithEmbeddings } from './create-documents';
+
+import type { Documents } from '@/types';
 /**
  * LocalVectorStore
  *
@@ -41,12 +48,6 @@
  *  - Add write batching & debounced flush.
  *  - Allow filter predicates (e.g., by accountId) pre‑scoring.
  */
-
-import { openai } from '@/lib/ai/openai';
-import { getAllTransactions } from '@/lib/db/queries/accounts';
-import { getDocuments } from '@/lib/db/queries/documents';
-import { cosineSimilarity, embed } from 'ai';
-import { createDocumentsWithEmbeddings } from './create-documents';
 
 export class LocalVectorStore {
 	/**

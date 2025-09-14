@@ -1,6 +1,6 @@
 'use client';
 
-import { useUserProfile } from '@/hooks/use-user-profile';
+import { type UserProfile, useUserProfile } from '@/hooks/use-user-profile';
 
 import {
 	Avatar,

@@ -13,6 +13,8 @@ import {
 import { revalidateTag } from 'next/cache';
 import { ulid } from 'ulid';
 
+import type { Chat } from '@/types/chat';
+
 const model = openai('gpt-5-nano');
 
 /**

@@ -15,7 +15,8 @@ import { ChatThinkingMessage } from './chat-thinking-message';
 import { PromptInput } from './prompt-input';
 import { Greeting } from './ui';
 
-export function Chat() {
+import type { Chat } from '@/types';
+export function Chat({ hideLogin }: { hideLogin?: boolean }) {
 	const { messages, status } = useChat<Chat.UIMessage>();
 
 	const isThinking =
@@ -25,7 +26,7 @@ export function Chat() {
 
 	return (
 		<div className='bg-background flex h-dvh min-w-0 flex-col overflow-hidden overscroll-none'>
-			<Header>
+			<Header {...{ hideLogin }}>
 				<div className='flex h-full w-full items-center justify-start gap-2'>
 					<span className='font-bold'>Chat</span>
 					<Badge

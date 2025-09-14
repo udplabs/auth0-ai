@@ -5,6 +5,8 @@ import {
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
+import type { Accounts } from '@/types';
+
 export interface AccountSummaryProps extends React.ComponentProps<'div'> {
 	accounts?: Accounts.Account[];
 	AccountSummaryCardProps?: Omit<AccountSummaryCardProps, 'account' | 'ref'>;

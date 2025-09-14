@@ -1,3 +1,5 @@
+import type { Accounts } from '@/types';
+
 export const CurrencyField = ({
 	children = '**hidden**',
 	currencyCode = 'USD',

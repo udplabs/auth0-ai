@@ -8,6 +8,8 @@ import { neon } from '../../neon/client';
 import { prisma } from '../../prisma/client';
 import { getMessageById } from './query-messages';
 
+import type { Chat } from '@/types/chat';
+
 interface VoteMessageOptions {
 	userId?: string;
 }

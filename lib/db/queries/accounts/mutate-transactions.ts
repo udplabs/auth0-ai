@@ -1,6 +1,8 @@
 'use server';
 import { prisma } from '@/lib/db/prisma/client';
 import { updateBalances } from './mutate-accounts';
+
+import type { Transfers } from '@/types';
 interface CreateTransferInput extends Transfers.TransactionCreateInput {
 	fromAccountId: string;
 	toAccountId: string;

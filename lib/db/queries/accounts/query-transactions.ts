@@ -7,9 +7,11 @@ import {
 	Transaction as TransactionModel,
 } from '../../generated/prisma';
 import { prisma } from '../../prisma/client';
+
+import type { Transactions } from '@/types';
 export async function getTransactionsByAccountId(
 	accountId: string
-): Promise<Accounts.Transaction[]> {
+): Promise<Transactions.Transaction[]> {
 	const transactions = await prisma.transaction.findMany({
 		where: {
 			accountId,
@@ -17,12 +19,14 @@ export async function getTransactionsByAccountId(
 		orderBy: { date: 'desc' },
 	});
 
-	return convertToUI<TransactionModel[], Accounts.Transaction[]>(transactions);
+	return convertToUI<TransactionModel[], Transactions.Transaction[]>(
+		transactions
+	);
 }
 
 export async function getTransactionsByUserId(
 	userId: string
-): Promise<Accounts.Transaction[]> {
+): Promise<Transactions.Transaction[]> {
 	const accounts = await getAccountsByUserId(userId, true);
 
 	return accounts.flatMap(({ transactions = [] }) => transactions);
@@ -32,11 +36,13 @@ export async function getTransactionsByUserId(
 // DO NOT USE THIS IN ANY API ROUTES
 export async function getAllTransactions(
 	where?: Prisma.TransactionWhereInput
-): Promise<Accounts.Transaction[]> {
+): Promise<Transactions.Transaction[]> {
 	const transactions = await prisma.transaction.findMany({
 		orderBy: { date: 'desc' },
 		where,
 	});
 
-	return convertToUI<TransactionModel[], Accounts.Transaction[]>(transactions);
+	return convertToUI<TransactionModel[], Transactions.Transaction[]>(
+		transactions
+	);
 }

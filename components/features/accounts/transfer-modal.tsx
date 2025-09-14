@@ -19,6 +19,13 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 
+import type { Accounts, Transfers } from '@/types';
+
+interface TransferModalProps extends Transfers.TransferContext {
+	children?: React.ReactNode;
+	accounts?: Accounts.Account[];
+}
+
 export const TransferModal = ({
 	accounts = [],
 	fromAccountId,
@@ -40,7 +47,7 @@ export const TransferModal = ({
 	};
 
 	return (
-		<Dialog {...{ open, onOpenChange: () => toggleModal() }}>
+		<Dialog {...{ open, onOpenChange: () => toggleModal({ open: false }) }}>
 			<DialogContent className='sm:max-w-[425px]'>
 				<DialogHeader>
 					<DialogTitle>Transfer Money</DialogTitle>
@@ -146,7 +153,3 @@ export const TransferModal = ({
 		</Dialog>
 	);
 };
-interface TransferModalProps extends Transfers.TransferContext {
-	children?: React.ReactNode;
-	accounts?: Accounts.Account[];
-}

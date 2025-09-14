@@ -5,11 +5,13 @@ import type {
 	SampleDocument as SampleDocumentModel,
 } from '@/lib/db/generated/prisma';
 
+import type { Accounts, Documents, Transactions } from '@/types';
+
 type SampleAccount = Accounts.Account & {
 	lastSyncedAt?: Date;
 	expiresAt?: Date;
 };
-type SampleTransaction = Accounts.Transaction & {
+type SampleTransaction = Transactions.Transaction & {
 	lastSyncedAt?: Date;
 	expiresAt?: Date;
 };

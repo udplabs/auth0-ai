@@ -1,6 +1,5 @@
 'use server';
 
-import { omitBy } from 'lodash-es';
 import {
 	Prisma as Neon,
 	RemoteContent as RemoteContentModel,
@@ -14,6 +13,71 @@ import {
 } from '../generated/prisma';
 import { neon } from '../neon/client';
 import { prisma } from '../prisma/client';
+
+namespace Content {
+	export interface UIContent
+		extends Omit<
+				RemoteContentModel,
+				| 'createdAt'
+				| 'updatedAt'
+				| 'contentType'
+				| 'contentPlacement'
+				| 'mimeType'
+			>,
+			Omit<
+				LocalContentModel,
+				| 'createdAt'
+				| 'updatedAt'
+				| 'expiresAt'
+				| 'lastSyncedAt'
+				| 'contentType'
+				| 'mimeType'
+				| 'contentPlacement'
+			> {
+		createdAt?: string;
+		updatedAt?: string;
+		contentType: UIType;
+		contentPlacement?: UIContentPlacement;
+		embedding?: number[];
+		mimeType?: UIMimeType;
+	}
+
+	export type UIContentPlacement = 'aiya' | 'labs' | 'secret';
+
+	/**
+	 * GUIDE_: Presented to user as static content OR incorporated into response with adjustments.
+	 *
+	 * PROMPT_: Ingested as part of _system prompt_.
+	 *
+	 */
+	export type UIType =
+		| 'guide/step'
+		| 'guide/lab'
+		| 'prompt/step'
+		| 'prompt/system'
+		| 'prompt/lab'
+		| 'prompt/unknown'
+		| 'reference/code'
+		| 'unknown';
+
+	export type UIMimeType =
+		| 'text/markdown'
+		| 'text/plan'
+		| 'text/html'
+		| 'text/csv'
+		| 'application/json'
+		| 'application/xml'
+		| 'application/typescript';
+
+	export interface GetParams {
+		key?: QueryKeys;
+		query?: string;
+		contentPlacement?: UIContentPlacement;
+		contentType?: UIType;
+	}
+
+	type QueryKeys = 'name' | 'filename' | 'labStep';
+}
 
 function getContentType(contentType: Content.UIType) {
 	const dbContentType = contentType
@@ -44,6 +108,7 @@ function getUIContentType(contentType: ContentType | null) {
 	if (contentType !== null) {
 		return contentType.replace('_', '/').toLowerCase() as Content.UIType;
 	}
+	return 'unknown';
 }
 function getUIContentPlacement(contentPlacement: ContentPlacement | null) {
 	if (contentPlacement !== null) {
@@ -259,26 +324,24 @@ function UIContent(
 ): Content.UIContent | Content.UIContent[] {
 	const isArray = Array.isArray(content);
 	const _content = isArray ? content : [content];
-	const result = _content.map((c) =>
-		omitBy<Content.UIContent>(
-			{
-				...c,
-				contentPlacement: getUIContentPlacement(c?.contentPlacement),
-				contentType: getUIContentType(c.contentType),
-				mimeType: getUIMimeType(c.mimeType),
-				createdAt: c.createdAt.toISOString(),
-				updatedAt: c.updatedAt.toISOString(),
-			},
-			(value: any, key: string) => {
-				if (value == null || ['expiresAt', 'lastSyncedAt'].includes(key)) {
-					return true;
-				}
-				return false;
+	const omitAlways = new Set<keyof any>(['expiresAt', 'lastSyncedAt']);
+	const cleaned = _content.map<Content.UIContent>((c) => {
+		const ui: Content.UIContent = {
+			...c,
+			contentPlacement: getUIContentPlacement(c?.contentPlacement),
+			contentType: getUIContentType(c.contentType),
+			mimeType: getUIMimeType(c.mimeType),
+			createdAt: c.createdAt.toISOString(),
+			updatedAt: c.updatedAt.toISOString(),
+		};
+
+		for (const key of Object.keys(ui) as (keyof typeof ui)[]) {
+			if (ui[key] == null || omitAlways.has(key)) {
+				delete ui[key];
 			}
-		)
-	) as Content.UIContent[];
+		}
+		return ui;
+	});
 
-	if (isArray) return result;
-
-	return result[0];
+	return isArray ? cleaned : cleaned[0];
 }

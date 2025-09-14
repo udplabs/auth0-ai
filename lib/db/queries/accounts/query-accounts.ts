@@ -4,6 +4,8 @@ import { convertToUI } from '@/lib/utils/db-converter';
 import { Account as AccountModel, Prisma } from '../../generated/prisma';
 import { prisma } from '../../prisma/client';
 
+import type { Accounts, Transactions } from '@/types';
+
 export async function getExternalAccountsByUserId(userId: string) {
 	const dbAccounts = await prisma.account.findMany({
 		where: { customerId: userId, isExternal: true },
