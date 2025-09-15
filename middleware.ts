@@ -3,7 +3,6 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
 	if (!auth0) {
-		console.warn('Auth0 client is not initialized. Follow the lab guide!');
 		return;
 	}
 
