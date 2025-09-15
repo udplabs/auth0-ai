@@ -1,7 +1,7 @@
 import { AccountDetailsCard } from '@/components/features/accounts/account-details-card';
-import { TransactionsList } from '@/components/features/accounts/transactions-list';
+import { TransactionsCard } from '@/components/features/accounts/transactions-card';
 import { Header } from '@/components/layout/header';
-import { getUser } from '@/lib/auth0';
+import { getUser } from '@/lib/auth0/client';
 
 import type { Metadata } from 'next';
 
@@ -33,7 +33,7 @@ export default async function AccountDetailsPage({
 						<AccountDetailsCard {...{ accountId }} />
 					</div>
 					<div className='md:col-span-2'>
-						<TransactionsList {...{ accountId }} />
+						<TransactionsCard {...{ accountId }} />
 					</div>
 				</div>
 			</div>
