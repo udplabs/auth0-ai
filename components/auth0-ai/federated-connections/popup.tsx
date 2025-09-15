@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { Loader } from '@/components/ui/ai-elements/loader';
 import { PromptUserContainer } from '../util/prompt-user-container';
-import type { FederatedConnectionAuthProps } from './FederatedConnectionAuthProps';
+import type { FederatedConnectionAuthProps } from './federated-connection-auth-props';
 
 export function EnsureAPIAccessPopup({
 	interrupt: { connection, requiredScopes, resume },
