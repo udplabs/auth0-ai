@@ -10,11 +10,11 @@ import { useAccounts } from '@/hooks/use-accounts';
 import { LS_KEY_AUTH, LS_KEY_FIRST } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import {
-	BugOffIcon,
-	CirclePowerIcon,
+	CircleArrowOutUpRightIcon,
 	EyeIcon,
 	FileStackIcon,
 	LockIcon,
+	RefreshCcwDot,
 	RotateCcwIcon,
 	WandSparkles,
 	WrenchIcon,
@@ -57,6 +57,43 @@ export const FAB = () => {
 				)}
 			>
 				<div className='z-99 flex flex-col-reverse items-end gap-y-2'>
+					<div className='flex items-center gap-2'>
+						Resend 'first-message'
+						<Button
+							className='h-8 w-8 rounded-full p-4'
+							variant='warning'
+							onClick={() => {
+								localStorage.removeItem(LS_KEY_FIRST);
+								localStorage.removeItem(LS_KEY_AUTH);
+								redirect('/chat');
+							}}
+						>
+							<CircleArrowOutUpRightIcon className='h-5 w-5' />
+						</Button>
+					</div>
+					<div className='flex items-center gap-2'>
+						Resend 'authenticated-message'
+						<Button
+							className='h-8 w-8 rounded-full p-4'
+							variant='warning'
+							onClick={() => {
+								localStorage.setItem(LS_KEY_AUTH, 'false');
+								redirect('/chat');
+							}}
+						>
+							<RotateCcwIcon className='h-5 w-5' />
+						</Button>
+					</div>
+					<div className='flex items-center gap-2'>
+						Reset Account Permissions
+						<Button
+							className='h-8 w-8 rounded-full p-4'
+							variant='destructive'
+							onClick={() => resetPermissions()}
+						>
+							<RefreshCcwDot className='h-5 w-5' />
+						</Button>
+					</div>
 					<div className='flex items-center gap-2'>
 						Initialize Vector Store
 						<Button
@@ -101,42 +138,6 @@ export const FAB = () => {
 							onClick={() => handleVectorSummary()}
 						>
 							<EyeIcon className='h-5 w-5' />
-						</Button>
-					</div>
-					<div className='flex items-center gap-2'>
-						Resend 'first-message'
-						<Button
-							className='h-8 w-8 rounded-full p-4'
-							variant='destructive'
-							onClick={() => {
-								localStorage.removeItem(LS_KEY_FIRST);
-								redirect('/chat');
-							}}
-						>
-							<BugOffIcon className='h-5 w-5' />
-						</Button>
-					</div>
-					<div className='flex items-center gap-2'>
-						Resend 'authenticated-message'
-						<Button
-							className='h-8 w-8 rounded-full p-4'
-							variant='destructive'
-							onClick={() => {
-								localStorage.removeItem(LS_KEY_AUTH);
-								redirect('/chat');
-							}}
-						>
-							<CirclePowerIcon className='h-5 w-5' />
-						</Button>
-					</div>
-					<div className='flex items-center gap-2'>
-						Reset Account Permissions
-						<Button
-							className='h-8 w-8 rounded-full p-4'
-							variant='destructive'
-							onClick={() => resetPermissions()}
-						>
-							<LockIcon className='h-5 w-5' />
 						</Button>
 					</div>
 				</div>
