@@ -1,11 +1,9 @@
-import {
-	Authenticators,
-	DebugCard,
-	LinkedAccounts,
-	UserProfileCard,
-} from '@/components/features/user-profile';
+import { Authenticators } from '@/components/features/user-profile/authenticators/authenticators';
+import { DebugCard } from '@/components/features/user-profile/debug-card';
+import { LinkedAccounts } from '@/components/features/user-profile/linked-accounts';
+import { UserProfileCard } from '@/components/features/user-profile/user-profile-card';
 import { Header } from '@/components/layout/header';
-import { getSession } from '@/lib/auth0';
+import { getSession } from '@/lib/auth0/client';
 import { redirect } from 'next/navigation';
 
 import type { Metadata } from 'next';

@@ -53,6 +53,7 @@ If multiple are missing, group them minimally: “Need: from account, to account
 - Theme preference change (dark/light): `toggleTheme`
 - Durable preference, remembered fact, or lab progress: `userSettings`
 - Retrieve lab or step documentation: `getContent`
+- Fetch all source code content for a specific step: `getStepCode`
 - Fetch source file contents for coding help: `getReferenceFile`
 - MFA enrollment (push): `pushEnroll`
 
@@ -114,20 +115,21 @@ Action: `getContent` (with step identifier if known or ask for clarification if 
 If no tool was needed (pure explanation): be concise and, if appropriate, suggest a tool the user can invoke next.
 
 ## 13. Tool Invocation Summary (Cheat Sheet)
-| Intent                                   | Tool                |
-| ---------------------------------------- | ------------------- |
-| Accounts overview                        | getAccounts         |
-| External accounts (list)                 | getExternalAccounts |
-| Add external/bank link                   | addExternalAccount  |
-| Generic transaction list                 | getTransactions     |
-| Semantic / fuzzy query                   | searchTransactions  |
-| Money movement                           | transferFunds       |
-| User profile info                        | getUserProfile      |
-| Theme toggle                             | toggleTheme         |
-| Save preference/progress                 | userSettings        |
-| Lab docs / step content                  | getContent          |
-| Get source code relevant to current step | getStepCode         |
-| Specific source code file contents       | getReferenceFile    |
-| Enroll push MFA                          | pushEnroll          |
+| Intent                                                 | Tool                |
+| ------------------------------------------------------ | ------------------- |
+| Accounts overview                                      | getAccounts         |
+| External accounts (list)                               | getExternalAccounts |
+| Add external/bank link                                 | addExternalAccount  |
+| Generic transaction list                               | getTransactions     |
+| Semantic / fuzzy query                                 | searchTransactions  |
+| Money movement                                         | transferFunds       |
+| User profile info                                      | getUserProfile      |
+| Theme toggle                                           | toggleTheme         |
+| Save preference/progress                               | userSettings        |
+| Lab docs / step content                                | getContent          |
+| Get source code relevant to current step               | getStepCode         |
+| Specific source code file contents for a specific step | getStepCode         |
+| Specific source code file contents                     | getReferenceFile    |
+| Enroll push MFA                                        | pushEnroll          |
 
 Follow this guide exactly. If a rule here conflicts with prompt‑00, prompt‑00 (Core Prompt) prevails.

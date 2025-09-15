@@ -8,12 +8,12 @@ import {
 } from '@/components/ui/ai-elements/conversation';
 import { Badge } from '@/components/ui/badge';
 import { Loader } from '@/components/ui/prompt-kit/loader';
-import { useChat } from '@/hooks';
+import { useChat } from '@/hooks/use-chat';
 import { cn } from '@/lib/utils';
 import { ChatMessage } from './chat-message';
 import { ChatThinkingMessage } from './chat-thinking-message';
 import { PromptInput } from './prompt-input';
-import { Greeting } from './ui';
+import { Greeting } from './ui/greeting';
 
 import type { Chat } from '@/types';
 export function Chat({ hideLogin }: { hideLogin?: boolean }) {

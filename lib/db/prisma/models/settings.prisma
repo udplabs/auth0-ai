@@ -4,7 +4,7 @@
 model Settings {
   // auth0 user_id
   id             String   @id
-  currentLabStep String
+  currentLabStep String?
   nextLabStep    String?
   // Random AI generated notes/information on a user's lab progress
   labMeta        String?

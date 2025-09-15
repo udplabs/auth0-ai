@@ -1,4 +1,4 @@
-import { getUser } from '@/lib/auth0';
+import { getUser } from '@/lib/auth0/client';
 import { createTransfer } from '@/lib/db/queries/accounts/mutate-transactions';
 import { APIError, handleApiError } from '@/lib/errors';
 import { revalidateTag } from 'next/cache';

@@ -1,5 +1,5 @@
 import { saveChatAction } from '@/app/(chat)/api/actions';
-import { getUser } from '@/lib/auth0';
+import { getUser } from '@/lib/auth0/client';
 import { APIError } from '@/lib/errors';
 import { z } from 'zod';
 import { PostRequestBodySchema } from './schemas';

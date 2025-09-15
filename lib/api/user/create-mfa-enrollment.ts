@@ -1,4 +1,4 @@
-import { auth0Management } from '@/lib/auth0';
+import { auth0Management } from '@/lib/auth0/management-client';
 
 type AuthenticatorType = 'totp' | 'sms' | 'push' | 'email';
 

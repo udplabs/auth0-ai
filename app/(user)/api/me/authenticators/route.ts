@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
-import { getAuthenticators } from '@/lib/api/user';
-import { getUser } from '@/lib/auth0';
+import { getAuthenticators } from '@/lib/api/user/get-authenticators';
+import { getUser } from '@/lib/auth0/client';
 import { handleApiError } from '@/lib/errors';
 // Get user authenticators
 export async function GET() {

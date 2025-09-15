@@ -1,4 +1,4 @@
-import { getUser } from '@/lib/auth0';
+import { getUser } from '@/lib/auth0/client';
 import { syncContent } from '@/lib/db/queries/content';
 import { upsertSettings } from '@/lib/db/queries/settings';
 import { APIError, handleApiError } from '@/lib/errors';

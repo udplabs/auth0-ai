@@ -11,14 +11,18 @@ import {
 	type ToolOutputProps,
 	type ToolProps,
 } from '@/components/ui/ai-elements/tool';
+import { useDataStream } from '@/hooks/use-data-stream';
+import type { UserProfile } from '@/hooks/use-user-profile';
+import type { Accounts } from '@/types/accounts';
+import type { Chat } from '@/types/chat';
+import type { Transactions } from '@/types/transactions';
 import { ToolUIPart } from 'ai';
+import { TransactionsList } from '../features/accounts/transactions-list';
+import type { DataStream } from '../providers/data-stream-provider';
 import { CodeBlock } from '../ui/ai-elements/code-block';
 import { AccountSummary } from './account-summary';
 import { ChatActionCard } from './chat-action-card';
 import { Weather, type WeatherAtLocationData } from './weather';
-
-import type { UserProfile } from '@/hooks/use-user-profile';
-import type { Accounts, Chat } from '@/types';
 
 export type ToolPart = ToolUIPart;
 
@@ -33,7 +37,7 @@ export interface ToolResultProps extends ToolProps {
 type ToolType = Chat.ToolPart['type'];
 
 const renderByType: Partial<
-	Record<ToolType, (part: ToolPart) => React.ReactNode>
+	Record<ToolType, (part: ToolPart, dataStream?: DataStream) => React.ReactNode>
 > = {
 	'tool-getWeather': (part) => {
 		const data = getToolOutput<WeatherAtLocationData>(part);
@@ -50,9 +54,41 @@ const renderByType: Partial<
 			/>
 		);
 	},
-	'tool-getAccounts': (part) => {
+	'tool-getAccounts': (part, dataStream = []) => {
+		// This should always be empty
 		const accounts = getToolOutput<Accounts.Account[]>(part) ?? [];
+
+		if (accounts.length === 0 && dataStream.length > 0) {
+			const stream = dataStream.find((s) => s.id === part.toolCallId);
+
+			if (stream) {
+				return (
+					<AccountSummary
+						accounts={(stream?.data as Accounts.Account[]) || []}
+					/>
+				);
+			}
+		}
+
 		return <AccountSummary {...{ accounts }} />;
+	},
+	'tool-getTransactions': (part, dataStream = []) => {
+		// This should always be empty
+		const transactions = getToolOutput<Transactions.Transaction[]>(part) ?? [];
+
+		if (transactions.length === 0 && dataStream.length > 0) {
+			const stream = dataStream.find((s) => s.id === part.toolCallId);
+
+			if (stream) {
+				return (
+					<TransactionsList
+						{...{ transactions: stream?.data as Transactions.Transaction[] }}
+					/>
+				);
+			}
+		}
+
+		return <TransactionsList {...{ transactions }} />;
 	},
 	'tool-getUserProfile': (part) => {
 		const data = getToolOutput<UserProfile>(part);
@@ -77,11 +113,16 @@ export const ToolResult = ({
 		return null;
 	}
 
+	const { dataStream } = useDataStream();
+
 	const { input, type } = toolPart;
 	const output = toolPart?.output as unknown as Chat.ToolsResponse;
 	const errorText = output?.error?.message;
 	const state = !!errorText ? 'output-error' : toolPart?.state;
-	const widget = renderByType[toolPart.type as ToolType]?.(toolPart);
+	const widget = renderByType[toolPart.type as ToolType]?.(
+		toolPart,
+		dataStream
+	);
 
 	// Hide certain internal tools
 	if (['tool-getContent', 'tool-userSettings'].includes(toolPart.type)) {
@@ -90,6 +131,7 @@ export const ToolResult = ({
 
 	return (
 		<div className='items-stretch, flex w-full flex-col-reverse gap-3'>
+			{widget}
 			<Tool {...props}>
 				<ToolHeader {...{ ...ToolHeaderProps, type, state }} />
 				<ToolContent {...ToolContentProps}>
@@ -114,7 +156,6 @@ export const ToolResult = ({
 					)}
 				</ToolContent>
 			</Tool>
-			{widget}
 		</div>
 	);
 };

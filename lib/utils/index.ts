@@ -1,10 +1,18 @@
-export { chunk } from './chunking';
-export { convertToDB, convertToUI } from './db-converter';
-export { fetchWithErrorHandlers, fetcher } from './fetch';
-export { getCacheKey } from './get-cache-key';
-export { getLastPart } from './get-last-part';
-export { getSearchParams } from './get-search-params';
-export { groupItemsByDate } from './group-items-by-date';
-export * from './utils';
-export { withStaticContent } from './with-static-content';
-export { withStreamingJitter } from './with-streaming-jitter';
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+	return twMerge(clsx(inputs));
+}
+
+export function sortBy<T, K extends keyof T>(array: readonly T[], key: K) {
+	return [...array].toSorted((a: T, b: T) => {
+		const av = a[key] as any;
+		const bv = b[key] as any;
+
+		if (av == null && bv == null) return 0;
+		if (av == null) return 1;
+		if (bv == null) return -1;
+		return av < bv ? -1 : av > bv ? 1 : 0;
+	});
+}

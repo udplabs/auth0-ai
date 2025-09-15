@@ -4,7 +4,7 @@ import {
 } from '@/components/animated-button';
 import { Button } from '@/components/ui/button';
 import { useChatHistory } from '@/hooks/use-chat-history';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils';
 import { PlusIcon } from 'lucide-react';
 
 export interface NewChatButtonProps

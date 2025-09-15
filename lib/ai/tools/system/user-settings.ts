@@ -1,4 +1,4 @@
-import { getUser } from '@/lib/auth0';
+import { getUser } from '@/lib/auth0/client';
 import { upsertSettings } from '@/lib/db/queries/settings';
 import { tool } from 'ai';
 import { z } from 'zod';

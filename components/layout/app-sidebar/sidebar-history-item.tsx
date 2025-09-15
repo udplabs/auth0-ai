@@ -3,7 +3,7 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { useChatHistory } from '@/hooks';
+import { useChatHistory } from '@/hooks/use-chat-history';
 import { TrashIcon } from 'lucide-react';
 import Link from 'next/link';
 import { memo } from 'react';

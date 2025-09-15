@@ -10,7 +10,8 @@ import {
 } from '@/components/ui/card';
 import { useAccounts } from '@/hooks/use-accounts';
 import { startCase } from 'lodash-es';
-import { CurrencyField, DateField } from './ui';
+import { CurrencyField } from './ui/currency-field';
+import { DateField } from './ui/date-field';
 
 import type { Accounts } from '@/types';
 

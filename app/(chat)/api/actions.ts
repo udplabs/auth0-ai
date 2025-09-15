@@ -2,8 +2,10 @@
 
 import { openai } from '@/lib/ai/openai';
 import { chatKey } from '@/lib/api/chat/get-chat';
-import { saveChat, saveMessages } from '@/lib/db/queries/chat';
-import { chunk, withStreamingJitter } from '@/lib/utils';
+import { saveChat } from '@/lib/db/queries/chat/mutate-chats';
+import { saveMessages } from '@/lib/db/queries/chat/mutate-messages';
+import { chunk } from '@/lib/utils/chunking';
+import { withStreamingJitter } from '@/lib/utils/with-streaming-jitter';
 import {
 	type UIMessage,
 	type UIMessageStreamWriter,

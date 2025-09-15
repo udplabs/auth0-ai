@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { VerifiedBadge } from '../verified-badge';
 
-import { useAuthenticators } from '@/hooks';
+import { useAuthenticators } from '@/hooks/use-authenticators';
 import {
 	FaFingerprint as BiometricIcon,
 	FaEnvelope as EmailIcon,

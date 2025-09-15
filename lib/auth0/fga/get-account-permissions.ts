@@ -154,7 +154,7 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 		}
 
 		// Helpful in the lab to see what was granted.
-		console.log('Account Permissions:', permissions);
+		// console.log('Account Permissions:', permissions);
 
 		return copy as Accounts.Account;
 	});

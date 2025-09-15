@@ -34,8 +34,6 @@ export function withStaticContent<
 
 		let onFinish: () => Promise<void> | void = () => {};
 
-		console.log('withStaticContent...');
-
 		const lastMessage =
 			messages.length === 1 ? messages[0] : messages[messages.length - 1];
 
@@ -47,7 +45,6 @@ export function withStaticContent<
 
 		if (lastPart?.type === 'text') {
 			if (lastPartUpper.includes('MY FIRST MESSAGE')) {
-				console.log('returning intro...');
 				contentId = '01K3VDGK1XKJR87HZZS1JY57HJ';
 				onFinish = async () => {
 					// If user is somehow authenticated...
@@ -65,7 +62,6 @@ export function withStaticContent<
 				lastPartUpper.includes('SUCCESSFULLY AUTHENTICATED') &&
 				userId
 			) {
-				console.log('returning post auth...');
 				contentId = '01K3VDJ331E72V2RE00M81J9WR';
 
 				onFinish = async () => {

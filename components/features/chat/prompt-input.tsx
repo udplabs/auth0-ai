@@ -8,7 +8,9 @@ import {
 	type PromptInputSubmitProps,
 	type PromptInputTextareaProps,
 } from '@/components/ui/ai-elements/prompt-input';
-import { useChat, useChatHistory, useSuggestions } from '@/hooks';
+import { useChat } from '@/hooks/use-chat';
+import { useChatHistory } from '@/hooks/use-chat-history';
+import { useSuggestions } from '@/hooks/use-suggestions';
 import { cn } from '@/lib/utils';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';

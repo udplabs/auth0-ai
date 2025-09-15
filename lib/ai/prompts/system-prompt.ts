@@ -23,8 +23,6 @@ export async function getSystemPrompts({
 
 	prompts.push(...(await getRequestPromptFromHints(hints)));
 
-	console.log('System Prompts Loaded:', prompts.length);
-
 	return prompts.flat().join('\n\n');
 }
 
@@ -48,8 +46,6 @@ export async function getRequestPromptFromHints({
 async function getPrompts(settings?: Partial<UISettings>) {
 	const systemPrompts = sortBy(await getDBSystemPrompts(), 'name');
 
-	console.log('=== found', systemPrompts.length, 'system prompts ===');
-
 	// Defaulting to Step 2 as it is the first step
 	// User will not be authenticated and will not have settings
 	const { currentLabStep, nextLabStep } = settings || {};
@@ -60,13 +56,9 @@ async function getPrompts(settings?: Partial<UISettings>) {
 	if (labStep) {
 		const stepPrompts = sortBy(await getStepPrompts(labStep), 'name');
 
-		console.log('=== found', stepPrompts.length, 'step prompts ===');
-
 		systemPrompts.push(...stepPrompts);
 
 		const guidePrompts = sortBy(await getStepGuides(labStep), 'name');
-
-		console.log('=== found', guidePrompts.length, 'guides ===');
 
 		systemPrompts.push(...guidePrompts);
 	}
@@ -77,8 +69,6 @@ async function getPrompts(settings?: Partial<UISettings>) {
 		for (const prompt of systemPrompts) {
 			const { textData, name, contentType, mimeType } = prompt;
 			if (mimeType?.toUpperCase().startsWith('TEXT')) {
-				console.log(`loading prompt: ${name}`);
-
 				if (contentType === 'guide/step') {
 					// Wrap guide so Aiya knows it's the guide
 					prompts.push(
@@ -90,6 +80,5 @@ async function getPrompts(settings?: Partial<UISettings>) {
 		}
 	}
 
-	console.log('loaded', prompts.length, 'prompts');
 	return prompts;
 }

@@ -1,6 +1,6 @@
 // app/(accounts)/api/accounts/route.ts
-import { getAccounts } from '@/lib/api/accounts';
-import { getUser } from '@/lib/auth0';
+import { getAccounts } from '@/lib/api/accounts/get-accounts';
+import { getUser } from '@/lib/auth0/client';
 import { deleteAllUserTuples } from '@/lib/auth0/fga/utils';
 import { generateMockEmbeddings } from '@/lib/db/mock/mock-accounts';
 import { deleteAccountData } from '@/lib/db/queries/accounts/mutate-accounts';

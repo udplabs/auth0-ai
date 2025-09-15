@@ -2,7 +2,7 @@
 
 import { type Chat as ChatModel, Prisma } from '@/lib/db/generated/prisma';
 import { APIError } from '@/lib/errors';
-import { convertToDB } from '@/lib/utils';
+import { convertToDB } from '@/lib/utils/db-converter';
 import { neon } from '../../neon/client';
 import { prisma } from '../../prisma/client';
 import { saveAppInstance } from '../settings';

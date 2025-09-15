@@ -1,6 +1,6 @@
 import { resetAccountPermissions } from '@/lib/api/accounts/reset-account-permissions';
 
-import { getUser } from '@/lib/auth0';
+import { getUser } from '@/lib/auth0/client';
 
 // Handles resetting account permissions
 export async function DELETE() {

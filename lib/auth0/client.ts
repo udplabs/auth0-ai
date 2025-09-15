@@ -1,4 +1,7 @@
 // lib/auth0/client.ts
+import { Auth0Client } from '@auth0/nextjs-auth0/server';
+import type { SessionData, User } from '@auth0/nextjs-auth0/types';
+import { APIError } from '../errors';
 /**
  * Auth0 server helpers used by the lab.
  *
@@ -26,10 +29,6 @@
  * - getSession(true) and getUser(true) throw APIError('unauthorized:auth') if missing.
  * - getSession() and getUser() return null/undefined instead of throwing.
  */
-
-import { Auth0Client } from '@auth0/nextjs-auth0/server';
-import type { SessionData, User } from '@auth0/nextjs-auth0/types';
-import { APIError } from '../errors';
 
 /**
  * Server-side Auth0 client used to read/update the session.

@@ -1,6 +1,6 @@
 import { Input, type InputProps } from '@/components/ui/input';
 import { Label, LabelProps } from '@/components/ui/label';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils';
 import { Skeleton } from './skeleton';
 
 export const TextField = ({

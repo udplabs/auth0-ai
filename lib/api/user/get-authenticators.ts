@@ -1,6 +1,6 @@
 import { auth0Management } from '@/lib/auth0/management-client';
 import { APIError } from '@/lib/errors';
-import { getCacheKey } from '@/lib/utils';
+import { getCacheKey } from '@/lib/utils/get-cache-key';
 import { unstable_cache } from 'next/cache';
 
 async function fetchAuthenticators(id: string) {

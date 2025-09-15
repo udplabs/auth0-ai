@@ -33,7 +33,7 @@ export async function createAccounts({
 	createEmbeddings = false,
 }: CreateAccountsOptions) {
 	const { saveAccountsAndReturnSeparate } = await import(
-		'@/lib/db/queries/accounts'
+		'@/lib/db/queries/accounts/mutate-accounts'
 	);
 	// 1) Save accounts and transactions to DB
 	const { accounts: newAccounts, transactions: newTransactions } =

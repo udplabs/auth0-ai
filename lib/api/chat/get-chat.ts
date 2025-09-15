@@ -1,5 +1,8 @@
-import { getChatById, listChatsByUserId } from '@/lib/db/queries/chat';
-import { getCacheKey } from '@/lib/utils';
+import {
+	getChatById,
+	listChatsByUserId,
+} from '@/lib/db/queries/chat/query-chats';
+import { getCacheKey } from '@/lib/utils/get-cache-key';
 import { unstable_cache } from 'next/cache';
 
 /**

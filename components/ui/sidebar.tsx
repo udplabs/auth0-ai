@@ -12,7 +12,7 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils';
 import { Slot } from '@radix-ui/react-slot';
 import { type VariantProps, cva } from 'class-variance-authority';
 import { Loader2Icon, PanelLeft } from 'lucide-react';

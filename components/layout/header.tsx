@@ -1,7 +1,7 @@
 'use client';
 
 import { NewChatButton } from '@/components/features/chat/ui/new-chat-button';
-import { SidebarToggle } from '@/components/layout/app-sidebar';
+import { SidebarToggle } from '@/components/layout/app-sidebar/sidebar-toggle';
 import { ModeToggle } from '@/components/mode-toggle';
 import { Button } from '@/components/ui/button';
 import { useSidebar } from '@/components/ui/sidebar';
@@ -64,27 +64,33 @@ export function Header({
 			{!hideSecondaryActions && (
 				<div className='order-5 flex flex-1 items-center justify-end gap-2 md:ml-auto'>
 					{(() => {
-						if (hideLogin) return null;
+						const showLogout = user && showIcons;
+						const showLogin = !hideLogin && !user && showIcons;
+						const showSignup = !hideLogin && !user;
 
-						if (user && showIcons) {
-							<Button
-								className='order-1 h-[34px]'
-								href='/auth/logout'
-							>
-								Log Out
-							</Button>;
+						if (showLogout) {
+							return (
+								<Button
+									className='order-1 h-[34px]'
+									href='/auth/logout'
+								>
+									Log Out
+								</Button>
+							);
 						}
 
 						return (
 							<>
-								<Button
-									className='order-1 h-[34px]'
-									href='/auth/login?screen_hint=signup'
-									variant='outline'
-								>
-									Sign Up
-								</Button>
-								{showIcons && (
+								{showSignup && (
+									<Button
+										className='order-1 h-[34px]'
+										href='/auth/login?screen_hint=signup'
+										variant='outline'
+									>
+										Sign Up
+									</Button>
+								)}
+								{showLogin && (
 									<Button
 										className='order-1 h-[34px]'
 										href='/auth/login'

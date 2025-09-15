@@ -1,5 +1,5 @@
 import { openai } from '@/lib/ai/openai';
-import { getAllTransactions } from '@/lib/db/queries/accounts';
+import { getAllTransactions } from '@/lib/db/queries/accounts/query-transactions';
 import { getDocuments } from '@/lib/db/queries/documents';
 import { cosineSimilarity, embed } from 'ai';
 import { createDocumentsWithEmbeddings } from './create-documents';
