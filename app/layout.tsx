@@ -20,9 +20,11 @@
  */
 
 import { FAB } from '@/components/fab';
-import { AppSidebar } from '@/components/layout/app-sidebar';
+import { AppSidebar } from '@/components/layout/app-sidebar/app-sidebar';
 import { Bootstrap } from '@/components/layout/bootstrap';
-import { SWRProvider, ThemeProvider } from '@/components/providers';
+import { DataStreamProvider } from '@/components/providers/data-stream-provider';
+import { SWRProvider } from '@/components/providers/swr-provider';
+import { ThemeProvider } from '@/components/providers/theme-provider';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import type { Metadata } from 'next';
@@ -88,8 +90,7 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
 	// Read cookie to restore sidebar state (cookie value 'true' => open).
 	const cookieStore = await cookies();
-	const isCollapsed =
-		cookieStore.get('sidebar:state')?.value == 'true' || false;
+	const defaultOpen = cookieStore.get('sidebar:state')?.value == 'true';
 
 	return (
 		<html
@@ -113,22 +114,24 @@ export default async function RootLayout({
 					disableTransitionOnChange
 				>
 					<SWRProvider>
-						<Toaster
-							position='top-right'
-							richColors
-						/>
-						<SidebarProvider defaultOpen={!isCollapsed}>
-							{/* App chrome (navigation) */}
-							<AppSidebar />
-							<SidebarInset className='overflow-none overscroll-none'>
-								{children}
-							</SidebarInset>
-							{/* Floating Action Button for local developer tools (e.g., open chat) */}
-							<div className={cn('fixed right-6 bottom-5 z-50', 'top-1/2')}>
-								<FAB />
-							</div>
-						</SidebarProvider>
-						<Bootstrap />
+						<DataStreamProvider>
+							<Toaster
+								position='top-right'
+								richColors
+							/>
+							<SidebarProvider {...{ defaultOpen }}>
+								{/* App chrome (navigation) */}
+								<AppSidebar />
+								<SidebarInset className='overflow-none overscroll-none'>
+									{children}
+								</SidebarInset>
+								{/* Floating Action Button for local developer tools (e.g., open chat) */}
+								<div className={cn('fixed right-6 bottom-5 z-50', 'top-1/2')}>
+									<FAB />
+								</div>
+							</SidebarProvider>
+							<Bootstrap />
+						</DataStreamProvider>
 					</SWRProvider>
 				</ThemeProvider>
 			</body>
