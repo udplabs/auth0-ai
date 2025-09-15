@@ -1,3 +1,17 @@
+import { toast } from '@/components/toast';
+import { ToastError } from '@/components/toast-error';
+import { useSidebar } from '@/components/ui/sidebar';
+import { APIError } from '@/lib/errors';
+import { useUser } from '@auth0/nextjs-auth0';
+import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { toast as sonnerToast } from 'sonner';
+import type { SWRResponse } from 'swr';
+import useSWR from 'swr';
+import { ulid } from 'ulid';
+
+import type { Chat } from '@/types/chat';
+import { isEqual } from 'date-fns';
 /**
  * useChatHistory
  *
@@ -19,19 +33,6 @@
  * - Integrate rate limiting or debounce for rapid deletes.
  * - Persist last viewed chat ID in user settings (so redirect after login restores context).
  */
-import { toast } from '@/components/toast';
-import { ToastError } from '@/components/toast-error';
-import { useSidebar } from '@/components/ui/sidebar';
-import { APIError } from '@/lib/errors';
-import { useUser } from '@auth0/nextjs-auth0';
-import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { toast as sonnerToast } from 'sonner';
-import type { SWRResponse } from 'swr';
-import useSWR from 'swr';
-import { ulid } from 'ulid';
-
-import type { Chat } from '@/types/chat';
 
 const key = '/api/chat?grouped=true';
 
@@ -71,14 +72,13 @@ export function useChatHistory() {
 
 	const [loading, setLoading] = useState(false);
 
-	const newChat = (id?: string, redirect = true) => {
+	const newChat = (redirect = true) => {
 		setOpenMobile(false);
 
 		const createdAt = new Date().toISOString();
-		const chatId = id || ulid();
 
 		const newChat: Chat.UIChat = {
-			id: chatId,
+			id: pathId,
 			title: 'New Chat',
 			createdAt,
 			updatedAt: createdAt,
@@ -97,13 +97,16 @@ export function useChatHistory() {
 				}
 				return {
 					...current,
-					today: [newChat, ...current?.today],
+					today: arrayUpsert(current.today, newChat, 'id'),
 				};
 			},
 			{ revalidate: false, populateCache: true }
 		);
 
-		if (redirect) router.replace(`/chat/${chatId}`);
+		if (redirect) {
+			console.log('redirecting...');
+			router.push('/chat');
+		}
 	};
 
 	/**
@@ -125,7 +128,8 @@ export function useChatHistory() {
 		});
 
 		// (2) If deleting the currently open chat, navigate to a fresh session.
-		if (chatId === id) {
+		if (chatId === pathId) {
+			console.log('Navigating to new chat...');
 			newChat();
 		}
 
@@ -201,4 +205,24 @@ function removeFromGroups(
 		lastMonth: out(groups.lastMonth),
 		older: out(groups.older),
 	};
+}
+
+function arrayUpsert<T>(
+	array: T[],
+	item: T,
+	isEqual: string | ((a: T, b: T) => boolean),
+	prepend = true
+): T[] {
+	const checker =
+		typeof isEqual === 'function'
+			? isEqual
+			: (a: T, b: T) => (a as any)[isEqual] === (b as any)[isEqual];
+	const index = array.findIndex((i) => checker(i, item));
+	if (index !== -1) {
+		// replace in position
+		const copy = array.slice();
+		copy[index] = item;
+		return copy;
+	}
+	return prepend ? [item, ...array] : [...array, item];
 }
