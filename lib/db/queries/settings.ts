@@ -30,7 +30,7 @@ export async function upsertSettings(
 	// Build base data object
 	// - coerce ISO strings to Date for createdAt/updatedAt
 	const _data = Object.entries({
-		currentLabStep: 'UNKNOWN',
+		currentLabStep: null,
 		...rest,
 		createdAt:
 			typeof createdAt === 'string'
@@ -127,14 +127,10 @@ export async function saveAppInstance() {
 		? (await readFile(filepath, 'utf8')).trim()
 		: undefined;
 
-	console.log('localAppInstance:', localAppInstance);
-
 	const auth0ClientId = process.env.AUTH0_CLIENT_ID || null;
 	const auth0Domain = process.env.AUTH0_DOMAIN || null;
 
-	const [id = ulid(), hash] = localAppInstance
-		? localAppInstance?.split('|')
-		: [];
+	const [id = ulid()] = localAppInstance ? localAppInstance?.split('|') : [];
 
 	const str = [];
 
@@ -148,7 +144,6 @@ export async function saveAppInstance() {
 	const appInstanceId = `${id}|${hashedInstanceId}`;
 
 	if (localAppInstance !== appInstanceId) {
-		console.log('replacing existing localAppInstance...');
 		// replace localAppInstanceId
 		try {
 			await writeFile(filepath, appInstanceId, 'utf8');
