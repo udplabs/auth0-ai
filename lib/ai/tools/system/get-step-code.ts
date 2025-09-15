@@ -40,7 +40,7 @@ export const getStepCode = tool<
 					const { custom_metadata } =
 						(await getUserProfile({ userId: user.sub })) || {};
 
-					labStep = custom_metadata?.currentLabStep;
+					labStep = custom_metadata?.currentLabStep ?? undefined;
 				}
 			}
 

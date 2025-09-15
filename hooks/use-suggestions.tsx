@@ -16,7 +16,7 @@ export const useSuggestions = (): UseSuggestionsResponse => {
 	const { data: user, isLoading } = useUserProfile();
 
 	const labStepString: string | undefined = !isLoading
-		? user?.custom_metadata?.currentLabStep
+		? (user?.custom_metadata?.currentLabStep ?? undefined)
 		: undefined;
 
 	const [_, labStepNum] = labStepString
