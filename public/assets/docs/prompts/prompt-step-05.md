@@ -22,16 +22,15 @@
   ```ts
   export async function createClient() {
     try {
-      const options: ClientConfiguration = {
-        apiUrl: process.env.FGA_API_URL ?? 'https://api.us1.fga.dev',
+      const options: UserClientConfigurationParams = {
+        apiUrl: process.env.FGA_API_URL,
         storeId: process.env.FGA_STORE_ID,
         authorizationModelId: process.env.FGA_MODEL_ID,
         credentials: {
           method: CredentialsMethod.ClientCredentials,
           config: {
-            apiTokenIssuer: process.env.FGA_API_TOKEN_ISSUER ?? 'auth.fga.dev',
-            apiAudience:
-              process.env.FGA_API_AUDIENCE ?? 'https://api.us1.fga.dev/',
+            apiTokenIssuer: process.env.FGA_API_TOKEN_ISSUER,
+            apiAudience: process.env.FGA_API_AUDIENCE,
             clientId: process.env.FGA_CLIENT_ID,
             clientSecret: process.env.FGA_CLIENT_SECRET,
           },
@@ -55,23 +54,29 @@
 - STEP 2
   - Expand an array of permissions to check.
   ```ts
-  const RELATIONS: Accounts.AccountPermissions[] = [
+	const RELATIONS: Accounts.AccountPermissions[] = [
 		'can_view',
 		'can_view_balances',
 		'can_view_transactions',
 		'can_transfer',
+		// Note we are NOT asking `can_transfer_funds`
+		// That is a permission we check for at the time
+		// of an actual transfer request.
 	];
   ```
 - STEP 3
   - Build out an array of checks to send to FGA as a batch.
   ```ts
-  const checks = accounts.flatMap(({ id, customerId }) => {
-    return RELATIONS.map((relation) => ({
-      user: `user:${customerId}`,
-      relation,
-      object: `account:${id}`,
-    }));
-  });
+	const checks = accounts.flatMap(({ id, customerId }) => {
+		return RELATIONS.map(
+			(relation) =>
+				({
+					user: `user:${customerId}`,
+					relation,
+					object: `account:${id}`,
+				}) as ClientBatchCheckItem
+		);
+	});
   ```
 - STEP 4
   - Completed for them
@@ -79,9 +84,8 @@
   - Completed for them
 - STEP 6
   ```ts
-  const output: (Accounts.Account | null)[] = accounts.map((account) => {
-
-  const permissions = granted[account.id] ?? [];
+	const output: (Accounts.Account | null)[] = accounts.map((account) => {
+		const permissions = granted[account.id] ?? [];
 
 		if (!permissions.includes('can_view')) {
 			return null;
@@ -99,12 +103,15 @@
 			delete copy.cashBalance;
 		}
 
-		if (copy?.transactions?.length && !permissions.includes('can_view_transactions')) {
+		if (
+			copy?.transactions?.length &&
+			!permissions.includes('can_view_transactions')
+		) {
 			delete copy.transactions;
 		}
 
 		// Helpful in the lab to see what was granted.
-		console.log('Account Permissions:', permissions);
+		// console.log('Account Permissions:', permissions);
 
 		return copy as Accounts.Account;
 	});

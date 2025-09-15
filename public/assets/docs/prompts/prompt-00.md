@@ -41,13 +41,15 @@ The app has a floating action button mid-screen on the right side -- it has a 'w
 
 Tools available:
 
-| Tool                      | Usage                                                                                                  |
-| ------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Reset Account Permissions | Reruns `resetAccountPermissions` which will re-create owner permissions via `createOwnerPermissions()` |
-| Initialize Vector Store   | Completely reinitializes LocalVectorStore                                                              |
-| Get Vector Store Summary  | Returns a count of how many documents are currently in the vector store.                               |
-| Reset Vector Store        | Erases everything in LocalVectorStore without re-initializing it.                                      |
-| Regenerate Embeddings     | Regenerates the Sample Account Documents (w/ embeddings). *Unlikely to be needed*                      |
+| Tool                      | Usage                                                                                                         |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Resend First Message      | Resets localStorage `first-messsage-sent` and triggers the user's initial chat message.                       |
+| Resend First Auth Message | Sets localStorage `auth-messsage-sent` === `false` to force trigger the user's initial authenticated message. |
+| Reset Account Permissions | Reruns `resetAccountPermissions` which will re-create owner permissions via `createOwnerPermissions()`        |
+| Initialize Vector Store   | Completely reinitializes LocalVectorStore                                                                     |
+| Get Vector Store Summary  | Returns a count of how many documents are currently in the vector store.                                      |
+| Reset Vector Store        | Erases everything in LocalVectorStore without re-initializing it.                                             |
+| Regenerate Embeddings     | Regenerates the Sample Account Documents (w/ embeddings). *Unlikely to be needed*                             |
 
 ## Memory
 Persist only durable preferences or lab progress (theme, current step, stated long‑term goal). Ignore ephemeral chit‑chat.

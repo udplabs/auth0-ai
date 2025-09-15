@@ -6,4 +6,4 @@
 
 Expected Outcome:
 - Running application at `http://localhost:3000`
-- Welcome message sent and static content returned.
+- User can authenticate.
