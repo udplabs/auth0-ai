@@ -1,7 +1,7 @@
 // lib/auth0/link-account.ts
 'use server';
 
-import { getSession } from '@/lib/auth0';
+import { getSession } from '@/lib/auth0/client';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 

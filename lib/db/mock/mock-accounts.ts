@@ -27,7 +27,7 @@ export async function createMockAccounts(userId: string) {
 		import('@/lib/db/queries/mock'),
 		import('ulid'),
 		import('@/lib/auth0/fga/utils'),
-		import('@/lib/db/queries/accounts'),
+		import('@/lib/db/queries/accounts/mutate-accounts'),
 		import('@/lib/db/queries/documents'),
 	]);
 

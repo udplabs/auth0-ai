@@ -1,8 +1,7 @@
 import { getAccountPermissions } from '@/lib/auth0/fga/_get-account-permissions';
-import { getAccountsByUserId } from '@/lib/db/queries/accounts';
+import { getAccountsByUserId } from '@/lib/db/queries/accounts/query-accounts';
 
 export async function getAccounts(userId: string, includeTransactions = false) {
-	console.log('getAccounts called with userId:', userId);
 	let data = await getAccountsByUserId(userId, includeTransactions);
 
 	if (data.length === 0) {

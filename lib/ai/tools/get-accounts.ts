@@ -1,6 +1,6 @@
 // lib/ai/tools/get-accounts.ts
-import { getAccounts as getAccountsApi } from '@/lib/api/accounts';
-import { getUser } from '@/lib/auth0';
+import { getAccounts as getAccountsApi } from '@/lib/api/accounts/get-accounts';
+import { getUser } from '@/lib/auth0/client';
 import { tool } from 'ai';
 import { z } from 'zod';
 import { AccountSchema, ToolResponseSchema } from '../schemas';

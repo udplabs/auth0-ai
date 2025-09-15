@@ -1,5 +1,5 @@
-import { createMFAEnrollment } from '@/lib/api/user';
-import { getUser } from '@/lib/auth0';
+import { createMFAEnrollment } from '@/lib/api/user/create-mfa-enrollment';
+import { getUser } from '@/lib/auth0/client';
 import { tool } from 'ai';
 import { z } from 'zod';
 export const pushEnrollment = tool({

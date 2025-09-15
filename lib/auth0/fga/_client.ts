@@ -2,6 +2,12 @@
 // FINAL CODE
 'use server';
 
+import {
+	CredentialsMethod,
+	OpenFgaClient,
+	type UserClientConfigurationParams,
+} from '@openfga/sdk';
+
 /**
  * Lab Exercise: Implement an OpenFGA client factory.
  *
@@ -41,12 +47,6 @@
  *    - Logging secrets (DO NOT log clientSecret).
  *    - Using the client before env vars are loaded.
  */
-
-import {
-	CredentialsMethod,
-	OpenFgaClient,
-	type UserClientConfigurationParams,
-} from '@openfga/sdk';
 
 // ---------------------------------------------------------------------------
 // ✅ STEP 1: Define a (mutable) module‑level singleton reference.

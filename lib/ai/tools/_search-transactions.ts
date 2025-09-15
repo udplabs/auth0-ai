@@ -1,6 +1,6 @@
 // lib/ai/tools/search-transactions.ts
 // THIS IS FINAL CODE
-import { getUser } from '@/lib/auth0';
+import { getUser } from '@/lib/auth0/client';
 import { tool } from 'ai';
 import { z } from 'zod';
 import { DocumentWithScoreSchema, ToolResponseSchema } from '../schemas';

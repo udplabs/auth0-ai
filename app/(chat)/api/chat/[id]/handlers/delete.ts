@@ -1,5 +1,5 @@
 import { chatKey } from '@/lib/api/chat/get-chat';
-import { getUser } from '@/lib/auth0';
+import { getUser } from '@/lib/auth0/client';
 import { deleteChatById } from '@/lib/db/queries/chat/mutate-chats';
 import { APIError } from '@/lib/errors';
 import { revalidateTag } from 'next/cache';

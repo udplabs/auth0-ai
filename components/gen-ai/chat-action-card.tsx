@@ -1,6 +1,6 @@
 'use client';
 import { Button, type ButtonProps } from '@/components/ui/button';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils';
 import { ArrowDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 

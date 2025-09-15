@@ -1,6 +1,6 @@
 'use client';
 
-import { useAccounts } from '@/hooks';
+import { useAccounts } from '@/hooks/use-accounts';
 import { merge } from 'lodash-es';
 import { createContext, useCallback, useMemo, useReducer } from 'react';
 import { toast } from 'sonner';

@@ -25,11 +25,12 @@
  * - Consider unique threadID per run if resumable streams reintroduced.
  * - Consider reintroducing resumable streams.
  */
+import { saveMessagesAction } from '@/app/(chat)/api/actions';
 import { openai } from '@/lib/ai/openai';
 import { getSystemPrompts } from '@/lib/ai/prompts/system-prompt';
 import { toolRegistry } from '@/lib/ai/tool-registry';
 import { APIError } from '@/lib/errors';
-import { withStaticContent } from '@/lib/utils';
+import { withStaticContent } from '@/lib/utils/with-static-content';
 import { setAIContext } from '@auth0/ai-vercel';
 import { geolocation } from '@vercel/functions';
 import {
@@ -50,8 +51,8 @@ import {
 import { type NextRequest } from 'next/server';
 import { ulid } from 'ulid';
 import { ZodError } from 'zod';
-import { saveMessagesAction } from '../../../actions';
-import { UIMessageMetadataSchema, parseIncomingChatRequest } from './_helpers';
+import { parseIncomingChatRequest } from './_helpers/parse-incoming-chat-request';
+import { UIMessageMetadataSchema } from './_helpers/schemas';
 
 import type { Chat } from '@/types/chat';
 
@@ -75,15 +76,14 @@ export async function POST(
 			...chat
 		} = await parseIncomingChatRequest(request, await params);
 
-		console.log('=== MESSAGES (incoming) ===');
-		console.log(messages);
-
 		// 2. Validate UI messages (tool calls, metadata shape).
 		const uiMessages = await validateUIMessages<UseChatToolsMessage>({
 			messages,
 			tools: toolRegistry,
 			metadataSchema: UIMessageMetadataSchema,
 		});
+
+		const lastUserMessage = uiMessages.findLast((m) => m.role === 'user');
 
 		// Thread context (telemetry / grouping).
 		setAIContext({ threadID: chat.id });
@@ -97,9 +97,7 @@ export async function POST(
 				geolocation: geolocation(request),
 				userId,
 				settings: {
-					currentLabStep: uiMessages.findLast(
-						(m) => m.role === 'user' && m.metadata?.labStep !== undefined
-					)?.metadata?.labStep,
+					currentLabStep: lastUserMessage?.metadata?.labStep,
 				},
 			},
 		});
@@ -127,9 +125,6 @@ export async function POST(
 									[];
 								const lastResult = results.at(-1);
 								hasOwnUI = (lastResult?.output as any)?.hasOwnUI;
-								if (hasOwnUI) {
-									console.log('hasOwnUI: true → stopping stream early.');
-								}
 							}
 							return hasOwnUI || stepCountIs(5)(ctx); // Hard cap to prevent runaway loops.
 						},

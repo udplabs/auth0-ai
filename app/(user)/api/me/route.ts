@@ -1,5 +1,6 @@
-import { getUserProfile, updateUser } from '@/lib/api/user';
-import { getSession, getUser, updateSession } from '@/lib/auth0';
+import { getUserProfile } from '@/lib/api/user/get-user-profile';
+import { updateUser } from '@/lib/api/user/update-user';
+import { getSession, getUser, updateSession } from '@/lib/auth0/client';
 import { handleApiError } from '@/lib/errors';
 import type { UserUpdate } from 'auth0';
 import { revalidateTag } from 'next/cache';

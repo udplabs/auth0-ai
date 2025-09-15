@@ -1,7 +1,7 @@
 // src/lib/auth0/unlink-account.ts
 'use server';
 
-import { getUser } from '@/lib/auth0';
+import { getUser } from '@/lib/auth0/client';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 

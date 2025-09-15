@@ -2,7 +2,7 @@
 
 import { TransferProvider } from '@/components/features/accounts/transfer-provider';
 import { Loader } from '@/components/ui/prompt-kit/loader';
-import { useAccounts } from '@/hooks';
+import { useAccounts } from '@/hooks/use-accounts';
 import { cn } from '@/lib/utils';
 import { AccountSummaryCard } from './account-summary-card';
 import { AccountSummarySubHeader } from './account-summary-sub-header';

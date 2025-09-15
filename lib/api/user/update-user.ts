@@ -1,5 +1,5 @@
 import type { UserProfile } from '@/hooks/use-user-profile';
-import { auth0Management } from '@/lib/auth0';
+import { auth0Management } from '@/lib/auth0/management-client';
 import { APIError } from '@/lib/errors';
 import type { UserUpdate } from 'auth0';
 

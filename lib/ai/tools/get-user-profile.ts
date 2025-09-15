@@ -1,5 +1,5 @@
-import { getUserProfile as getUserProfileApi } from '@/lib/api/user';
-import { getUser } from '@/lib/auth0';
+import { getUserProfile as getUserProfileApi } from '@/lib/api/user/get-user-profile';
+import { getUser } from '@/lib/auth0/client';
 import { tool } from 'ai';
 import { z } from 'zod';
 

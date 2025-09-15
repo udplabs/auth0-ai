@@ -1,7 +1,8 @@
 import { revalidateTag } from 'next/cache';
 import { type NextRequest } from 'next/server';
 
-import { auth0Management, getUser } from '@/lib/auth0';
+import { getUser } from '@/lib/auth0/client';
+import { auth0Management } from '@/lib/auth0/management-client';
 import { APIError } from '@/lib/errors';
 
 // Delete user authenticator

@@ -1,5 +1,5 @@
-import { getTransactions } from '@/lib/api/accounts';
-import { getUser } from '@/lib/auth0';
+import { getTransactions } from '@/lib/api/accounts/get-transactions';
+import { getUser } from '@/lib/auth0/client';
 import { handleApiError } from '@/lib/errors';
 import { type NextRequest, NextResponse } from 'next/server';
 

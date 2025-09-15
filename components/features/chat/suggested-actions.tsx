@@ -13,9 +13,9 @@ import {
 	type CollapsibleProps,
 	type CollapsibleTriggerProps,
 } from '@/components/ui/collapsible';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { useSuggestions } from 'hooks';
+import { useSuggestions } from 'hooks/use-suggestions';
 import { ChevronUpIcon as ArrowIcon } from 'lucide-react';
 
 interface SuggestedActionsProps extends Omit<CollapsibleProps, 'onSubmit'> {

@@ -2,7 +2,8 @@
 
 import { Button, type ButtonProps } from '@/components/ui/button';
 import { Card, CardContent, type CardProps } from '@/components/ui/card';
-import { useAccounts, useTransferModal } from '@/hooks';
+import { useAccounts } from '@/hooks/use-accounts';
+import { useTransferModal } from '@/hooks/use-transfer-modal';
 import { cn } from '@/lib/utils';
 import { ArrowLeftRight, PlusCircle } from 'lucide-react';
 

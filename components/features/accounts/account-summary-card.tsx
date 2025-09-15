@@ -9,13 +9,14 @@ import {
 	type CardProps,
 	CardTitle,
 } from '@/components/ui/card';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils';
 import { startCase } from 'lodash-es';
 import { ArrowRight } from 'lucide-react';
 import { memo } from 'react';
 
 import { useTransferModal } from '@/hooks/use-transfer-modal';
-import { AccountIcon, CurrencyField } from './ui';
+import { AccountIcon } from './ui/account-icon';
+import { CurrencyField } from './ui/currency-field';
 
 import type { Accounts } from '@/types';
 

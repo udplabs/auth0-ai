@@ -1,5 +1,6 @@
 /// Originally written by Vercel
 /// Modify by @danny-fuhriman_atko
+import { NextResponse } from 'next/server';
 /**
  * Centralized API / domain error shaping for the Next.js (App Router) backend.
  *
@@ -33,8 +34,6 @@
  *  - Fix minor bug: `this.cause = cause === 'string' ? cause : undefined;` should test typeof.
  *  - Narrow `details` typing (unknown) and redact sensitive keys before logging.
  */
-
-import { NextResponse } from 'next/server';
 
 export namespace Errors {
 	export type Code = `${Type}:${Surface}`;
