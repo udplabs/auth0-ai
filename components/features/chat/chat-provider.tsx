@@ -1,8 +1,10 @@
 'use client';
 import { toast } from '@/components/toast';
-import { useChatHistory, useUserProfile } from '@/hooks';
+import { useChatHistory } from '@/hooks/use-chat-history';
+import { useDataStream } from '@/hooks/use-data-stream';
+import { useUserProfile } from '@/hooks/use-user-profile';
 import { APIError } from '@/lib/errors';
-import { fetchWithErrorHandlers } from '@/lib/utils';
+import { fetchWithErrorHandlers } from '@/lib/utils/fetch';
 import { Chat as AIChat } from '@ai-sdk/react';
 import {
 	ChatInit,
@@ -24,7 +26,7 @@ export const ChatContext = createContext<ChatContextValue | undefined>(
 );
 
 interface CreateChatOptions
-	extends Omit<ChatInit<ChatType.UIMessage>, 'transport'> {
+	extends Omit<ChatInit<ChatType.UIMessage>, 'transport' | 'id'> {
 	transport?: HttpChatTransportInitOptions<ChatType.UIMessage>;
 }
 
@@ -35,107 +37,100 @@ export interface ChatProviderOptions extends React.PropsWithChildren {
 	isNewChat?: boolean;
 }
 
-function createChat(
-	options?: CreateChatOptions,
-	utils?: { refreshChatHistory?: () => void }
-) {
-	const _id = ulid();
-	const {
-		id = _id,
-		generateId = ulid,
-		onData,
-		onError,
-		onFinish,
-		transport,
-		...chatOptions
-	} = options || {};
-
-	const {
-		prepareSendMessagesRequest,
-		prepareReconnectToStreamRequest,
-		...transportOptions
-	} = transport || ({} as HttpChatTransportInitOptions<ChatType.UIMessage>);
-
-	return new AIChat<ChatType.UIMessage>({
-		...chatOptions,
-		id,
-		generateId,
-		onData: (dataPart) => {
-			console.log('=== DATA PART ===');
-			console.table(dataPart);
-
-			if (onData) {
-				console.warn('Custom onData provided! overriding default behavior...');
-				return onData(dataPart);
-			}
-			console.log('no default behavior...');
-		},
-		onError: (error) => {
-			console.log('=== useChat error ===');
-			console.table(error);
-
-			if (onError) {
-				console.warn('Custom onError provided! overriding default behavior...');
-				return onError(error);
-			}
-
-			if (error instanceof APIError) {
-				console.table(error);
-				toast({
-					type: 'error',
-					description: error.message,
-				});
-			}
-		},
-		onFinish: (options) => {
-			if (onFinish) {
-				console.warn(
-					'Custom onFinish provided! overriding default behavior...'
-				);
-				return onFinish(options);
-			}
-
-			utils?.refreshChatHistory?.();
-		},
-		transport: new DefaultChatTransport({
-			api: `/api/chat/${id}`,
-			fetch: fetchWithErrorHandlers,
-			...transportOptions,
-			prepareSendMessagesRequest(options) {
-				if (prepareSendMessagesRequest) {
-					return prepareSendMessagesRequest(options);
-				}
-
-				const { messages, id, body } = options;
-
-				return {
-					body: {
-						id,
-						message: messages.at(-1),
-						...body,
-					},
-				};
-			},
-		}),
-	});
-}
-
 export function ChatProvider({
 	chatId,
-	chatOptions: { messages, id = chatId, ...options },
+	chatOptions,
 	children,
 	isNewChat,
 }: ChatProviderOptions) {
+	const { setDataStream } = useDataStream();
 	const { mutate: refreshChatHistory } = useChatHistory();
 	const { data: user, isAuthenticated, updateUserSettings } = useUserProfile();
-
+	console.log('isNewChat:', isNewChat);
 	const chatRef = useRef<AIChat<ChatType.UIMessage>>();
 
-	if (!chatRef.current || chatRef.current.id !== id) {
-		chatRef.current = createChat(
-			{ id, messages, ...options },
-			{ ...(isNewChat ? { refreshChatHistory } : {}) }
-		);
+	if (!chatRef.current || chatRef.current.id !== chatId) {
+		const {
+			onData,
+			onError,
+			onFinish,
+			transport,
+			generateId = ulid,
+			...options
+		} = chatOptions || {};
+
+		const {
+			prepareSendMessagesRequest,
+			prepareReconnectToStreamRequest,
+			...transportOptions
+		} = transport || ({} as HttpChatTransportInitOptions<ChatType.UIMessage>);
+
+		chatRef.current = new AIChat<ChatType.UIMessage>({
+			...options,
+			id: chatId,
+			onData: (dataPart) => {
+				if (onData) {
+					console.warn(
+						'Custom onData provided! overriding default behavior...'
+					);
+					return onData(dataPart);
+				}
+				setDataStream?.((ds) => (ds ? [...ds, dataPart] : []));
+			},
+			onError: (error) => {
+				console.log('=== useChat error ===');
+				console.table(error);
+
+				if (onError) {
+					console.warn(
+						'Custom onError provided! overriding default behavior...'
+					);
+					return onError(error);
+				}
+
+				if (error instanceof APIError) {
+					console.table(error);
+					toast({
+						type: 'error',
+						description: error.message,
+					});
+				}
+			},
+			onFinish: (options) => {
+				if (onFinish) {
+					console.warn(
+						'Custom onFinish provided! overriding default behavior...'
+					);
+					return onFinish(options);
+				}
+
+				if (isNewChat) {
+					// Update chat history to get generated chat name.
+					// TODO: Eliminate this once we add title streaming
+					refreshChatHistory();
+				}
+			},
+			transport: new DefaultChatTransport({
+				api: `/api/chat/${chatId}`,
+				fetch: fetchWithErrorHandlers,
+				...transportOptions,
+				prepareSendMessagesRequest(options) {
+					if (prepareSendMessagesRequest) {
+						return prepareSendMessagesRequest(options);
+					}
+
+					const { messages, id, body } = options;
+
+					return {
+						body: {
+							id,
+							message: messages.at(-1),
+							...body,
+						},
+					};
+				},
+			}),
+		});
 	}
 
 	const chat = chatRef.current;
@@ -144,7 +139,7 @@ export function ChatProvider({
 			!isAuthenticated &&
 			(localStorage.getItem(LS_KEY_FIRST) ?? 'false') !== 'true';
 
-		if (id && sendFirstMessage) {
+		if (chatId && sendFirstMessage) {
 			// This is the first interaction with this user/person.
 			// They might not even be authenticated!
 			// Let's kick off an introductory monologue for Aiya.
@@ -159,15 +154,17 @@ export function ChatProvider({
 
 			localStorage.setItem(LS_KEY_FIRST, 'true');
 		}
-	}, [id, isAuthenticated, chatId, chat]);
+	}, [chatId, isAuthenticated, chatId, chat]);
 
 	const isFirstLogin = user?.logins_count <= 1;
 	useEffect(() => {
+		const sendAuthMessageLS = localStorage.getItem(LS_KEY_AUTH);
+
+		// For debug purposes -- If localStorage is explicitly set to 'false',
+		// we will send the message even if it is not the user's first login.
 		const sendAuthMessage =
-			id &&
-			user?.user_id &&
-			isFirstLogin &&
-			(localStorage.getItem(LS_KEY_AUTH) ?? 'false') !== 'true';
+			sendAuthMessageLS === 'false' ||
+			(chatId && user?.user_id && isFirstLogin && sendAuthMessageLS !== 'true');
 
 		if (!sendAuthMessage) return;
 
@@ -188,7 +185,7 @@ export function ChatProvider({
 		});
 
 		localStorage.setItem(LS_KEY_AUTH, 'true');
-	}, [id, user, chat, isFirstLogin, chatId]);
+	}, [chatId, user, chat, isFirstLogin]);
 
 	const value = useMemo<ChatContextValue>(
 		() => ({ chat: chat as unknown as AIChat<ChatType.UIMessage> }),

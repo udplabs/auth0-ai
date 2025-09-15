@@ -1,7 +1,7 @@
-import { Chat, ChatProvider } from '@/components/features/chat';
-import { getUser } from '@/lib/auth0';
-import { auth0 } from '@/lib/auth0/client';
-import { getChatById } from '@/lib/db/queries/chat';
+import { Chat } from '@/components/features/chat/chat';
+import { ChatProvider } from '@/components/features/chat/chat-provider';
+import { auth0, getUser } from '@/lib/auth0/client';
+import { getChatById } from '@/lib/db/queries/chat/query-chats';
 import { APIError } from '@/lib/errors';
 import { redirect } from 'next/navigation';
 import { ulid } from 'ulid';
@@ -62,18 +62,12 @@ export default async function Page({
 	// Await dynamic route params (Next 13+ provides as a promise in server components).
 	const { id: _pathId } = (await params) || {};
 
-	let isNewChat = false;
-
 	// Normalize route param: if catch‑all produced an array, take the first segment.
-	let id = _pathId && Array.isArray(_pathId) ? _pathId[0] : _pathId;
+	const id = _pathId && Array.isArray(_pathId) ? _pathId[0] : _pathId;
 
 	// No id supplied → generate a new ULID and mark as new chat session.
 	if (!id) {
-		id = ulid();
-
-		isNewChat = true;
-
-		redirect(`/chat/${id}`);
+		redirect(`/chat/${ulid()}`);
 	}
 
 	// Attempt to resolve user (non‑blocking / non‑throwing).
@@ -87,35 +81,38 @@ export default async function Page({
 	// Collector for preloaded messages (if existing chat found).
 	const initialMessages: ChatType.UIMessage[] = [];
 
+	let isNewChat = false;
 	// If continuing an existing chat, fetch it (and its messages) from DB.
-	if (!isNewChat) {
-		try {
-			const dbChats = await getChatById(id, {
-				userId: user?.sub,
-				includeMessages: true,
-			});
+	try {
+		const dbChats = await getChatById(id, {
+			userId: user?.sub,
+			includeMessages: true,
+		});
 
-			if (dbChats) {
-				const { messages = [] } = dbChats;
-				initialMessages.push(...messages);
+		if (dbChats) {
+			const { messages = [] } = dbChats;
+			initialMessages.push(...messages);
+		} else {
+			isNewChat = true;
+		}
+	} catch (error: unknown) {
+		// Graceful degradation: not-found simply starts a fresh chat;
+		// unexpected errors are logged.
+		if (error instanceof APIError) {
+			if (error.type === 'not_found') {
+				console.log('starting new chat...');
+				isNewChat = true;
 			}
-		} catch (error: unknown) {
-			// Graceful degradation: not-found simply starts a fresh chat;
-			// unexpected errors are logged.
-			if (error instanceof APIError) {
-				if (error.type === 'not_found') {
-					console.log('starting new chat...');
-				}
-			} else {
-				console.log('unexpected error loading chat:');
-				console.log(error);
-			}
+		} else {
+			console.log('unexpected error loading chat:');
+			console.log(error);
 		}
 	}
 
 	return (
 		<ChatProvider
 			{...{
+				isNewChat,
 				chatId: id,
 				chatOptions: {
 					...(initialMessages.length > 0 ? { messages: initialMessages } : {}),
