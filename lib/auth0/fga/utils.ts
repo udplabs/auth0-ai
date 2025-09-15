@@ -1,7 +1,7 @@
 // lib/auth0/fga/utils.ts
 // REFERENCE CODE (not part of lab)
 // Utility functions for FGA operations.
-import { getFgaClient } from './_client';
+import { getFgaClient } from './client';
 
 import type { TupleKey } from '@openfga/sdk';
 

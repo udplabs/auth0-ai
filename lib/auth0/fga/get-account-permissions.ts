@@ -1,5 +1,5 @@
 // lib/auth0/fga/get-account-permissions.ts
-import { getFgaClient } from './_client';
+import { getFgaClient } from './client';
 
 import type { Accounts } from '@/types';
 import type { ClientBatchCheckItem } from '@openfga/sdk';
