@@ -10,6 +10,8 @@ You’ll build a demo app for ***the bAInk*** using Next.js (App Router) that sh
 
 - Throughout the lab you will see types of alerts/panels like the following. They provide useful information. Take a minute to familiarize yourself with their intent so you know which ones you should _really_ pay attention to. :)
 
+<br>
+
   > [!NOTE]
   > Useful information that might help you.
 
