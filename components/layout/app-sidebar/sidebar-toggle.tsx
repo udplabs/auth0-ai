@@ -32,13 +32,20 @@ export function SidebarToggle({
 
 	if (animated) {
 		return (
-			<AnimatedButton
+			<Button
+				animated
 				{...{
 					...props,
 					icon: open ? (
-						<PanelLeftCloseIcon size={16} />
+						<PanelLeftCloseIcon
+							key='close-icon'
+							size={16}
+						/>
 					) : (
-						<PanelLeftOpenIcon size={16} />
+						<PanelLeftOpenIcon
+							key='open-icon'
+							size={16}
+						/>
 					),
 					className,
 					label: `${open ? 'Close' : 'Open'} Sidebar`,
@@ -60,14 +67,15 @@ export function SidebarToggle({
 						onClick: toggleSidebar,
 						variant: 'outline',
 						className: cn('md:h-fit md:px-2', className),
+						icon: open ? (
+							<PanelLeftCloseIcon size={16} />
+						) : (
+							<PanelLeftOpenIcon size={16} />
+						),
 						...props,
 					}}
 				>
-					{open ? (
-						<PanelLeftCloseIcon size={16} />
-					) : (
-						<PanelLeftOpenIcon size={16} />
-					)}
+					{open ? '' : 'Open Sidebar'}
 				</Button>
 			</TooltipTrigger>
 			<TooltipContent
