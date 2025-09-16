@@ -39,6 +39,7 @@ By the end, you will:
     - Internet;
     - Node.js;
     - *Disabled VPN*
+    - at least 8gb memory
   - Code editor (*VS Code recommended*).
     > [!WARNING]
     > Web IDEs *may* work, but are not tested. Local dev is strongly recommended.
@@ -47,7 +48,7 @@ By the end, you will:
   > [!CAUTION]
   > ***Required tooling***
   >
-  > * **Node.js ≥ 20** *<span style='color: red; font-variant: small-caps'>← Required</span>* <span style='font-size: 10px; font-variant: small=caps'>[Install Instructions](https://nodejs.org/en/download/)</span>
+  > * **Node.js ≥ 22** *<span style='color: red; font-variant: small-caps'>← Required</span>* <span style='font-size: 10px; font-variant: small=caps'>[Install Instructions](https://nodejs.org/en/download/)</span>
   > * **pnpm ≥ 9** *<span style='color: red; font-variant: small-caps'>← Required</span>* <span style='font-size: 10px; font-variant: small=caps'>[Install Instructions](https://pnpm.io/installation)</span>
   > * A modern browser (Chrome recommended)
 
