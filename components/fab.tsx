@@ -57,89 +57,89 @@ export const FAB = () => {
 				)}
 			>
 				<div className='z-99 flex flex-col-reverse items-end gap-y-2'>
-					<div className='flex items-center gap-2'>
-						Resend 'first-message'
-						<Button
-							className='h-8 w-8 rounded-full p-4'
-							variant='warning'
-							onClick={() => {
-								localStorage.removeItem(LS_KEY_FIRST);
-								localStorage.removeItem(LS_KEY_AUTH);
-								redirect('/chat');
-							}}
-						>
-							<CircleArrowOutUpRightIcon className='h-5 w-5' />
-						</Button>
-					</div>
-					<div className='flex items-center gap-2'>
-						Resend 'authenticated-message'
-						<Button
-							className='h-8 w-8 rounded-full p-4'
-							variant='warning'
-							onClick={() => {
-								localStorage.setItem(LS_KEY_AUTH, 'false');
-								redirect('/chat');
-							}}
-						>
-							<RotateCcwIcon className='h-5 w-5' />
-						</Button>
-					</div>
-					<div className='flex items-center gap-2'>
+					<Button
+						className='p-0 hover:bg-transparent'
+						variant='ghost'
+						onClick={() => {
+							localStorage.removeItem(LS_KEY_FIRST);
+							localStorage.removeItem(LS_KEY_AUTH);
+							redirect('/chat');
+						}}
+					>
+						{`Resend 'first-message'`}
+						<div className='rounded-full bg-yellow-500 p-2 text-white hover:bg-yellow-600'>
+							<CircleArrowOutUpRightIcon className='h-8 w-8' />
+						</div>
+					</Button>
+					<Button
+						className='p-0 hover:bg-transparent'
+						variant='ghost'
+						onClick={() => {
+							localStorage.setItem(LS_KEY_AUTH, 'false');
+							redirect('/chat');
+						}}
+					>
+						{`Resend 'authenticated-message'`}
+						<div className='rounded-full bg-yellow-500 p-2 text-white hover:bg-yellow-600'>
+							<RotateCcwIcon className='h-8 w-8' />
+						</div>
+					</Button>
+					<Button
+						className='p-0 hover:bg-transparent'
+						variant='ghost'
+						onClick={() => resetPermissions()}
+					>
 						Reset Account Permissions
-						<Button
-							className='h-8 w-8 rounded-full p-4'
-							variant='destructive'
-							onClick={() => resetPermissions()}
-						>
-							<RefreshCcwDot className='h-5 w-5' />
-						</Button>
-					</div>
-					<div className='flex items-center gap-2'>
+						<div className='bg-destructive text-destructive-foreground hover:bg-destructive/80 rounded-full p-2'>
+							<RefreshCcwDot className='h-8 w-8' />
+						</div>
+					</Button>
+					<Button
+						className='p-0 hover:bg-transparent'
+						variant='ghost'
+						onClick={() => handleVectorReInit()}
+					>
 						Initialize Vector Store
-						<Button
-							variant='success'
-							className='h-8 w-8 rounded-full p-4'
-							onClick={() => handleVectorReInit()}
-						>
-							<WandSparkles className='h-5 w-5' />
-						</Button>
-					</div>
-					<div className='flex items-center gap-2'>
+						<div className='rounded-full bg-green-500 p-2 text-white hover:bg-green-600'>
+							<WandSparkles className='h-8 w-8' />
+						</div>
+					</Button>
+					<Button
+						className='p-0 hover:bg-transparent'
+						variant='ghost'
+						onClick={() => {
+							handleEmbeddingsBuild()
+								.then(() => {
+									mutate();
+								})
+								.finally(() => handleVectorReset());
+						}}
+					>
 						Regenerate Embeddings
-						<Button
-							className='h-8 w-8 rounded-full p-4'
-							onClick={() => {
-								handleEmbeddingsBuild()
-									.then(() => {
-										mutate();
-									})
-									.finally(() => handleVectorReset());
-							}}
-							variant='warning'
-						>
-							<FileStackIcon className='h-5 w-5' />
-						</Button>
-					</div>
-					<div className='flex items-center gap-2'>
+						<div className='rounded-full bg-yellow-500 p-2 text-white hover:bg-yellow-600'>
+							<FileStackIcon className='h-8 w-8' />
+						</div>
+					</Button>
+					<Button
+						className='p-0 hover:bg-transparent'
+						variant='ghost'
+						onClick={() => handleVectorReset()}
+					>
 						Reset Vector Store
-						<Button
-							className='h-8 w-8 rounded-full p-4'
-							onClick={() => handleVectorReset()}
-							variant='destructive'
-						>
-							<RotateCcwIcon className='h-5 w-5' />
-						</Button>
-					</div>
-					<div className='flex items-center gap-2'>
+						<div className='bg-destructive text-destructive-foreground hover:bg-destructive/80 rounded-full p-2'>
+							<RotateCcwIcon className='h-8 w-8' />
+						</div>
+					</Button>
+					<Button
+						className='p-0 hover:bg-transparent'
+						variant='ghost'
+						onClick={() => handleVectorSummary()}
+					>
 						Get Vector Store Summary
-						<Button
-							className='h-8 w-8 rounded-full p-4'
-							variant='success'
-							onClick={() => handleVectorSummary()}
-						>
-							<EyeIcon className='h-5 w-5' />
-						</Button>
-					</div>
+						<div className='rounded-full bg-green-500 p-2 text-white hover:bg-green-600'>
+							<EyeIcon className='h-8 w-8' />
+						</div>
+					</Button>
 				</div>
 			</PopoverContent>
 		</Popover>
