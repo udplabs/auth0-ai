@@ -45,11 +45,16 @@ By the end, you will:
     - *Disabled VPN*
     - at least **8GB** memory
     - Integrated Code Editor (*VS Code recommended*).
-      <br><br>
+
+      <br>
+      
       > [!WARNING]
       > *Web* IDEs *may* work, but are not tested.
       >
       > Use of an IDE is ***strongly*** encouraged to take advantage of IntelliSense/Typescript
+
+      <br>
+      
   - Access to the [**Auth0 Demo Platform**](https://demo.okta.com) (*this one should be easy!*).
 
 <br>
