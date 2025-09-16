@@ -1,5 +1,5 @@
 'use client';
-import { Logo } from '@/components/logo';
+import { DarkLogo, LightLogo } from '@/components/logo';
 import {
 	SidebarMenu,
 	type SidebarMenuProps,
@@ -32,10 +32,11 @@ export function SidebarHeader({
 					}}
 					className='flex flex-row items-center gap-3'
 				>
-					<Logo
-						className='w-full pe-5'
-						{...{ dark: theme.resolvedTheme === 'dark' }}
-					/>
+					{theme.resolvedTheme === 'dark' ? (
+						<DarkLogo className='w-full pe-5' />
+					) : (
+						<LightLogo />
+					)}
 				</Link>
 			</SidebarMenu>
 		</UISidebarHeader>
