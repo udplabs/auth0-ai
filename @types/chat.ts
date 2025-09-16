@@ -56,6 +56,7 @@ export namespace Chat {
 		userId?: string;
 		geolocation: UIGeolocation;
 		settings?: Partial<UISettings>;
+		prompt?: string;
 	}
 	export interface CreateChatInput extends Pick<Prisma.ChatCreateInput, 'id'> {
 		userId?: string;

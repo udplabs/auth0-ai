@@ -11,6 +11,7 @@ You’re a developer at *the bAInk*, a fancy new digital-only financial institut
 
 **How to interact.** Treat Aiya like a senior pair‑programmer. Ask precise questions. If you’re blocked, paste the error + a short description of what you tried.
 
+<br>
 
 > [!WARNING]
 > **AI disclaimer**
@@ -21,6 +22,8 @@ You’re a developer at *the bAInk*, a fancy new digital-only financial institut
 >
 > - By continuing you agree to the sharing of any/all content/information generated with or by the LLM (***including the content of chat messages***) within the learning application.
 
+<br>
+
 ## Objective
 
 By the end, you will:
@@ -30,27 +33,44 @@ By the end, you will:
 - Implement a **RAG retriever** that filters results using FGA (policy‑aware retrieval).
 - Trigger a **CIBA**-style async authorization flow for a sensitive action. *<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>*
 
-**Expected outcome.** A working local app you can reuse as a starter: readable, composable, and production‑opinionated.
+### ✅ Expected outcome
+- A working local app you can reuse as a starter: readable, composable, and production‑opinionated.
 
 ## Prerequisites
 
 ### You must have the following:
   - *64-bit* Windows, Mac, or Linux Laptop with
     - Internet;
-    - Node.js;
+    - Node.js v23.0;
     - *Disabled VPN*
-    - at least 8gb memory
-  - Code editor (*VS Code recommended*).
-    > [!WARNING]
-    > Web IDEs *may* work, but are not tested. Local dev is strongly recommended.
+    - at least **8GB** memory
+    - Integrated Code Editor (*VS Code recommended*).
+      <br><br>
+      > [!WARNING]
+      > *Web* IDEs *may* work, but are not tested.
+      >
+      > Use of an IDE is ***strongly*** encouraged to take advantage of IntelliSense/Typescript
   - Access to the [**Auth0 Demo Platform**](https://demo.okta.com) (*this one should be easy!*).
+
+<br>
 
   > [!CAUTION]
   > ***Required tooling***
   >
-  > * **Node.js ≥ 22** *<span style='color: red; font-variant: small-caps'>← Required</span>* <span style='font-size: 10px; font-variant: small=caps'>[Install Instructions](https://nodejs.org/en/download/)</span>
+  > * A modern browser (*Chrome recommended*)
+  > * **Node.js v23.0** *<span style='color: red; font-variant: small-caps'>← Required</span>* <span style='font-size: 10px; font-variant: small=caps'>[Install Instructions](https://nodejs.org/en/download/)</span>
+  >
+  >    <sup>*There have been errors/issues reported with anything greater than v23.0*</sup>
   > * **pnpm ≥ 9** *<span style='color: red; font-variant: small-caps'>← Required</span>* <span style='font-size: 10px; font-variant: small=caps'>[Install Instructions](https://pnpm.io/installation)</span>
-  > * A modern browser (Chrome recommended)
+  >
+  > <br>
+  >
+  > ***Windows users:*** We advise using the following *PowerShell* script to install `pnpm`:
+  >   ```ps
+  >   Invoke-WebRequest https://get.pnpm.io/install.ps1 -UseBasicParsing | Invoke-Expression
+  >   ```
+
+<br>
 
 ### You should be comfortable with:
 
@@ -63,11 +83,15 @@ By the end, you will:
 - Next.js (App Router)
   <br><sup>[_Learn more_](https://nextjs.org/docs)</sup>
 
+<br>
+
 > [!IMPORTANT]
 >
 > *This is not an Auth0 FGA lab*. However, this lab does utilizes Auth0 FGA.
 >
 > If you’re new to FGA, we recommend you skim the [concepts](https://docs.fga.dev/fga-concepts).
+
+<br>
 
 ## What you will learn
 

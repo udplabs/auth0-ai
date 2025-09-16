@@ -79,7 +79,7 @@ export const searchTransactions = tool<
 			const user = await getUser();
 
 			// ---------------------------------------------------------------------
-			// ❌ STEP 3: Instantiate the FGA filter.
+			// ✅ STEP 3: Instantiate the FGA filter.
 			// buildQuery: Given a retrieved document, produce a single auth check:
 			//   user: principal performing the search
 			//   object: the account resource tied to the transaction
@@ -136,10 +136,9 @@ export const searchTransactions = tool<
 				rawResults.length
 			);
 			// ---------------------------------------------------------------------
-			// ❌ STEP 5: Apply authorization filter (core FGA step).
+			// ✅ STEP 5: Apply authorization filter (core FGA step).
 			// Internally may batch; returns only documents passing the relation check.
 			// ---------------------------------------------------------------------
-			// TODO: Implement the actual filtering
 			const authorizedResults = await fgaRetriever.filter(rawResults);
 
 			console.log(

@@ -4,7 +4,7 @@ This guide attempts to mirror the Google codelab style: short steps, runnable co
 
 You’ll build a demo app for ***the bAInk*** using Next.js (App Router) that showcases **Auth0 Auth for AI Agents** as well as **Auth0 FGA** (fine‑grained authorization) powering **RAG** and **securing AI tools**. Your companion AI assistant **Aiya** will be available inside the app (once you get it spun up) to help you out.
 
-# Just a few things...
+### Just a few things...
 
 - This lab uses a combination of the Okta Demo Platform and a self-guided learning application. Feel free to switch between the two but keep in mind the content _may_ vary slightly. When in doubt, the Demo Platform is [most likely] the more accurate source of truth.
 
@@ -25,6 +25,8 @@ You’ll build a demo app for ***the bAInk*** using Next.js (App Router) that sh
   > [!Caution]
   > Advises about risks or negative outcomes of certain actions.
 
+<br>
+
 ---
 > [!IMPORTANT]
 > *As you work through the lab steps you will be asked to write actual code.* 🙌
@@ -42,3 +44,137 @@ You’ll build a demo app for ***the bAInk*** using Next.js (App Router) that sh
 > ***We encourage you to try on your own first.***
 
 ---
+
+***IGNORE THE FOLLOWING! INTERNAL TESTING***
+<details open=true>
+<summary>Testing Demo Platform Markdown</summary>
+This is a test of the markdown renderer. Please ignore this.
+</details>
+
+<details>
+<summary>Testing Demo Platform Markdown</summary>
+<p style='padding: 15px'>This is a test of the markdown renderer. Please ignore this.</p>
+</details>
+
+<details>
+<summary>Testing Demo Platform Markdown</summary>
+  <table>
+    <tr>
+      <td>
+        <b>US</b>
+      </td>
+      <td>
+        /ˈtuːpəl/
+      </td>
+      <td>
+        <audio controls>
+          <source src='./assets/audio/tuples_en_us.mp3' type='audio/mpeg'>
+          Sadly audio is not supported
+        </audio>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <b>UK</b>
+      </td>
+      <td>
+        /ˈtjuːpəl/
+      </td>
+      <td>
+        <audio controls>
+          <source src='./assets/audio/tuples_en_uk.mp3' type='audio/mpeg'>
+          Sadly audio is not supported
+        </audio>
+      </td>
+    </tr>
+  </table>
+</details>
+
+What is <abbr title='Retrieval-Augmented Generation'>RAG</abbr>?
+
+<mark>Highlighting</mark>
+
+<small>Small text</small> Big text
+
+This is <q>An inline quote</q>
+
+Sample Output: <samp>Hey there!</samp>
+
+Keyboard input: <kbd>Ctrl</kbd> + <kbd>C</kbd>
+
+Figure:
+<figure>
+<img src='./assets/images/show-me-the-code.png'/>
+<figcaption>Fig 1. Optional Aiya helper</figcaption>
+</figure>
+
+MD Table
+|        |            |                                                                                                                      |
+| ------ | ---------- | -------------------------------------------------------------------------------------------------------------------- |
+| **US** | /ˈtuːpəl/  | <audio controls><source src='./assets/audio/tuples_en_us.mp3' type='audio/mpeg'>Sadly audio is not supported</audio> |
+| **UK** | /ˈtjuːpəl/ | <audio controls><source src='./assets/audio/tuples_en_uk.mp3' type='audio/mpeg'>Sadly audio is not supported</audio> |
+
+HTML Table
+<table>
+  <tr>
+    <td>
+      <b>US</b>
+    </td>
+    <td>
+      /ˈtuːpəl/
+    </td>
+    <td>
+      <audio controls>
+        <source src='./assets/audio/tuples_en_us.mp3' type='audio/mpeg'>
+        Sadly audio is not supported
+      </audio>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <b>UK</b>
+    </td>
+    <td>
+      /ˈtjuːpəl/
+    </td>
+    <td>
+      <audio controls>
+        <source src='./assets/audio/tuples_en_uk.mp3' type='audio/mpeg'>
+        Sadly audio is not supported
+      </audio>
+    </td>
+  </tr>
+</table>
+
+tuples | **too**•plz
+
+US /ˈtuːpəl/
+
+<audio controls>
+  <source src='./assets/audio/tuples_en_us.mp3' type='audio/mpeg'>
+  Sadly audio is not supported :(
+</audio>
+
+UK /ˈtjuːpəl/
+
+<audio controls>
+  <source src='./assets/audio/tuples_en_uk.mp3' type='audio/mpeg'>
+  Sadly audio is not supported :(
+</audio>
+
+
+*Inside Github Alert*
+> [!NOTE]
+> US /ˈtuːpəl/
+>
+> <audio controls>
+>   <source src='./assets/audio/tuples_en_us.mp3' type='audio/mpeg'>
+>   Sadly audio is not supported :(
+> </audio>
+>
+> UK /ˈtjuːpəl/
+>
+> <audio controls>
+>   <source src='./assets/audio/tuples_en_uk.mp3' type='audio/mpeg'>
+>   Sadly audio is not supported :(
+> </audio>
