@@ -74,7 +74,8 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 	// ---------------------------------------------------------------------------
 	const RELATIONS: Accounts.AccountPermissions[] = [
 		'can_view',
-		// TODO: ... add other relations here
+		// ...👈 add other relations here
+
 		// Note: we are NOT asking `can_transfer_funds`
 		// That is a permission we check for at the time
 		// of an actual transfer request.
@@ -82,16 +83,20 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 
 	// ---------------------------------------------------------------------------
 	// ❌ STEP 3: Build the batch checks.
-	// Ask: “Does user:<customerId> have <relation> on account:<id>?”
+	// Think of it like you are asking FGA: “Does user:<customerId> have <relation> on account:<id>?”
 	// ---------------------------------------------------------------------------
 	const checks = accounts.flatMap(({ id, customerId }) => {
 		// TODO: ensure checks are built correctly
 		return RELATIONS.map(
 			(relation) =>
 				({
-					//...,
-					relation,
-					//...,
+					// Not sure what goes here?
+					// Check the types for ClientBatchCheckItem
+					// OR... ask Aiya for a hint
+
+					//..., 👈 who?
+					relation, // 👈 can do what?
+					//..., 👈 to or with what?
 				}) as ClientBatchCheckItem
 		);
 	});
@@ -128,29 +133,32 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 	// 3. Handle the data/response based on the permission.
 	// ---------------------------------------------------------------------------
 	const output: (Accounts.Account | null)[] = accounts.map((account) => {
-		// 1. What permissions did FGA return?
+		// ✅ 1. What permissions did FGA return?
 		const permissions = granted[account.id] ?? [];
 
-		// 2. What should I do with them?
+		// ✅ 2.What should I do with them?
 		if (!permissions.includes('can_view')) {
 			return null;
 		}
-		// Shallow copy so we don’t mutate the original.
+		// ✅ Shallow copy so we don’t mutate the original.
+		// Just good practice
 		const copy: any = { ...account, permissions };
 
-		// TODO: Remove sensitive fields unless user can view balances.
+		// ❌ 3. Remove sensitive fields if user is not authorized.
 		if (!permissions.includes('can_view_balances')) {
+			// 👈 What other fields should be stripped?
 			delete copy.balance;
 			// HINT: availableBalance
-			// What other fields?
 			// Not sure? Check @types/accounts.d.ts and decide for yourself
 		}
 
-		// TODO: Transactions are nested in account.transactions but...
-		// Should they always be returned? 🤔
-		// Are there permissions that control when they should be?
+		// ❌ 4. Transactions are nested in account.transactions but...
 		if (copy?.transactions?.length /*&&...*/) {
-			delete copy.transactions;
+			// 👈 Are there permissions that control when they should be?
+			// Should they always be returned? 🤔
+			// Should we do something with them?
+			// Is this a similar use case to `can_view_balances`?
+			// You can always ask Aiya if you're stuck!
 		}
 
 		// Helpful in the lab to see what was granted.

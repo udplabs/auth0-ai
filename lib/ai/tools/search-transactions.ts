@@ -74,7 +74,6 @@ export const searchTransactions = tool<
 			// If unauthenticated, getUser() should throw (caught below).
 			// Check out the helper function for more details.
 			// ---------------------------------------------------------------------
-
 			const user = await getUser();
 
 			// ---------------------------------------------------------------------
@@ -88,7 +87,6 @@ export const searchTransactions = tool<
 			//   - 'can_view_balances' (likely fewer docs)
 			//   - a non-existent relation (should yield zero docs)
 			// ---------------------------------------------------------------------
-			// TODO: Initialize FGA Filter here
 			const fgaRetriever = FGAFilter.create<Documents.DocumentWithScore>({
 				buildQuery: (doc) => {
 					// OPTIONAL Defensive coding: ensure metadata has expected shape.
@@ -103,8 +101,8 @@ export const searchTransactions = tool<
 						};
 					}
 
-					// TODO: Return a valid response
 					return {
+						// 👈 Return a valid response
 						user: ``,
 						object: ``,
 						relation: '',
@@ -117,7 +115,6 @@ export const searchTransactions = tool<
 			// LocalVectorStore.init(true) forces a rebuild (dev convenience).
 			// Production: don't use a LOCAL vector store! 🤣
 			// ---------------------------------------------------------------------
-
 			if (
 				LocalVectorStore.initialized === false ||
 				LocalVectorStore.count === 0
@@ -138,9 +135,8 @@ export const searchTransactions = tool<
 			// ❌ STEP 5: Apply authorization filter (core FGA step).
 			// Internally may batch; returns only documents passing the relation check.
 			// ---------------------------------------------------------------------
-			// TODO: Apply FGA filter to raw results
-			const authorizedResults: Documents.DocumentWithScore[] = [];
-			// const authorizedResults: Documents.DocumentWithScore[] = await fgaRetriever...
+			// const authorizedResults: Documents.DocumentWithScore[] = await fgaRetriever(...) // 👈 Apply FGA filter to raw results
+			const authorizedResults: Documents.DocumentWithScore[] = []; // ❌ Remove this placeholder line
 			console.log(
 				'[searchTransactions] Authorized results:',
 				authorizedResults.length

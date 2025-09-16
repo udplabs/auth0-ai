@@ -71,7 +71,7 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 	}
 
 	// ---------------------------------------------------------------------------
-	// ❌ STEP 2: Define the relations to check for. (must match your FGA model).
+	// ✅ STEP 2: Define the relations to check for. (must match your FGA model).
 	// ---------------------------------------------------------------------------
 	const RELATIONS: Accounts.AccountPermissions[] = [
 		'can_view',
@@ -84,7 +84,7 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 	];
 
 	// ---------------------------------------------------------------------------
-	// ❌ STEP 3: Build the batch checks.
+	// ✅ STEP 3: Build the batch checks.
 	// Ask: “Does user:<customerId> have <relation> on account:<id>?”
 	// ---------------------------------------------------------------------------
 	const checks = accounts.flatMap(({ id, customerId }) => {
@@ -123,7 +123,7 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 	}
 
 	// ---------------------------------------------------------------------------
-	// ❌ STEP 6: Build the final accounts array. (rudimentary implementation)
+	// ✅ STEP 6: Build the final accounts array. (rudimentary implementation)
 	//
 	// 1. Map through all the accounts
 	// 2. Check what permissions exist for that account (what FGA returned)

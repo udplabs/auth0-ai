@@ -55,7 +55,7 @@ import {
 let singleton: OpenFgaClient | null = null;
 
 // ---------------------------------------------------------------------------
-// ❌ STEP 2: Create (internal) FGA client. Keep separate from public getter so you
+// ✅ STEP 2: Create (internal) FGA client. Keep separate from public getter so you
 // can add retries / backoff later if desired.
 
 // NOTE: If you are not familiar with NextJS -- be advised that ENV vars must be accessed inline as `process.env.{var}` and not via object destructuring.
@@ -63,6 +63,10 @@ let singleton: OpenFgaClient | null = null;
 export async function createClient() {
 	try {
 		const options: UserClientConfigurationParams = {
+			retryParams: {
+				maxRetry: 2,
+				minWaitInMs: 300,
+			},
 			apiUrl: process.env.FGA_API_URL,
 			storeId: process.env.FGA_STORE_ID,
 			authorizationModelId: process.env.FGA_MODEL_ID,
