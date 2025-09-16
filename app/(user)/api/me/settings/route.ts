@@ -34,9 +34,10 @@ export async function PATCH(request: NextRequest) {
 	try {
 		const user = await getUser();
 
-		const { id, ...settings } = (await request.json()) as UICreateSettingsInput;
+		const { id = user?.sub, ...settings } =
+			(await request.json()) as UICreateSettingsInput;
 
-		if (user.sub !== id) {
+		if (id && user.sub !== id) {
 			throw new APIError('unauthorized:api', 'Invalid user ID');
 		}
 

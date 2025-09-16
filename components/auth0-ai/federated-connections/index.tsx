@@ -1,4 +1,4 @@
-import { BrowserView, MobileView } from 'react-device-detect';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 import type { FederatedConnectionAuthProps } from './federated-connection-auth-props';
 import { EnsureAPIAccessPopup } from './popup';
@@ -6,6 +6,7 @@ import { EnsureAPIAccessRedirect } from './redirect';
 
 export function EnsureAPIAccess(props: FederatedConnectionAuthProps) {
 	const { mode } = props;
+	const isMobile = useIsMobile();
 
 	switch (mode) {
 		case 'popup':
@@ -14,15 +15,9 @@ export function EnsureAPIAccess(props: FederatedConnectionAuthProps) {
 			return <EnsureAPIAccessRedirect {...props} />;
 		case 'auto':
 		default:
-			return (
-				<>
-					<BrowserView>
-						<EnsureAPIAccessPopup {...props} />
-					</BrowserView>
-					<MobileView>
-						<EnsureAPIAccessRedirect {...props} />
-					</MobileView>
-				</>
-			);
+			if (isMobile) {
+				return <EnsureAPIAccessRedirect {...props} />;
+			}
+			return <EnsureAPIAccessPopup {...props} />;
 	}
 }

@@ -29,6 +29,11 @@ export const useSuggestions = (): UseSuggestionsResponse => {
 	// Placed in front of other suggestions in order
 	const stepSuggestions: SuggestedActions[] = [
 		{
+			suggestion: 'Show me the .env settings',
+			variant: 'default',
+			shouldShow: labStep === 3,
+		},
+		{
 			suggestion: 'Show me the createClient() code',
 			variant: 'default',
 			shouldShow: labStep === 5,

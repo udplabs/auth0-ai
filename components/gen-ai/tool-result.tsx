@@ -109,11 +109,11 @@ export const ToolResult = ({
 	ToolOutputProps,
 	...props
 }: ToolResultProps) => {
+	const { dataStream } = useDataStream();
+
 	if (!toolPart) {
 		return null;
 	}
-
-	const { dataStream } = useDataStream();
 
 	const { input, type } = toolPart;
 	const output = toolPart?.output as unknown as Chat.ToolsResponse;

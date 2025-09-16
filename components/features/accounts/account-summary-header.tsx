@@ -15,7 +15,7 @@ export function AccountSummaryHeader() {
 					<span className='text-bank-primary'>{user?.displayName}</span>
 				</h1>
 				<p className='text-muted-foreground'>
-					Here's an overview of your accounts
+					{`Here's an overview of your accounts`}
 				</p>
 			</div>
 			<div className='flex items-center gap-2'>

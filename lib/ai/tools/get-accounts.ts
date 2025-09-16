@@ -56,7 +56,7 @@ export const getAccounts = tool<
 			const user = await getUser();
 
 			// Fetch accounts for the authenticated user
-			const data = await getAccountsApi(user.sub);
+			const data = await getAccountsApi({ userId: user.sub });
 
 			// Validate shape: ensures you return strong-typed, safe data to the model/UI
 			// This is necessary or Typescript throws a fit.

@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useChatHistory } from '@/hooks/use-chat-history';
 import { useUser } from '@auth0/nextjs-auth0';
-import { startCase } from 'lodash-es';
+import startCase from 'lodash-es/startCase';
 import { useParams } from 'next/navigation';
 import { SidebarHistoryItem } from './sidebar-history-item';
 
@@ -79,21 +79,21 @@ export function SidebarHistory() {
 
 	const groups = Object.keys(chats);
 
-	return groups.map((group) => {
+	return groups.map((group, grpIndex) => {
 		const items = chats[
 			group as keyof Chat.GroupedItems<Chat.UIChat>
 		] as Chat.UIChat[];
 
 		if (items.length > 0) {
 			return (
-				<SidebarGroup key={`sidebar-group-${group}`}>
+				<SidebarGroup key={`sidebar-group-${group}-${grpIndex}`}>
 					<SidebarGroupLabel className='uppercase'>
 						{startCase(group)}
 					</SidebarGroupLabel>
 					<SidebarGroupContent className='pb-5'>
-						{items.map((chat) => (
+						{items.map((chat, i) => (
 							<SidebarHistoryItem
-								key={chat.id}
+								key={`${chat.id}-${i}`}
 								{...{
 									chat,
 									isActive: chat.id === id,

@@ -7,6 +7,7 @@ import {
 } from '@/lib/db/queries/content';
 import { upsertSettings } from '@/lib/db/queries/settings';
 import { sortBy } from '@/lib/utils';
+import { tokenVaultPrompt } from './token-vault';
 
 import type { Chat, UISettings } from '@/types';
 
@@ -29,6 +30,7 @@ export async function getSystemPrompts({
 export async function getRequestPromptFromHints({
 	geolocation,
 	userId,
+	prompt,
 }: Chat.RequestHints) {
 	const prompts = [];
 
@@ -38,6 +40,10 @@ export async function getRequestPromptFromHints({
 
 	if (geolocation) {
 		prompts.push(getGeolocationPrompt(geolocation));
+	}
+
+	if (prompt?.includes('token vault')) {
+		prompts.push(tokenVaultPrompt);
 	}
 
 	return prompts;

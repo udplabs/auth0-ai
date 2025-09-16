@@ -26,7 +26,7 @@ export function Header({
 }: HeaderProps) {
 	const { open } = useSidebar();
 	const { width: windowWidth } = useWindowSize();
-	const { data: user } = useUserProfile();
+	const { data: user, isAuthenticated } = useUserProfile();
 	const pathname = usePathname();
 
 	const showIcons = !open || windowWidth < 768;
@@ -40,10 +40,11 @@ export function Header({
 			{showIcons && (
 				<>
 					{!pathname.includes('accounts') && (
-						<AnimatedButton
+						<Button
 							icon={<PiggyBankIcon />}
 							label='Account Dashboard'
 							className='order-2'
+							animated
 						/>
 					)}
 					<NewChatButton
@@ -63,44 +64,28 @@ export function Header({
 			</div>
 			{!hideSecondaryActions && (
 				<div className='order-5 flex flex-1 items-center justify-end gap-2 md:ml-auto'>
-					{(() => {
-						const showLogout = user && showIcons;
-						const showLogin = !hideLogin && !user && showIcons;
-						const showSignup = !hideLogin && !user;
-
-						if (showLogout) {
-							return (
+					{isAuthenticated ? <Button
+							className='order-1 h-[34px]'
+							href='/auth/logout'
+						>
+							Log Out
+						</Button> : <>
+							<Button
+								className='order-1 h-[34px]'
+								href='/auth/login?screen_hint=signup'
+								variant='outline'
+							>
+								Sign Up
+							</Button>
+							{!hideLogin && showIcons && (
 								<Button
 									className='order-1 h-[34px]'
-									href='/auth/logout'
+									href='/auth/login'
 								>
-									Log Out
+									Log In
 								</Button>
-							);
-						}
-
-						return (
-							<>
-								{showSignup && (
-									<Button
-										className='order-1 h-[34px]'
-										href='/auth/login?screen_hint=signup'
-										variant='outline'
-									>
-										Sign Up
-									</Button>
-								)}
-								{showLogin && (
-									<Button
-										className='order-1 h-[34px]'
-										href='/auth/login'
-									>
-										Log In
-									</Button>
-								)}
-							</>
-						);
-					})()}
+							)}
+						</>}
 					<ModeToggle
 						className='order-2'
 						variant='dropdown'

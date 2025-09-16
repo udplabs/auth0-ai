@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 import { AccountSummaryCard } from './account-summary-card';
 import { AccountSummarySubHeader } from './account-summary-sub-header';
 
+type AccountSummaryProps = React.ComponentProps<'div'>;
+
 export const AccountSummary = ({ ...props }: AccountSummaryProps) => {
 	const { data: accounts = [], isLoading } = useAccounts();
 
@@ -48,4 +50,3 @@ export const AccountSummary = ({ ...props }: AccountSummaryProps) => {
 		</div>
 	);
 };
-interface AccountSummaryProps extends React.ComponentProps<'div'> {}

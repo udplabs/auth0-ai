@@ -16,30 +16,17 @@ import { prisma } from '../prisma/client';
 
 namespace Content {
 	export interface UIContent
-		extends Omit<
-				RemoteContentModel,
-				| 'createdAt'
-				| 'updatedAt'
-				| 'contentType'
-				| 'contentPlacement'
-				| 'mimeType'
-			>,
-			Omit<
-				LocalContentModel,
-				| 'createdAt'
-				| 'updatedAt'
-				| 'expiresAt'
-				| 'lastSyncedAt'
-				| 'contentType'
-				| 'mimeType'
-				| 'contentPlacement'
-			> {
+		extends Pick<RemoteContentModel, 'id' | 'name'>,
+			Pick<LocalContentModel, 'id' | 'name'> {
 		createdAt?: string;
 		updatedAt?: string;
 		contentType: UIType;
 		contentPlacement?: UIContentPlacement;
 		embedding?: number[];
 		mimeType?: UIMimeType;
+		textData?: string;
+		labStep?: string;
+		applicationData?: Record<string, any>;
 	}
 
 	export type UIContentPlacement = 'aiya' | 'labs' | 'secret';
@@ -328,6 +315,12 @@ function UIContent(
 	const cleaned = _content.map<Content.UIContent>((c) => {
 		const ui: Content.UIContent = {
 			...c,
+			applicationData: c.applicationData as Record<string, any>,
+			labStep: c?.labStep != null ? c.labStep : undefined,
+			textData:
+				c?.textData != null
+					? c.textData?.replaceAll('./assets', '/assets')
+					: undefined,
 			contentPlacement: getUIContentPlacement(c?.contentPlacement),
 			contentType: getUIContentType(c.contentType),
 			mimeType: getUIMimeType(c.mimeType),

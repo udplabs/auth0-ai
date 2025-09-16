@@ -66,7 +66,14 @@ export async function createClient() {
 			//...
 		};
 
-		// TODO: return instance of OpenFgaClient
+		// ---------------------------------------------------------------------------
+		// ❌ STEP 3: Return FGA client. Keep separate from public getter so you
+		// can add retries / backoff later if desired.
+
+		// NOTE: If you are not familiar with NextJS -- be advised that ENV vars must be accessed inline as `process.env.{var}` and not via object destructuring.
+		// ---------------------------------------------------------------------------
+
+		// ❌ TODO: return instance of OpenFgaClient
 		return null;
 	} catch (error: unknown) {
 		console.warn('FGA Client initialization failed!');
@@ -94,6 +101,10 @@ export async function createClient() {
 export async function getFgaClient(): Promise<OpenFgaClient | null> {
 	if (!singleton) {
 		singleton = await createClient();
+	}
+
+	if (singleton == null) {
+		console.warn('FGA Client not initialized!');
 	}
 
 	return singleton;

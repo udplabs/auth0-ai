@@ -14,7 +14,7 @@ import { userSettings } from './tools/system/user-settings';
 import { transferFunds } from './tools/transfer-funds';
 
 // ---------------------------------------------------------------------------
-// ❌ STEP 8: Import searchTransactions tool
+// ✅ STEP 8: Import searchTransactions tool
 import { searchTransactions } from './tools/search-transactions';
 // ---------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ export const toolRegistry = {
 	transferFunds,
 	userSettings,
 	// ---------------------------------------------------------------------------
-	// ❌ STEP 9: Add searchTransactions tool
+	// ✅ STEP 9: Add searchTransactions tool
 	searchTransactions,
 	// ---------------------------------------------------------------------------
 } satisfies ToolSet;

@@ -76,7 +76,7 @@
   import { transferFunds } from './tools/transfer-funds';
 
   // ---------------------------------------------------------------------------
-  // ❌ STEP 8: Import searchTransactions tool
+  // ✅ STEP 8: Import searchTransactions tool
   import { searchTransactions } from './tools/search-transactions';
   // ---------------------------------------------------------------------------
 
@@ -92,7 +92,7 @@
     transferFunds,
     userSettings,
     // ---------------------------------------------------------------------------
-    // ❌ STEP 9: Add searchTransactions tool
+    // ✅ STEP 9: Add searchTransactions tool
     searchTransactions,
     // ---------------------------------------------------------------------------
   } satisfies ToolSet;
