@@ -1,6 +1,7 @@
 import assert from 'assert';
 import { ManagementClient } from 'auth0';
-import { concat, orderBy } from 'lodash-es';
+import concat from 'lodash-es/concat';
+import orderBy from 'lodash-es/orderBy';
 
 import type { ManagementClientOptionsWithClientSecret as ManagementClientOptions } from 'auth0';
 

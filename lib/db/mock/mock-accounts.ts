@@ -13,9 +13,7 @@ const sampleUserIds = [
 export async function createMockAccounts(userId: string) {
 	console.log('Creating mock accounts for user:', userId);
 
-	const { fakerEN: faker } = await import('@faker-js/faker');
-
-	const sampleUserId = faker.helpers.arrayElement(sampleUserIds);
+	const sampleUserId = arrayElement(sampleUserIds);
 
 	const [
 		{ getSampleData },
@@ -162,4 +160,8 @@ export async function generateMockEmbeddings() {
 
 		await createDocumentsWithEmbeddings(transactions, 'sample');
 	}
+}
+
+function arrayElement<T = string>(array: readonly T[]): T {
+	return array[Math.floor(Math.random() * array.length)];
 }

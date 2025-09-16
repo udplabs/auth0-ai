@@ -1,7 +1,7 @@
 'use client';
 
 import { useAccounts } from '@/hooks/use-accounts';
-import { merge } from 'lodash-es';
+import merge from 'lodash-es/merge';
 import { createContext, useCallback, useMemo, useReducer } from 'react';
 import { toast } from 'sonner';
 import { TransferModal } from './transfer-modal';

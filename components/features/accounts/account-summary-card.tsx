@@ -10,7 +10,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { startCase } from 'lodash-es';
+import startCase from 'lodash-es/startCase';
 import { ArrowRight } from 'lucide-react';
 import { memo } from 'react';
 

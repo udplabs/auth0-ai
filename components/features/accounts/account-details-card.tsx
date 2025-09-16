@@ -9,7 +9,7 @@ import {
 	type CardProps,
 } from '@/components/ui/card';
 import { useAccounts } from '@/hooks/use-accounts';
-import { startCase } from 'lodash-es';
+import startCase from 'lodash-es/startCase';
 import { CurrencyField } from './ui/currency-field';
 import { DateField } from './ui/date-field';
 
