@@ -11,7 +11,7 @@ export async function getTransactions({
 }) {
 	// We are cheating for now and just fetching the account w/ transactions.
 	// Easier since we are handling permissions at the account level (for now).
-	const accounts = await getAccounts(userId, true);
+	const accounts = await getAccounts({ userId, includeTransactions: true });
 
 	if (accountId) {
 		const account = accounts.find((a) => a.id === accountId);

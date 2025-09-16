@@ -8,8 +8,7 @@ import { AccountSchema, ToolResponseSchema } from '../schemas';
  * getAccounts tool
  *
  * Purpose
- * - Fetches the authenticated user's accounts from the API and returns them to the model.
- * - Designed to return data for UI rendering (no text summarization).
+ * - Fetches a list of authenticated user's accounts from the API and returns them to the model.
  *
  * Contract
  * - input: no parameters (must be authenticated via session)

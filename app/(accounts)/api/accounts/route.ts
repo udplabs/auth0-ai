@@ -5,7 +5,7 @@ import { deleteAllUserTuples } from '@/lib/auth0/fga/utils';
 import { generateMockEmbeddings } from '@/lib/db/mock/mock-accounts';
 import { deleteAccountData } from '@/lib/db/queries/accounts/mutate-accounts';
 import { handleApiError } from '@/lib/errors';
-import { type NextRequest, NextResponse } from 'next/server';
+import { type NextRequest } from 'next/server';
 /**
  * Accounts API
  *
@@ -46,10 +46,9 @@ import { type NextRequest, NextResponse } from 'next/server';
 export async function GET() {
 	try {
 		const user = await getUser(); // Throws if not authenticated
-		const data = await getAccounts(user.sub);
-
+		const data = await getAccounts({ userId: user.sub });
 		// Success: return JSON array (shape defined by getAccounts implementation)
-		return NextResponse.json(data);
+		return new Response(JSON.stringify(data), { status: 200 });
 	} catch (error: unknown) {
 		return handleApiError(error);
 	}

@@ -1,7 +1,7 @@
 import { getTransactions } from '@/lib/api/accounts/get-transactions';
 import { getUser } from '@/lib/auth0/client';
 import { handleApiError } from '@/lib/errors';
-import { type NextRequest, NextResponse } from 'next/server';
+import { type NextRequest } from 'next/server';
 
 export async function GET(
 	_: NextRequest,
@@ -14,7 +14,7 @@ export async function GET(
 
 		const data = await getTransactions({ accountId, userId: user.sub });
 
-		return NextResponse.json(data);
+		return new Response(JSON.stringify(data), { status: 200 });
 	} catch (error: unknown) {
 		return handleApiError(error);
 	}
