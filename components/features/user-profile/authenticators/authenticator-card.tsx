@@ -42,7 +42,10 @@ export const AuthenticatorCard = ({
 	skeleton = false,
 	...props
 }: AuthenticatorCardProps) => {
+	const { isLoading, deleteAuthenticator } = useAuthenticators();
+
 	const { id, enrolled, type: factorType } = data || {};
+
 	const {
 		primary,
 		secondary,
@@ -52,8 +55,6 @@ export const AuthenticatorCard = ({
 	if (!enrolled) {
 		return null;
 	}
-
-	const { isLoading, deleteAuthenticator } = useAuthenticators();
 
 	return (
 		<Card

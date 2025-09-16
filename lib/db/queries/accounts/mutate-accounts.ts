@@ -45,11 +45,6 @@ interface AccountsSeparatedResponse {
 	transactions: Transactions.Transaction[];
 }
 
-interface AccountsSeparatedInput {
-	accounts: Accounts.CreateAccountInput[];
-	transactions?: Transactions.CreateTransactionInput[];
-}
-
 export async function saveAccountsAndReturnSeparate(
 	accounts: Accounts.CreateAccountInput[],
 	transactions?: Transactions.CreateTransactionInput[]

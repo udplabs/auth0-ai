@@ -4,7 +4,7 @@ import { convertToUI } from '@/lib/utils/db-converter';
 import { Account as AccountModel, Prisma } from '../../generated/prisma';
 import { prisma } from '../../prisma/client';
 
-import type { Accounts, Transactions } from '@/types';
+import type { Accounts } from '@/types';
 
 export async function getExternalAccountsByUserId(userId: string) {
 	const dbAccounts = await prisma.account.findMany({
@@ -34,15 +34,6 @@ export async function getAccountsByUserId(
 	const dbAccounts = await prisma.account.findMany({
 		where: { customerId: userId },
 		include: includeTransactions ? { transactions: true } : undefined,
-	});
-	return convertToUI<AccountModel[], Accounts.Account[]>(dbAccounts);
-}
-
-export async function listAccountsByCustomerId(
-	customerId: string
-): Promise<Accounts.Account[]> {
-	const dbAccounts = await prisma.account.findMany({
-		where: { customerId },
 	});
 	return convertToUI<AccountModel[], Accounts.Account[]>(dbAccounts);
 }

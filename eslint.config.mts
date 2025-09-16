@@ -12,10 +12,13 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
 	...compat.config({
+		ignorePatterns: ['lib/db/generated/**'],
 		extends: ['next/core-web-vitals', 'next/typescript'],
 		rules: {
 			'@typescript-eslint/no-explicit-any': 'off',
 			'@typescript-eslint/ban-ts-comment': 'off',
+			'@typescript-eslint/no-namespace': 'off', // TODO: get rid of namespacing
+			'@typescript-eslint/no-unused-vars': 'warn',
 		},
 	}),
 	eslintConfigPrettier,
