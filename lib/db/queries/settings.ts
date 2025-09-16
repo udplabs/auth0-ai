@@ -29,9 +29,8 @@ export async function upsertSettings(
 
 	// Build base data object
 	// - coerce ISO strings to Date for createdAt/updatedAt
-	const _data = Object.entries({
-		currentLabStep: null,
-		...rest,
+	const payload = {
+		...data,
 		createdAt:
 			typeof createdAt === 'string'
 				? new Date(createdAt)
@@ -40,26 +39,12 @@ export async function upsertSettings(
 			typeof updatedAt === 'string'
 				? new Date(updatedAt)
 				: ((rest as any).updatedAt ?? undefined),
-	});
-
-	// Build update payload:
-	// - keep nulls (explicit clears)
-	// - drop undefined (not provided)
-	const update = Object.fromEntries(_data.filter(([, v]) => v !== undefined));
-
-	// Build create payload:
-	// undefined => null
-	const createData = {
-		id,
-		...Object.fromEntries(
-			_data.map(([k, v]) => (v === undefined ? [k, null] : [k, v]))
-		),
 	};
 
 	const result = await prisma.settings.upsert({
 		where: { id },
-		update,
-		create: createData as Prisma.SettingsCreateInput,
+		update: payload,
+		create: payload as Prisma.SettingsCreateInput,
 	});
 
 	const appInstance = await saveAppInstance();
@@ -69,11 +54,11 @@ export async function upsertSettings(
 	await neon.remoteSettings.upsert({
 		where: { id },
 		update: {
-			...update,
+			...payload,
 			appInstanceId: appInstance.id,
 		},
 		create: {
-			...createData,
+			...payload,
 		} as Neon.RemoteSettingsCreateInput,
 	});
 

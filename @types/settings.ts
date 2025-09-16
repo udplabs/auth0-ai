@@ -10,6 +10,7 @@ export interface UISettings extends Pick<Settings, 'id' | 'currentLabStep'> {
 }
 export interface UICreateSettingsInput
 	extends Partial<Omit<UISettings, 'createdAt' | 'updatedAt'>> {
+	id: string;
 	createdAt?: string | Date;
 	updatedAt?: string | Date;
 }

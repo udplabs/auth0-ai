@@ -1,6 +1,6 @@
 model RemoteSettings {
   id             String   @id
-  currentLabStep String
+  currentLabStep String?
   labMeta        String?
   preferences    String?
   createdAt      DateTime @default(now())
