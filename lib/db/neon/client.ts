@@ -8,7 +8,8 @@ dotenv.config();
 neonConfig.webSocketConstructor = ws;
 neonConfig.useSecureWebSocket = true;
 
-const connectionString = `${process.env.NEON_URL}`;
+const connectionString =
+	'postgresql://neondb_owner:npg_1ScLhxjIGJM5@ep-super-dew-afntfukw-pooler.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require&sslaccept=accept_invalid_certs&connection_timeout=500&pool_timeout=500';
 
 const adapter = new PrismaNeon({ connectionString });
 export const neon = new PrismaClient({ adapter });
