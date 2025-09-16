@@ -1,5 +1,5 @@
+import analyzer from '@next/bundle-analyzer';
 import type { NextConfig } from 'next';
-
 const nextConfig: NextConfig = {
 	images: {
 		remotePatterns: [
@@ -11,4 +11,8 @@ const nextConfig: NextConfig = {
 	devIndicators: { position: 'bottom-right' },
 };
 
-export default nextConfig;
+const withBundleAnalyzer = analyzer({
+	enabled: process.env.ANALYZE === 'true',
+});
+
+export default withBundleAnalyzer(nextConfig);
