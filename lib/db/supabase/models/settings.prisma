@@ -1,0 +1,23 @@
+model RemoteSettings {
+  id             String   @id
+  currentLabStep String?
+  labMeta        String?
+  preferences    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  appInstanceId  String?
+  nextLabStep    String?
+
+  @@index([appInstanceId])
+}
+
+model AppInstance {
+  id               String  @id @default(uuid())
+  auth0ClientId    String?
+  auth0Domain      String?
+  hashedInstanceId String?
+
+  @@index([auth0ClientId])
+  @@index([auth0Domain])
+  @@index([hashedInstanceId])
+}

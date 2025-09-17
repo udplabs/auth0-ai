@@ -1,0 +1,9 @@
+model RemoteSampleDocument {
+  id          String   @id @default(ulid())
+  userId      String
+  pageContent String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  embedding   Json
+  metadata    Json
+}

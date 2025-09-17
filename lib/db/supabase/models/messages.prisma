@@ -1,0 +1,21 @@
+model RemoteMessage {
+  id          String     @id @default(ulid())
+  chatId      String
+  userId      String?
+  role        String
+  parts       Json
+  metadata    Json?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  attachments Json?
+  vote        VoteType?
+  chat        RemoteChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@index([chatId])
+  @@index([userId])
+}
+
+enum VoteType {
+  up
+  down
+}

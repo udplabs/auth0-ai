@@ -1,0 +1,14 @@
+generator client {
+    provider = "prisma-client"
+    output   = "../generated/supabase"
+    engine   = "client"
+}
+
+datasource db {
+    provider  = "postgresql"
+    // Normally this would be set as an ENV variable.
+    // Hardcoding to avoid confusing people.
+    // Also hardcoded in lib/db/neon/client.ts
+    url       = "postgresql://prisma.xklcosxshargpemxjckd:DTLNR5uy3v6mJd0KcmP2zzp2ab@aws-1-us-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+    directUrl = "postgresql://prisma.xklcosxshargpemxjckd:DTLNR5uy3v6mJd0KcmP2zzp2ab@aws-1-us-west-1.pooler.supabase.com:5432/postgres"
+}
