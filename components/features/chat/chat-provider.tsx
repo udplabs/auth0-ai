@@ -46,7 +46,7 @@ export function ChatProvider({
 	const { setDataStream } = useDataStream();
 	const { mutate: refreshChatHistory } = useChatHistory();
 	const { data: user, isAuthenticated, updateUserSettings } = useUserProfile();
-	console.log('isNewChat:', isNewChat);
+
 	const chatRef = useRef<AIChat<ChatType.UIMessage>>();
 
 	if (!chatRef.current || chatRef.current.id !== chatId) {
