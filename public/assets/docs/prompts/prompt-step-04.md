@@ -1,9 +1,13 @@
 ## LAB STEP CONTEXT
 - Lab Step: `step-04`
-- Lab Guide Name: `configure-fga`
+- Lab Guide Name: `04-configure-fga`
 - Static Aiya response: `aiya-post-auth` (*ALREADY sent AFTER completion of Auth0 configuration in step-03*)
 - Implementation Code:
   - `.env`
+
+Guidelines
+- Pull the GUIDE using `getContent` tool for full context.
+- Implementation of FGA should be via https://fga.dev NOT using the CLI.
 
 ##### FGA Model (for reference)
 ```
@@ -73,8 +77,8 @@ transaction_amount <= transaction_limit
 ```
 
 ##### Expected Outcome:
-- Created an FGA store
-- Added model (copy/paste from guide)
-- Created an FGA client
+- Created an FGA store (via fga.dev)
+- Added model (copy/paste from guide into fga.dev)
+- Created an FGA client (via fga.dev)
 - Updated .env w/ FGA settings
 - Should NOT be able to see account data.
