@@ -7,8 +7,8 @@ import {
 	JsonArray,
 	JsonObject,
 } from '../generated/prisma/internal/prismaNamespace';
-import { neon } from '../neon/client';
 import { prisma } from '../prisma/client';
+import { supabase } from '../supabase/client';
 
 import type { Documents } from '@/types/documents';
 
@@ -39,7 +39,7 @@ export async function saveEmbeddings(
 	let dbResult: DocumentModel[] = [];
 
 	if (table === 'sample') {
-		dbResult = await neon.remoteSampleDocument.createManyAndReturn({
+		dbResult = await supabase.remoteSampleDocument.createManyAndReturn({
 			data,
 		});
 		console.log('saved sample documents:', dbResult.length);

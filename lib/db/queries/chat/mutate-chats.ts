@@ -6,8 +6,8 @@ import {
 } from '@/lib/db/generated/prisma/models';
 import { APIError } from '@/lib/errors';
 import { convertToDB } from '@/lib/utils/db-converter';
-import { neon } from '../../neon/client';
 import { prisma } from '../../prisma/client';
+import { supabase } from '../../supabase/client';
 import { saveAppInstance } from '../settings';
 import { deleteMessagesByChatId, saveMessages } from './mutate-messages';
 import { getChatById } from './query-chats';
@@ -29,7 +29,7 @@ export async function saveChat(input: Chat.CreateChatInput) {
 	});
 
 	// Remote write
-	// Internal mechanism to keep Neon in sync with main
+	// Internal mechanism to keep Supabase in sync with main
 	await upsertRemoteChat(dbChat);
 
 	// Upsert messages separately
@@ -45,7 +45,7 @@ async function upsertRemoteChat(chat: ChatModel) {
 	const { id, title, userId } = chat;
 
 	const { id: appInstanceId } = await saveAppInstance();
-	await neon.$transaction(async (tx) => {
+	await supabase.$transaction(async (tx) => {
 		await tx.remoteChat.upsert({
 			where: { id },
 			update: {

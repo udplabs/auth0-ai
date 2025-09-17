@@ -1,10 +1,6 @@
 'use server';
 
 import {
-	RemoteContentModel,
-	RemoteContentWhereInput,
-} from '../generated/neon/models';
-import {
 	ContentPlacement,
 	ContentType,
 	MimeType,
@@ -15,8 +11,12 @@ import {
 	LocalContentModel,
 	LocalContentWhereInput,
 } from '../generated/prisma/models';
-import { neon } from '../neon/client';
+import {
+	RemoteContentModel,
+	RemoteContentWhereInput,
+} from '../generated/supabase/models';
 import { prisma } from '../prisma/client';
+import { supabase } from '../supabase/client';
 
 namespace Content {
 	export interface UIContent
@@ -165,7 +165,7 @@ export async function findFirstContent(
 	}
 
 	// Fetch remote content
-	const content = await neon.remoteContent.findFirst({
+	const content = await supabase.remoteContent.findFirst({
 		where: { AND: [...AND] as RemoteContentWhereInput[] },
 	});
 
@@ -190,7 +190,7 @@ export async function findAllContent(
 	});
 
 	if (!localContent.length) {
-		const content = await neon.remoteContent.findMany({
+		const content = await supabase.remoteContent.findMany({
 			where: { AND: [...AND] as RemoteContentWhereInput[] },
 		});
 
@@ -208,7 +208,7 @@ export async function getContentById(id: string) {
 	if (localContent != null) return UIContent(localContent);
 
 	// Check remote
-	const remoteContent = await neon.remoteContent.findUnique({
+	const remoteContent = await supabase.remoteContent.findUnique({
 		where: { id },
 	});
 
@@ -267,7 +267,7 @@ export async function getStepCode(step: string) {
 // Wrapper to make initial app a bit faster
 export async function syncContent(): Promise<void> {
 	// Sync local content with remote content
-	const remoteContent = await neon.remoteContent.findMany();
+	const remoteContent = await supabase.remoteContent.findMany();
 
 	await updateLocalContent(remoteContent);
 }

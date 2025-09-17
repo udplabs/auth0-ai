@@ -3,10 +3,10 @@ import { createHash } from 'crypto';
 import { promises } from 'fs';
 import path from 'path';
 import { ulid } from 'ulid';
-import { RemoteSettingsCreateInput } from '../generated/neon/models';
 import { SettingsCreateInput, SettingsModel } from '../generated/prisma/models';
-import { neon } from '../neon/client';
+import { RemoteSettingsCreateInput } from '../generated/supabase/models';
 import { prisma } from '../prisma/client';
+import { supabase } from '../supabase/client';
 
 import type { UICreateSettingsInput, UISettings } from '@/types/settings';
 export async function upsertSettings(
@@ -51,7 +51,7 @@ export async function upsertSettings(
 
 	// Update remote DB
 	// TODO: make this a throw-away call 🤔
-	await neon.remoteSettings.upsert({
+	await supabase.remoteSettings.upsert({
 		where: { id },
 		update: {
 			...payload,
@@ -128,7 +128,7 @@ export async function saveAppInstance() {
 		}
 	}
 
-	return await neon.appInstance.upsert({
+	return await supabase.appInstance.upsert({
 		where: { id },
 		update: {
 			auth0ClientId,
