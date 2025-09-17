@@ -47,7 +47,7 @@ export function ChatProvider({
 	const { mutate: refreshChatHistory } = useChatHistory();
 	const { data: user, isAuthenticated, updateUserSettings } = useUserProfile();
 
-	const chatRef = useRef<AIChat<ChatType.UIMessage>>();
+	const chatRef = useRef<AIChat<ChatType.UIMessage>>(null);
 
 	if (!chatRef.current || chatRef.current.id !== chatId) {
 		const {

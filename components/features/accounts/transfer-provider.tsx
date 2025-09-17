@@ -64,9 +64,7 @@ export type TransferProviderOptions = React.PropsWithChildren;
 export const TransferProvider = ({ children }: TransferProviderOptions) => {
 	const { data: accounts = [], mutate } = useAccounts();
 
-	const [state, dispatch] = useReducer<
-		React.Reducer<Transfers.TransferContext, Transfers.TransferAction>
-	>(TransferReducer, initialContext);
+	const [state, dispatch] = useReducer(TransferReducer, initialContext);
 
 	const toggleModal: Transfers.TransferContext['toggleModal'] = useCallback(
 		(options) => {
