@@ -12,7 +12,7 @@ export async function resetAccountPermissions(userId: string) {
 	const accounts = await getAccountsByUserId(userId);
 
 	// Attempt to delete existing tuples
-	await deleteAllUserTuples(userId);
+	await deleteAllUserTuples(userId, accounts);
 
 	// Recreate owner permissions for all accounts
 	const accountIds = accounts.map((acc) => acc.id);
