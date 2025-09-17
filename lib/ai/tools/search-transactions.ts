@@ -10,7 +10,7 @@ import { DocumentWithScoreSchema, ToolResponseSchema } from '../schemas';
 import { LocalVectorStore } from '@/lib/ai/rag/vector-store';
 import { FGAFilter } from '@auth0/ai';
 
-import type { Documents } from '@/types';
+import type { Documents } from '@/types/documents';
 
 /**
  * Lab Exercise: Implement FGA for RAG tool `searchTransactions`
@@ -135,7 +135,7 @@ export const searchTransactions = tool<
 			// ❌ STEP 5: Apply authorization filter (core FGA step).
 			// Internally may batch; returns only documents passing the relation check.
 			// ---------------------------------------------------------------------
-			// const authorizedResults: Documents.DocumentWithScore[] = await fgaRetriever(...) // 👈 Apply FGA filter to raw results
+			// const authorizedResults: Documents.DocumentWithScore[] = await fgaRetriever.filter(...) // 👈 Apply FGA filter to raw results
 			const authorizedResults: Documents.DocumentWithScore[] = []; // ❌ Remove this placeholder line
 			console.log(
 				'[searchTransactions] Authorized results:',

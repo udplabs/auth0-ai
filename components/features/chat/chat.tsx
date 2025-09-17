@@ -15,7 +15,7 @@ import { ChatThinkingMessage } from './chat-thinking-message';
 import { PromptInput } from './prompt-input';
 import { Greeting } from './ui/greeting';
 
-import type { Chat } from '@/types';
+import type { Chat } from '@/types/chat';
 export function Chat({ hideLogin }: { hideLogin?: boolean }) {
 	const { messages, status } = useChat<Chat.UIMessage>();
 

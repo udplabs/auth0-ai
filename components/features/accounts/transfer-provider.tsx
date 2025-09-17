@@ -6,7 +6,7 @@ import { createContext, useCallback, useMemo, useReducer } from 'react';
 import { toast } from 'sonner';
 import { TransferModal } from './transfer-modal';
 
-import type { Transfers } from '@/types';
+import type { Transfers } from '@/types/transfers';
 
 const stub = () => {
 	throw new Error('You forgot to wrap your app with a transfer provider!');

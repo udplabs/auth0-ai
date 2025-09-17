@@ -13,7 +13,7 @@ import startCase from 'lodash-es/startCase';
 import { CurrencyField } from './ui/currency-field';
 import { DateField } from './ui/date-field';
 
-import type { Accounts } from '@/types';
+import type { Accounts } from '@/types/accounts';
 
 interface AccountDetailsCardProps extends CardProps {
 	accountId: string;

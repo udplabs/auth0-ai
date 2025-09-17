@@ -1,15 +1,16 @@
 // lib/db/queries/documents.ts
 'use server';
 
-import type {
-	Document as DocumentModel,
-	Prisma,
-} from '@/lib/db/generated/prisma';
+import type { DocumentModel } from '@/lib/db/generated/prisma/models';
 import { convertToUI } from '@/lib/utils/db-converter';
-import { neon } from '../neon/client';
+import {
+	JsonArray,
+	JsonObject,
+} from '../generated/prisma/internal/prismaNamespace';
 import { prisma } from '../prisma/client';
+import { supabase } from '../supabase/client';
 
-import type { Documents } from '@/types';
+import type { Documents } from '@/types/documents';
 
 export async function saveEmbeddings(
 	documents: Documents.CreateDocumentInput[],
@@ -38,7 +39,7 @@ export async function saveEmbeddings(
 	let dbResult: DocumentModel[] = [];
 
 	if (table === 'sample') {
-		dbResult = await neon.remoteSampleDocument.createManyAndReturn({
+		dbResult = await supabase.remoteSampleDocument.createManyAndReturn({
 			data,
 		});
 		console.log('saved sample documents:', dbResult.length);
@@ -66,8 +67,8 @@ export async function saveDocuments(
 		data: documents.map(({ metadata, embedding, ...rest }) => {
 			return {
 				...rest,
-				embedding: embedding as Prisma.JsonArray,
-				metadata: metadata as Prisma.JsonObject,
+				embedding: embedding as JsonArray,
+				metadata: metadata as JsonObject,
 			};
 		}),
 	});

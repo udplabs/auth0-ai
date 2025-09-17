@@ -68,7 +68,7 @@ export const ChatMessage = ({
 									<Response
 										key={key}
 										{...{
-											defaultOrigin: `${window.location.origin}`,
+											defaultOrigin: `http://localhost:3000`,
 											...ResponseProps,
 										}}
 									>

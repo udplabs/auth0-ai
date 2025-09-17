@@ -1,10 +1,10 @@
 'use server';
 
 import { convertToUI } from '@/lib/utils/db-converter';
-import { Account as AccountModel, Prisma } from '../../generated/prisma';
+import { AccountModel, AccountWhereInput } from '../../generated/prisma/models';
 import { prisma } from '../../prisma/client';
 
-import type { Accounts } from '@/types';
+import type { Accounts } from '@/types/accounts';
 
 export async function getExternalAccountsByUserId(userId: string) {
 	const dbAccounts = await prisma.account.findMany({
@@ -52,7 +52,7 @@ export async function getAccountsByAccountId(
 // THIS IS AN INTERNAL FUNCTION USED ONLY TO GENERATE THE VECTOR DB
 // DO NOT USE THIS IN ANY API ROUTES
 export async function getAllAccounts(
-	where?: Prisma.AccountWhereInput
+	where?: AccountWhereInput
 ): Promise<Accounts.Account[]> {
 	const dbAccounts = await prisma.account.findMany(
 		where ? { where } : undefined

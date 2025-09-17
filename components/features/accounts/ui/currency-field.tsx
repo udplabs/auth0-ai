@@ -1,4 +1,4 @@
-import type { Accounts } from '@/types';
+import type { Accounts } from '@/types/accounts';
 
 export const CurrencyField = ({
 	children = '**hidden**',

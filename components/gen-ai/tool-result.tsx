@@ -125,9 +125,9 @@ export const ToolResult = ({
 	);
 
 	// Hide certain internal tools
-	if (['tool-getContent', 'tool-userSettings'].includes(toolPart.type)) {
-		return null;
-	}
+	// if (['tool-getContent', 'tool-userSettings'].includes(toolPart.type)) {
+	// 	return null;
+	// }
 
 	return (
 		<div className='items-stretch, flex w-full flex-col-reverse gap-3'>

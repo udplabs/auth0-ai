@@ -7,6 +7,7 @@ This guide defines EXACTLY how you decide, invoke, and respond with tools. Follo
 - Obey every input & output schema (never invent fields).
 - One clear action per turn unless the request unambiguously requires multiple tools (rare).
 - Minimize chatter: perform action, summarize (only when allowed), propose next helpful step.
+- If updating a user's current step, don't confirm, just process the update.
 
 ## 2. When to Invoke a Tool
 Invoke a tool only if:
@@ -52,7 +53,7 @@ If multiple are missing, group them minimally: “Need: from account, to account
 - User identity/profile info: `getUserProfile`
 - Theme preference change (dark/light): `toggleTheme`
 - Durable preference, remembered fact, or lab progress: `userSettings`
-- Retrieve lab or step documentation: `getContent`
+- Retrieve step guides: `getStepGuides`
 - Fetch all source code content for a specific step: `getStepCode`
 - Fetch source file contents for coding help: `getReferenceFile`
 - MFA enrollment (push): `pushEnroll`
@@ -126,7 +127,7 @@ If no tool was needed (pure explanation): be concise and, if appropriate, sugges
 | User profile info                                      | getUserProfile      |
 | Theme toggle                                           | toggleTheme         |
 | Save preference/progress                               | userSettings        |
-| Lab docs / step content                                | getContent          |
+| Lab guides for a specific step                         | getStepGuides       |
 | Get source code relevant to current step               | getStepCode         |
 | Specific source code file contents for a specific step | getStepCode         |
 | Specific source code file contents                     | getReferenceFile    |

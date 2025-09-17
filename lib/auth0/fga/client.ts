@@ -62,7 +62,11 @@ let singleton: OpenFgaClient | null = null;
 export async function createClient() {
 	try {
 		const options: UserClientConfigurationParams = {
-			apiUrl: process.env.FGA_API_URL,
+			retryParams: {
+				maxRetry: 2,
+				minWaitInMs: 300,
+			},
+			// apiUrl: process.env.FGA_API_URL,
 			//...
 		};
 

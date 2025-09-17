@@ -1,11 +1,16 @@
 'use server';
 
 import type {
-	Prisma,
-	SampleDocument as SampleDocumentModel,
-} from '@/lib/db/generated/prisma';
+	SampleDocumentCreateInput,
+	SampleDocumentModel,
+	SampleDocumentUpdateInput,
+	SampleTransactionCreateInput,
+	SampleTransactionUpdateInput,
+} from '@/lib/db/generated/prisma/models';
 
-import type { Accounts, Documents, Transactions } from '@/types';
+import type { Accounts } from '@/types/accounts';
+import type { Documents } from '@/types/documents';
+import type { Transactions } from '@/types/transactions';
 
 type SampleAccount = Accounts.Account & {
 	lastSyncedAt?: Date;
@@ -28,9 +33,9 @@ export async function getSampleData(userId: string): Promise<{
 	transactions: SampleTransaction[];
 	documents: SampleDocument[];
 }> {
-	const [{ prisma }, { neon }, { convertToUI }] = await Promise.all([
+	const [{ prisma }, { supabase }, { convertToUI }] = await Promise.all([
 		import('@/lib/db/prisma/client'),
-		import('@/lib/db/neon/client'),
+		import('@/lib/db/supabase/client'),
 		import('@/lib/utils/db-converter'),
 	]);
 
@@ -42,7 +47,7 @@ export async function getSampleData(userId: string): Promise<{
 	});
 
 	if (localSampleAccounts.length === 0) {
-		const remoteAccounts = await neon.remoteSampleAccount.findMany({
+		const remoteAccounts = await supabase.remoteSampleAccount.findMany({
 			where: { customerId: userId },
 		});
 
@@ -74,7 +79,7 @@ export async function getSampleData(userId: string): Promise<{
 	});
 
 	if (localSampleTransactions.length === 0) {
-		const remoteTransactions = await neon.remoteSampleTransaction.findMany({
+		const remoteTransactions = await supabase.remoteSampleTransaction.findMany({
 			where: { customerId: userId },
 		});
 
@@ -86,12 +91,12 @@ export async function getSampleData(userId: string): Promise<{
 						...t,
 						lastSyncedAt,
 						expiresAt,
-					} as Prisma.SampleTransactionUpdateInput,
+					} as SampleTransactionUpdateInput,
 					create: {
 						...t,
 						lastSyncedAt,
 						expiresAt,
-					} as Prisma.SampleTransactionCreateInput,
+					} as SampleTransactionCreateInput,
 				});
 			}),
 		]);
@@ -110,7 +115,7 @@ export async function getSampleData(userId: string): Promise<{
 	});
 
 	if (localSampleDocuments.length === 0) {
-		const remoteSampleDocuments = await neon.remoteSampleDocument.findMany({
+		const remoteSampleDocuments = await supabase.remoteSampleDocument.findMany({
 			where: { id: { in: lookupIds } },
 		});
 
@@ -122,12 +127,12 @@ export async function getSampleData(userId: string): Promise<{
 						...d,
 						lastSyncedAt,
 						expiresAt,
-					} as Prisma.SampleDocumentUpdateInput,
+					} as SampleDocumentUpdateInput,
 					create: {
 						...d,
 						lastSyncedAt,
 						expiresAt,
-					} as Prisma.SampleDocumentCreateInput,
+					} as SampleDocumentCreateInput,
 				});
 			}),
 		]);
@@ -147,12 +152,12 @@ export async function getSampleData(userId: string): Promise<{
 }
 
 export async function deleteSampleDocuments() {
-	const [{ prisma }, { neon }] = await Promise.all([
+	const [{ prisma }, { supabase }] = await Promise.all([
 		import('@/lib/db/prisma/client'),
-		import('@/lib/db/neon/client'),
+		import('@/lib/db/supabase/client'),
 	]);
 	// Delete local
 	await prisma.sampleDocument.deleteMany();
 	// Delete remote
-	return await neon.remoteSampleDocument.deleteMany();
+	return await supabase.remoteSampleDocument.deleteMany();
 }

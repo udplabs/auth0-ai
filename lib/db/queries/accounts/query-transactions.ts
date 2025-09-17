@@ -3,12 +3,12 @@
 import { getAccountsByUserId } from '@/lib/db/queries/accounts/query-accounts';
 import { convertToUI } from '@/lib/utils/db-converter';
 import {
-	Prisma,
-	Transaction as TransactionModel,
-} from '../../generated/prisma';
+	TransactionModel,
+	TransactionWhereInput,
+} from '../../generated/prisma/models';
 import { prisma } from '../../prisma/client';
 
-import type { Transactions } from '@/types';
+import type { Transactions } from '@/types/transactions';
 export async function getTransactionsByAccountId(
 	accountId: string
 ): Promise<Transactions.Transaction[]> {
@@ -35,7 +35,7 @@ export async function getTransactionsByUserId(
 // THIS IS AN INTERNAL FUNCTION USED ONLY TO GENERATE THE VECTOR DB
 // DO NOT USE THIS IN ANY API ROUTES
 export async function getAllTransactions(
-	where?: Prisma.TransactionWhereInput
+	where?: TransactionWhereInput
 ): Promise<Transactions.Transaction[]> {
 	const transactions = await prisma.transaction.findMany({
 		orderBy: { date: 'desc' },

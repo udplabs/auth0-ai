@@ -2,7 +2,7 @@ import type { SWRResponse } from 'swr';
 import useSWR from 'swr';
 import { useUserProfile } from './use-user-profile';
 
-import type { Accounts } from '@/types';
+import type { Accounts } from '@/types/accounts';
 
 const KEY = '/api/accounts';
 

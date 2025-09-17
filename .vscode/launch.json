@@ -11,7 +11,7 @@
 				"!${workspaceFolder}/node_modules/.pnpm_patches/**", // allow your patched pkgs
 				"!${workspaceFolder}/node_modules/@auth0/**",
 				"${workspaceFolder}/lib/db/generated/prisma/runtime/**",
-				"${workspaceFolder}/lib/db/generated/neon/runtime/**"
+				"${workspaceFolder}/lib/db/generated/supabase/runtime/**"
 			],
 			"resolveSourceMapLocations": [
 				"${workspaceFolder}/**",

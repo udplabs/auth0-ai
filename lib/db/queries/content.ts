@@ -1,18 +1,22 @@
 'use server';
 
 import {
-	Prisma as Neon,
-	RemoteContent as RemoteContentModel,
-} from '../generated/neon';
-import {
 	ContentPlacement,
 	ContentType,
-	LocalContent as LocalContentModel,
 	MimeType,
-	Prisma,
-} from '../generated/prisma';
-import { neon } from '../neon/client';
+} from '../generated/prisma/enums';
+import { JsonObject } from '../generated/prisma/internal/prismaNamespace';
+import {
+	LocalContentCreateInput,
+	LocalContentModel,
+	LocalContentWhereInput,
+} from '../generated/prisma/models';
+import {
+	RemoteContentModel,
+	RemoteContentWhereInput,
+} from '../generated/supabase/models';
 import { prisma } from '../prisma/client';
+import { supabase } from '../supabase/client';
 
 namespace Content {
 	export interface UIContent
@@ -109,8 +113,7 @@ function buildQuery({
 	contentType,
 	contentPlacement,
 }: Content.GetParams) {
-	const AND: Prisma.LocalContentWhereInput[] | Neon.RemoteContentWhereInput[] =
-		[];
+	const AND: LocalContentWhereInput[] | RemoteContentWhereInput[] = [];
 
 	if (key && query) {
 		if (key === 'name') {
@@ -153,7 +156,7 @@ export async function findFirstContent(
 			AND: [
 				...AND,
 				{ expiresAt: { gt: new Date() } },
-			] as Prisma.LocalContentWhereInput[],
+			] as LocalContentWhereInput[],
 		},
 	});
 
@@ -162,8 +165,8 @@ export async function findFirstContent(
 	}
 
 	// Fetch remote content
-	const content = await neon.remoteContent.findFirst({
-		where: { AND: [...AND] as Neon.RemoteContentWhereInput[] },
+	const content = await supabase.remoteContent.findFirst({
+		where: { AND: [...AND] as RemoteContentWhereInput[] },
 	});
 
 	if (content != null) {
@@ -182,13 +185,13 @@ export async function findAllContent(
 			AND: [
 				...AND,
 				{ expiresAt: { gt: new Date() } },
-			] as Prisma.LocalContentWhereInput[],
+			] as LocalContentWhereInput[],
 		},
 	});
 
 	if (!localContent.length) {
-		const content = await neon.remoteContent.findMany({
-			where: { AND: [...AND] as Neon.RemoteContentWhereInput[] },
+		const content = await supabase.remoteContent.findMany({
+			where: { AND: [...AND] as RemoteContentWhereInput[] },
 		});
 
 		return updateLocalContent(content);
@@ -205,7 +208,7 @@ export async function getContentById(id: string) {
 	if (localContent != null) return UIContent(localContent);
 
 	// Check remote
-	const remoteContent = await neon.remoteContent.findUnique({
+	const remoteContent = await supabase.remoteContent.findUnique({
 		where: { id },
 	});
 
@@ -234,14 +237,22 @@ export async function getStepPrompts(
 	});
 }
 
-export async function getStepGuides(
-	query: string
-): Promise<Content.UIContent[]> {
+interface GetStepGuidesParams {
+	query: string;
+	contentType?: Content.UIType;
+	contentPlacement?: Content.UIContentPlacement;
+}
+
+export async function getStepGuides({
+	query,
+	contentType = 'guide/step',
+	contentPlacement,
+}: GetStepGuidesParams): Promise<Content.UIContent[]> {
 	return await findAllContent({
 		key: 'labStep',
 		query,
-		contentType: 'guide/step',
-		contentPlacement: 'labs',
+		contentType,
+		contentPlacement,
 	});
 }
 
@@ -256,7 +267,7 @@ export async function getStepCode(step: string) {
 // Wrapper to make initial app a bit faster
 export async function syncContent(): Promise<void> {
 	// Sync local content with remote content
-	const remoteContent = await neon.remoteContent.findMany();
+	const remoteContent = await supabase.remoteContent.findMany();
 
 	await updateLocalContent(remoteContent);
 }
@@ -283,16 +294,16 @@ export async function updateLocalContent(
 				where: { id: c.id },
 				update: {
 					...c,
-					applicationData: (c?.applicationData || null) as Prisma.JsonObject,
+					applicationData: (c?.applicationData || null) as JsonObject,
 					lastSyncedAt,
 					expiresAt,
 				},
 				create: {
 					...c,
-					applicationData: (c?.applicationData || null) as Prisma.JsonObject,
+					applicationData: (c?.applicationData || null) as JsonObject,
 					lastSyncedAt,
 					expiresAt,
-				} as Prisma.LocalContentCreateInput,
+				} as LocalContentCreateInput,
 			});
 		}),
 	]);

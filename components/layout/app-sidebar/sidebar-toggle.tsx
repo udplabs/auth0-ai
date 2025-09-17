@@ -32,8 +32,7 @@ export function SidebarToggle({
 
 	if (animated) {
 		return (
-			<Button
-				animated
+			<AnimatedButton
 				{...{
 					...props,
 					icon: open ? (
@@ -67,15 +66,14 @@ export function SidebarToggle({
 						onClick: toggleSidebar,
 						variant: 'outline',
 						className: cn('md:h-fit md:px-2', className),
-						icon: open ? (
-							<PanelLeftCloseIcon size={16} />
-						) : (
-							<PanelLeftOpenIcon size={16} />
-						),
 						...props,
 					}}
 				>
-					{open ? '' : 'Open Sidebar'}
+					{open ? (
+						<PanelLeftCloseIcon size={16} />
+					) : (
+						<PanelLeftOpenIcon size={16} />
+					)}
 				</Button>
 			</TooltipTrigger>
 			<TooltipContent

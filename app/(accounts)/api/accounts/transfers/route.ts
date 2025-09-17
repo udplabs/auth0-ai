@@ -4,7 +4,7 @@ import { APIError, handleApiError } from '@/lib/errors';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 
-import type { Transfers } from '@/types';
+import type { Transfers } from '@/types/transfers';
 /**
  * POST /api/accounts/transfers
  *

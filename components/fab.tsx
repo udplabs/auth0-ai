@@ -58,7 +58,7 @@ export const FAB = () => {
 			>
 				<div className='z-99 flex flex-col-reverse items-end gap-y-2'>
 					<Button
-						className='p-0 hover:bg-transparent'
+						className='p-0 pl-2'
 						variant='ghost'
 						onClick={() => {
 							localStorage.removeItem(LS_KEY_FIRST);
@@ -72,7 +72,7 @@ export const FAB = () => {
 						</div>
 					</Button>
 					<Button
-						className='p-0 hover:bg-transparent'
+						className='p-0 pl-2'
 						variant='ghost'
 						onClick={() => {
 							localStorage.setItem(LS_KEY_AUTH, 'false');
@@ -85,7 +85,7 @@ export const FAB = () => {
 						</div>
 					</Button>
 					<Button
-						className='p-0 hover:bg-transparent'
+						className='p-0 pl-2'
 						variant='ghost'
 						onClick={() => resetPermissions()}
 					>
@@ -95,7 +95,7 @@ export const FAB = () => {
 						</div>
 					</Button>
 					<Button
-						className='p-0 hover:bg-transparent'
+						className='p-0 pl-2'
 						variant='ghost'
 						onClick={() => handleVectorReInit()}
 					>
@@ -105,7 +105,7 @@ export const FAB = () => {
 						</div>
 					</Button>
 					<Button
-						className='p-0 hover:bg-transparent'
+						className='p-0 pl-2'
 						variant='ghost'
 						onClick={() => {
 							handleEmbeddingsBuild()
@@ -121,7 +121,7 @@ export const FAB = () => {
 						</div>
 					</Button>
 					<Button
-						className='p-0 hover:bg-transparent'
+						className='p-0 pl-2'
 						variant='ghost'
 						onClick={() => handleVectorReset()}
 					>
@@ -131,7 +131,7 @@ export const FAB = () => {
 						</div>
 					</Button>
 					<Button
-						className='p-0 hover:bg-transparent'
+						className='p-0 pl-2'
 						variant='ghost'
 						onClick={() => handleVectorSummary()}
 					>

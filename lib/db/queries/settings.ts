@@ -3,10 +3,10 @@ import { createHash } from 'crypto';
 import { promises } from 'fs';
 import path from 'path';
 import { ulid } from 'ulid';
-import { Prisma as Neon } from '../generated/neon';
-import { Prisma } from '../generated/prisma';
-import { neon } from '../neon/client';
+import { SettingsCreateInput, SettingsModel } from '../generated/prisma/models';
+import { RemoteSettingsCreateInput } from '../generated/supabase/models';
 import { prisma } from '../prisma/client';
+import { supabase } from '../supabase/client';
 
 import type { UICreateSettingsInput, UISettings } from '@/types/settings';
 export async function upsertSettings(
@@ -44,14 +44,14 @@ export async function upsertSettings(
 	const result = await prisma.settings.upsert({
 		where: { id },
 		update: payload,
-		create: payload as Prisma.SettingsCreateInput,
+		create: payload as SettingsCreateInput,
 	});
 
 	const appInstance = await saveAppInstance();
 
 	// Update remote DB
 	// TODO: make this a throw-away call 🤔
-	await neon.remoteSettings.upsert({
+	await supabase.remoteSettings.upsert({
 		where: { id },
 		update: {
 			...payload,
@@ -59,14 +59,10 @@ export async function upsertSettings(
 		},
 		create: {
 			...payload,
-		} as Neon.RemoteSettingsCreateInput,
+		} as RemoteSettingsCreateInput,
 	});
 
-	return {
-		...result,
-		createdAt: result.createdAt.toISOString(),
-		updatedAt: result.updatedAt.toISOString(),
-	} as UISettings;
+	return UISettings(result);
 }
 
 // Call upsertSettings
@@ -78,15 +74,10 @@ async function getSettings(
 ): Promise<UISettings | undefined> {
 	if (!id) return;
 
-	const { createdAt, updatedAt, ...settings } =
-		(await prisma.settings.findUnique({ where: { id } })) || {};
+	const settings = await prisma.settings.findUnique({ where: { id } });
 
-	if (createdAt && updatedAt) {
-		return {
-			...settings,
-			createdAt: createdAt.toISOString(),
-			updatedAt: updatedAt.toISOString(),
-		} as UISettings;
+	if (settings?.createdAt && settings?.updatedAt) {
+		return UISettings(settings);
 	}
 
 	if (upsert) {
@@ -137,7 +128,7 @@ export async function saveAppInstance() {
 		}
 	}
 
-	return await neon.appInstance.upsert({
+	return await supabase.appInstance.upsert({
 		where: { id },
 		update: {
 			auth0ClientId,
@@ -162,4 +153,16 @@ export async function fileExistsAtRoot(filepath: string) {
 	} catch {
 		return false;
 	}
+}
+
+function UISettings(settings: SettingsModel): UISettings {
+	return {
+		...settings,
+		currentLabStep: settings?.currentLabStep ?? undefined,
+		nextLabStep: settings?.nextLabStep ?? undefined,
+		labMeta: settings?.labMeta ?? undefined,
+		preferences: settings?.preferences ?? undefined,
+		createdAt: settings.createdAt.toISOString(),
+		updatedAt: settings.updatedAt.toISOString(),
+	} as UISettings;
 }

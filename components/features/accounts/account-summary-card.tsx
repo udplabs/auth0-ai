@@ -18,7 +18,7 @@ import { useTransferModal } from '@/hooks/use-transfer-modal';
 import { AccountIcon } from './ui/account-icon';
 import { CurrencyField } from './ui/currency-field';
 
-import type { Accounts } from '@/types';
+import type { Accounts } from '@/types/accounts';
 
 export interface AccountSummaryCardProps extends CardProps {
 	account: Accounts.Account;

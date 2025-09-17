@@ -100,7 +100,6 @@ export default async function Page({
 		// unexpected errors are logged.
 		if (error instanceof APIError) {
 			if (error.type === 'not_found') {
-				console.log('starting new chat...');
 				isNewChat = true;
 			}
 		} else {

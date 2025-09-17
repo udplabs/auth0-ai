@@ -2,10 +2,17 @@
 
 import { APIError } from '@/lib/errors';
 import { convertToDB, convertToUI } from '@/lib/utils/db-converter';
-import type { Prisma as Neon } from '../../generated/neon';
-import type { Message as MessageModel, Prisma } from '../../generated/prisma';
-import { neon } from '../../neon/client';
+import type {
+	MessageCreateInput,
+	MessageModel,
+	MessageUpdateInput,
+} from '../../generated/prisma/models';
+import type {
+	RemoteMessageCreateInput,
+	RemoteMessageUpdateInput,
+} from '../../generated/supabase/models';
 import { prisma } from '../../prisma/client';
+import { supabase } from '../../supabase/client';
 import { getMessageById } from './query-messages';
 
 import type { Chat } from '@/types/chat';
@@ -40,25 +47,23 @@ export async function voteMessage(
 export async function updateMessage(
 	message: Chat.UIMessage
 ): Promise<Chat.UIMessage> {
-	const dbMessage = convertToDB<Chat.UIMessage, Prisma.MessageUpdateInput>(
-		message
-	);
+	const dbMessage = convertToDB<Chat.UIMessage, MessageUpdateInput>(message);
 	const result = await prisma.message.update({
 		where: { id: message.id },
 		data: dbMessage,
 	});
 
 	// Remote write
-	// Internal mechanism to keep Neon in sync with main
-	await neon.remoteMessage.update({
+	// Internal mechanism to keep Supabase in sync with main
+	await supabase.remoteMessage.update({
 		where: { id: message.id },
-		data: dbMessage as Neon.RemoteMessageUpdateInput,
+		data: dbMessage as RemoteMessageUpdateInput,
 	});
 
 	return convertToUI<MessageModel, Chat.UIMessage>(result);
 }
 export async function saveMessages(messages: Chat.UIMessage[]): Promise<void> {
-	const dbMessages = convertToDB<Chat.UIMessage[], Prisma.MessageCreateInput[]>(
+	const dbMessages = convertToDB<Chat.UIMessage[], MessageCreateInput[]>(
 		messages
 	);
 
@@ -77,16 +82,16 @@ export async function saveMessages(messages: Chat.UIMessage[]): Promise<void> {
 	]);
 
 	// Remote write
-	// Internal mechanism to keep Neon in sync with main
+	// Internal mechanism to keep Supabase in sync with main
 	await prisma.$transaction([
 		...dbMessages.map((m) => {
-			return neon.remoteMessage.upsert({
+			return supabase.remoteMessage.upsert({
 				where: { id: m?.id },
 				update: {
-					...(m as Neon.RemoteMessageUpdateInput),
+					...(m as RemoteMessageUpdateInput),
 				},
 				create: {
-					...(m as Neon.RemoteMessageCreateInput),
+					...(m as RemoteMessageCreateInput),
 				},
 			});
 		}),

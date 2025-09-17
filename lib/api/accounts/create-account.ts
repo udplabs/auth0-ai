@@ -1,4 +1,6 @@
-import type { Accounts, Documents, Transactions } from '@/types';
+import type { Accounts } from '@/types/accounts';
+import type { Documents } from '@/types/documents';
+import type { Transactions } from '@/types/transactions';
 
 interface CreateAccountsOptions {
 	userId: string;

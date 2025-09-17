@@ -7,7 +7,7 @@ import { ContentSchema, ToolResponseSchema } from '../../schemas';
 
 const inputSchema = z.object({
 	labStep: z
-		.stringFormat('step-00', /step-\d{2}/)
+		.string()
 		.optional()
 		.describe(
 			'The current lab step. If not provided, the current step will be looked up. Lab steps should be provided in `step-01` format.'
@@ -21,7 +21,11 @@ export const getStepCode = tool<
 >({
 	name: 'getStepCode',
 	description: `
-	This tool will retrieve any available reference code for a given step. If a user requests to see code for a step, i.e. 'show me the code for step 4' use this tool to fetch the code.
+	This tool will retrieve any available reference code for a given step.
+
+	If a user requests to see code for a step, i.e. 'show me the code for step 4' use this tool to fetch the code.
+
+	To fetch guide content use \`getContent\` NOT this tool.
 
 	If no step is provided then the tool will fetch the last known step.
 

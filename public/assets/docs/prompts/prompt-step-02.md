@@ -3,8 +3,7 @@
 - Lab Guide Name: `get-setup`
 - Static Aiya response auto-sent: `aiya-intro`
 - Implementation code: none
-- Reference Code:
-  - `package.json`
+- Reference Code: none
 
 Expected Outcome:
 - Running application at `http://localhost:3000`

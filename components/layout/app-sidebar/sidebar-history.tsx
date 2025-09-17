@@ -68,10 +68,14 @@ export function SidebarHistory() {
 				<SidebarGroupContent className='inline px-2 text-sm text-zinc-500 italic'>
 					Your conversations will appear here once you
 					<NewChatButton
-						{...{ className: 'h-auto py-0 px-1', variant: 'ghost' }}
+						{...{
+							className: 'h-auto py-0 ps-1 px-0 text-foreground',
+							variant: 'ghost',
+						}}
 					>
-						start chatting!
+						start chatting
 					</NewChatButton>
+					!
 				</SidebarGroupContent>
 			</SidebarGroup>
 		);

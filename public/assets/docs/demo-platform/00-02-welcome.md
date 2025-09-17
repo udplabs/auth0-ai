@@ -1,5 +1,5 @@
 ## Premise
-You’re a developer at *the bAInk*, a fancy new digital-only financial institution. Your task: wire an AI assistant into your banking UI without leaking sensitive data, enforce per‑account permissions with FGA, augment user interactions with RAG, and (coming soon!) require human approval for sensitive actions via async auth (CIBA) and Rich Authorization Requests.
+You’re a developer at *the bAInk*, a fancy new digital-only financial institution. Your task: wire an AI assistant into your banking UI without leaking sensitive data, enforce per‑account permissions with <abbr title='Fine-Grained Authorization'>FGA</abbr>, augment user interactions with <abbr title='Retrieval-Augmented Generation'>RAG</abbr>, and (coming soon!) require human approval for sensitive actions via async auth (<abbr title='Client Initiated Backchannel Authentication'>CIBA</abbr>) and Rich Authorization Requests.
 
 **Meet Aiya.** Aiya is the dev{camp} guide living inside your app. Once you get the app spun up you can utilize Aiya for things like:
 
@@ -16,7 +16,7 @@ You’re a developer at *the bAInk*, a fancy new digital-only financial institut
 > [!WARNING]
 > **AI disclaimer**
 >
-> - The learning application uses LLMs. Output can be incomplete, wrong, or inconsistent between runs.
+> - The learning application uses <abbr title='Large Language Models'>LLMs</abbr>. Output can be incomplete, wrong, or inconsistent between runs.
 >
 > - *Never* paste secrets or production data into the chat prompt.
 >
@@ -29,9 +29,9 @@ You’re a developer at *the bAInk*, a fancy new digital-only financial institut
 By the end, you will:
 
 - Run a Next.js banking starter app integrated with **Auth0 Auth for AI**.
-- Stand up an **Auth0 FGA Store**, load a model, and author tuples.
-- Implement a **RAG retriever** that filters results using FGA (policy‑aware retrieval).
-- Trigger a **CIBA**-style async authorization flow for a sensitive action. *<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>*
+- Stand up an **Auth0 <abbr title='Fine-Grained Authorization'>FGA</abbr> Store**, load a model, and author tuples.
+- Implement a **<abbr title='Retrieval-Augmented Generation'>RAG</abbr> retriever** that filters results using <abbr title='Fine-Grained Authorization'>FGA</abbr> (policy‑aware retrieval).
+- Trigger a **<abbr title='Client Initiated Backchannel Authentication'>CIBA</abbr>**-style async authorization flow for a sensitive action. *<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>*
 
 ### ✅ Expected outcome
 - A working local app you can reuse as a starter: readable, composable, and production‑opinionated.
@@ -41,20 +41,15 @@ By the end, you will:
 ### You must have the following:
   - *64-bit* Windows, Mac, or Linux Laptop with
     - Internet;
-    - Node.js v23.0;
+    - Node.js v22.0;
     - *Disabled VPN*
     - at least **8GB** memory
     - Integrated Code Editor (*VS Code recommended*).
-
-      <br>
-      
+      <br><br>
       > [!WARNING]
       > *Web* IDEs *may* work, but are not tested.
       >
       > Use of an IDE is ***strongly*** encouraged to take advantage of IntelliSense/Typescript
-
-      <br>
-      
   - Access to the [**Auth0 Demo Platform**](https://demo.okta.com) (*this one should be easy!*).
 
 <br>
@@ -70,10 +65,15 @@ By the end, you will:
   >
   > <br>
   >
-  > ***Windows users:*** We advise using the following *PowerShell* script to install `pnpm`:
+  > ***Windows users:*** We advise using the following *PowerShell* script to install <kbd>pnpm</kbd>:
   >   ```ps
   >   Invoke-WebRequest https://get.pnpm.io/install.ps1 -UseBasicParsing | Invoke-Expression
   >   ```
+
+<br>
+
+> [!WARNING]
+> You *may* need to restart terminal/PowerShell after installing Node.js and <kbd>pnpm</kbd>.
 
 <br>
 
@@ -92,16 +92,16 @@ By the end, you will:
 
 > [!IMPORTANT]
 >
-> *This is not an Auth0 FGA lab*. However, this lab does utilizes Auth0 FGA.
+> *This is not an Auth0 <abbr title='Fine-Grained Authorization'>FGA</abbr> lab*. However, this lab does utilizes Auth0 <abbr title='Fine-Grained Authorization'>FGA</abbr>.
 >
-> If you’re new to FGA, we recommend you skim the [concepts](https://docs.fga.dev/fga-concepts).
+> If you’re new to <abbr title='Fine-Grained Authorization'>FGA</abbr>, we recommend you skim the [concepts](https://docs.fga.dev/fga-concepts).
 
 <br>
 
 ## What you will learn
 
 - **Tools**: what a tool is in the Vercel AI SDK, how to define, validate input, and return structured results.
-- **RAG**: external knowledge retrieval, chunking/embeddings, and filtering results by policy.
-- [**Auth0 FGA**](https://auth0.com/fine-grained-authorization): model + tuples to gate which *documents/accounts* an identity can access.
-- **Async Auth (CIBA)**: decoupled approval for sensitive actions (e.g., high‑value transfer). *<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>*
+- **<abbr title='Retrieval-Augmented Generation'>RAG</abbr>**: external knowledge retrieval, chunking/embeddings, and filtering results by policy.
+- [**Auth0 <abbr title='Fine-Grained Authorization'>FGA</abbr>**](https://auth0.com/fine-grained-authorization): model + tuples to gate which *documents/accounts* an identity can access.
+- **Async Auth (<abbr title='Client Initiated Backchannel Authentication'>CIBA</abbr>)**: decoupled approval for sensitive actions (e.g., high‑value transfer). *<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>*
 - **Token Vault**: calling 3P APIs (Google Calendar) via Auth0 AI without handling user secrets directly. *<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>*

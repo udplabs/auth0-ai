@@ -104,7 +104,6 @@ export function useChatHistory() {
 		);
 
 		if (redirect) {
-			console.log('redirecting...');
 			router.push('/chat');
 		}
 	};

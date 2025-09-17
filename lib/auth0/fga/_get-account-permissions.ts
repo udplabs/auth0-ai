@@ -2,7 +2,7 @@
 // FINAL CODE
 import { getFgaClient } from './_client';
 
-import type { Accounts } from '@/types';
+import type { Accounts } from '@/types/accounts';
 import type { ClientBatchCheckItem } from '@openfga/sdk';
 
 const fga = await getFgaClient();

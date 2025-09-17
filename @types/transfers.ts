@@ -1,4 +1,4 @@
-import type { Transfer as TransferModel } from '@/lib/db/generated/prisma';
+import type { TransferModel } from '@/lib/db/generated/prisma/models';
 import type { Accounts } from './accounts';
 
 export namespace Transfers {

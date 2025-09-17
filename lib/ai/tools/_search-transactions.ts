@@ -11,7 +11,7 @@ import { DocumentWithScoreSchema, ToolResponseSchema } from '../schemas';
 import { LocalVectorStore } from '@/lib/ai/rag/vector-store';
 import { FGAFilter } from '@auth0/ai';
 
-import type { Documents } from '@/types';
+import type { Documents } from '@/types/documents';
 
 /**
  * Lab Exercise: Implement FGA for RAG tool `searchTransactions`

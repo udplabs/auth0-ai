@@ -20,10 +20,7 @@ async function fetchUserProfile(id: string): Promise<UserProfile | undefined> {
 
 		return { ...user, custom_metadata };
 	} catch (error: unknown) {
-		throw new APIError(
-			'server_error:api',
-			error instanceof Error ? error?.message : `Fetch profile failed for ${id}`
-		);
+		throw new APIError(error);
 	}
 }
 
