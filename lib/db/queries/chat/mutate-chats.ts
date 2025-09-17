@@ -1,6 +1,9 @@
 'use server';
 
-import { type Chat as ChatModel, Prisma } from '@/lib/db/generated/prisma';
+import {
+	type ChatModel,
+	ChatCreateInput,
+} from '@/lib/db/generated/prisma/models';
 import { APIError } from '@/lib/errors';
 import { convertToDB } from '@/lib/utils/db-converter';
 import { neon } from '../../neon/client';
@@ -14,10 +17,9 @@ import type { Chat } from '@/types/chat';
 export async function saveChat(input: Chat.CreateChatInput) {
 	const { messages = [], ...chat } = input;
 
-	const convertedChat = convertToDB<
-		Chat.CreateChatInput,
-		Prisma.ChatCreateInput
-	>(chat);
+	const convertedChat = convertToDB<Chat.CreateChatInput, ChatCreateInput>(
+		chat
+	);
 
 	// Upsert chat
 	const dbChat = await prisma.chat.upsert({

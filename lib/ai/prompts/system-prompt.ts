@@ -9,7 +9,8 @@ import { upsertSettings } from '@/lib/db/queries/settings';
 import { sortBy } from '@/lib/utils';
 import { tokenVaultPrompt } from './token-vault';
 
-import type { Chat, UISettings } from '@/types';
+import type { Chat } from '@/types/chat';
+import type { UISettings } from '@/types/settings';
 
 export async function getSystemPrompts({
 	requestHints: { settings, ...hints },
@@ -64,7 +65,10 @@ async function getPrompts(settings?: Partial<UISettings>) {
 
 		systemPrompts.push(...stepPrompts);
 
-		const guidePrompts = sortBy(await getStepGuides(labStep), 'name');
+		const guidePrompts = sortBy(
+			await getStepGuides({ query: labStep, contentPlacement: 'labs' }),
+			'name'
+		);
 
 		systemPrompts.push(...guidePrompts);
 	}

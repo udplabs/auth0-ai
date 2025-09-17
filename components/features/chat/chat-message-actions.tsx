@@ -11,7 +11,7 @@ import { memo } from 'react';
 import { toast } from 'sonner';
 import { useCopyToClipboard } from 'usehooks-ts';
 
-import type { Chat } from '@/types';
+import type { Chat } from '@/types/chat';
 
 export interface ChatMessageActionsProps extends ActionsProps {
 	ActionProps?: ActionProps;

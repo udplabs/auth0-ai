@@ -1,16 +1,20 @@
 'use server';
 
 import {
-	Prisma as Neon,
-	RemoteContent as RemoteContentModel,
-} from '../generated/neon';
+	RemoteContentModel,
+	RemoteContentWhereInput,
+} from '../generated/neon/models';
 import {
 	ContentPlacement,
 	ContentType,
-	LocalContent as LocalContentModel,
 	MimeType,
-	Prisma,
-} from '../generated/prisma';
+} from '../generated/prisma/enums';
+import { JsonObject } from '../generated/prisma/internal/prismaNamespace';
+import {
+	LocalContentCreateInput,
+	LocalContentModel,
+	LocalContentWhereInput,
+} from '../generated/prisma/models';
 import { neon } from '../neon/client';
 import { prisma } from '../prisma/client';
 
@@ -109,8 +113,7 @@ function buildQuery({
 	contentType,
 	contentPlacement,
 }: Content.GetParams) {
-	const AND: Prisma.LocalContentWhereInput[] | Neon.RemoteContentWhereInput[] =
-		[];
+	const AND: LocalContentWhereInput[] | RemoteContentWhereInput[] = [];
 
 	if (key && query) {
 		if (key === 'name') {
@@ -153,7 +156,7 @@ export async function findFirstContent(
 			AND: [
 				...AND,
 				{ expiresAt: { gt: new Date() } },
-			] as Prisma.LocalContentWhereInput[],
+			] as LocalContentWhereInput[],
 		},
 	});
 
@@ -163,7 +166,7 @@ export async function findFirstContent(
 
 	// Fetch remote content
 	const content = await neon.remoteContent.findFirst({
-		where: { AND: [...AND] as Neon.RemoteContentWhereInput[] },
+		where: { AND: [...AND] as RemoteContentWhereInput[] },
 	});
 
 	if (content != null) {
@@ -182,13 +185,13 @@ export async function findAllContent(
 			AND: [
 				...AND,
 				{ expiresAt: { gt: new Date() } },
-			] as Prisma.LocalContentWhereInput[],
+			] as LocalContentWhereInput[],
 		},
 	});
 
 	if (!localContent.length) {
 		const content = await neon.remoteContent.findMany({
-			where: { AND: [...AND] as Neon.RemoteContentWhereInput[] },
+			where: { AND: [...AND] as RemoteContentWhereInput[] },
 		});
 
 		return updateLocalContent(content);
@@ -234,14 +237,22 @@ export async function getStepPrompts(
 	});
 }
 
-export async function getStepGuides(
-	query: string
-): Promise<Content.UIContent[]> {
+interface GetStepGuidesParams {
+	query: string;
+	contentType?: Content.UIType;
+	contentPlacement?: Content.UIContentPlacement;
+}
+
+export async function getStepGuides({
+	query,
+	contentType = 'guide/step',
+	contentPlacement,
+}: GetStepGuidesParams): Promise<Content.UIContent[]> {
 	return await findAllContent({
 		key: 'labStep',
 		query,
-		contentType: 'guide/step',
-		contentPlacement: 'labs',
+		contentType,
+		contentPlacement,
 	});
 }
 
@@ -283,16 +294,16 @@ export async function updateLocalContent(
 				where: { id: c.id },
 				update: {
 					...c,
-					applicationData: (c?.applicationData || null) as Prisma.JsonObject,
+					applicationData: (c?.applicationData || null) as JsonObject,
 					lastSyncedAt,
 					expiresAt,
 				},
 				create: {
 					...c,
-					applicationData: (c?.applicationData || null) as Prisma.JsonObject,
+					applicationData: (c?.applicationData || null) as JsonObject,
 					lastSyncedAt,
 					expiresAt,
-				} as Prisma.LocalContentCreateInput,
+				} as LocalContentCreateInput,
 			});
 		}),
 	]);

@@ -3,7 +3,8 @@ import { openai } from '@/lib/ai/openai';
 import { saveEmbeddings } from '@/lib/db/queries/documents';
 import { embedMany } from 'ai';
 
-import type { Documents, Transactions } from '@/types';
+import type { Documents } from '@/types/documents';
+import type { Transactions } from '@/types/transactions';
 
 export async function createDocumentsWithEmbeddings(
 	transactions: Transactions.Transaction[],

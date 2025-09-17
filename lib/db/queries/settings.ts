@@ -3,8 +3,8 @@ import { createHash } from 'crypto';
 import { promises } from 'fs';
 import path from 'path';
 import { ulid } from 'ulid';
-import { Prisma as Neon } from '../generated/neon';
-import { Prisma } from '../generated/prisma';
+import { RemoteSettingsCreateInput } from '../generated/neon/models';
+import { SettingsCreateInput, SettingsModel } from '../generated/prisma/models';
 import { neon } from '../neon/client';
 import { prisma } from '../prisma/client';
 
@@ -44,7 +44,7 @@ export async function upsertSettings(
 	const result = await prisma.settings.upsert({
 		where: { id },
 		update: payload,
-		create: payload as Prisma.SettingsCreateInput,
+		create: payload as SettingsCreateInput,
 	});
 
 	const appInstance = await saveAppInstance();
@@ -59,14 +59,10 @@ export async function upsertSettings(
 		},
 		create: {
 			...payload,
-		} as Neon.RemoteSettingsCreateInput,
+		} as RemoteSettingsCreateInput,
 	});
 
-	return {
-		...result,
-		createdAt: result.createdAt.toISOString(),
-		updatedAt: result.updatedAt.toISOString(),
-	} as UISettings;
+	return UISettings(result);
 }
 
 // Call upsertSettings
@@ -78,15 +74,10 @@ async function getSettings(
 ): Promise<UISettings | undefined> {
 	if (!id) return;
 
-	const { createdAt, updatedAt, ...settings } =
-		(await prisma.settings.findUnique({ where: { id } })) || {};
+	const settings = await prisma.settings.findUnique({ where: { id } });
 
-	if (createdAt && updatedAt) {
-		return {
-			...settings,
-			createdAt: createdAt.toISOString(),
-			updatedAt: updatedAt.toISOString(),
-		} as UISettings;
+	if (settings?.createdAt && settings?.updatedAt) {
+		return UISettings(settings);
 	}
 
 	if (upsert) {
@@ -162,4 +153,16 @@ export async function fileExistsAtRoot(filepath: string) {
 	} catch {
 		return false;
 	}
+}
+
+function UISettings(settings: SettingsModel): UISettings {
+	return {
+		...settings,
+		currentLabStep: settings?.currentLabStep ?? undefined,
+		nextLabStep: settings?.nextLabStep ?? undefined,
+		labMeta: settings?.labMeta ?? undefined,
+		preferences: settings?.preferences ?? undefined,
+		createdAt: settings.createdAt.toISOString(),
+		updatedAt: settings.updatedAt.toISOString(),
+	} as UISettings;
 }

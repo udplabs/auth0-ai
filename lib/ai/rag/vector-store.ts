@@ -4,7 +4,7 @@ import { getDocuments } from '@/lib/db/queries/documents';
 import { cosineSimilarity, embed } from 'ai';
 import { createDocumentsWithEmbeddings } from './create-documents';
 
-import type { Documents } from '@/types';
+import type { Documents } from '@/types/documents';
 /**
  * LocalVectorStore
  *
@@ -160,13 +160,8 @@ export class LocalVectorStore {
 			for (const document of documents) {
 				const idx = LocalVectorStore.db.findIndex((d) => d.id === document.id);
 				if (idx !== -1) {
-					console.log('Updating existing document:', document.id);
 					LocalVectorStore.db[idx] = document;
 				} else {
-					console.log(
-						'Existing document not found, adding new one:',
-						document.id
-					);
 					LocalVectorStore.db.push(document);
 				}
 			}

@@ -9,7 +9,7 @@ import {
 	type LucideProps,
 } from 'lucide-react';
 
-import type { Accounts } from '@/types';
+import type { Accounts } from '@/types/accounts';
 
 export interface AccountIconProps extends LucideProps {
 	type?: Accounts.SubTypeOf<'deposit' | 'credit' | 'investment' | 'loan'>;

@@ -1,5 +1,8 @@
 import { toolRegistry } from '@/lib/ai/tool-registry';
-import type { Chat as ChatModel, Prisma } from '@/lib/db/generated/prisma';
+import type {
+	ChatCreateInput,
+	ChatModel,
+} from '@/lib/db/generated/prisma/models';
 
 import type {
 	UIMessage as AIMessage,
@@ -58,7 +61,7 @@ export namespace Chat {
 		settings?: Partial<UISettings>;
 		prompt?: string;
 	}
-	export interface CreateChatInput extends Pick<Prisma.ChatCreateInput, 'id'> {
+	export interface CreateChatInput extends Pick<ChatCreateInput, 'id'> {
 		userId?: string;
 		createdAt?: string;
 		updatedAt?: string;

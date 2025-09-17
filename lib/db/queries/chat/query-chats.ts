@@ -1,6 +1,6 @@
 'use server';
 
-import type { Chat as ChatModel } from '@/lib/db/generated/prisma';
+import type { ChatModel } from '@/lib/db/generated/prisma/models';
 import { APIError } from '@/lib/errors';
 import { convertToUI } from '@/lib/utils/db-converter';
 import { groupItemsByDate } from '@/lib/utils/group-items-by-date';

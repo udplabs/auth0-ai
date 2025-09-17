@@ -1,7 +1,7 @@
 'use server';
 
 import { convertToUI } from '@/lib/utils/db-converter';
-import type { Message as MessageModel } from '../../generated/prisma';
+import type { MessageModel } from '../../generated/prisma/models';
 import { prisma } from '../../prisma/client';
 
 import type { Chat } from '@/types/chat';

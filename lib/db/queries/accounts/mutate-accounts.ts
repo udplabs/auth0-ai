@@ -1,14 +1,16 @@
 'use server';
 
 import type {
-	Account as AccountModel,
-	Prisma,
-	Transaction as TransactionModel,
-	Transfer as TransferModel,
-} from '../../generated/prisma';
+	AccountCreateManyInput,
+	AccountModel,
+	TransactionCreateManyInput,
+	TransactionModel,
+	TransferModel,
+} from '../../generated/prisma/models';
 import { prisma } from '../../prisma/client';
 
-import type { Accounts, Transactions } from '@/types';
+import type { Accounts } from '@/types/accounts';
+import type { Transactions } from '@/types/transactions';
 
 export async function saveAccounts(
 	accounts: Accounts.CreateAccountInput[],
@@ -77,12 +79,12 @@ async function saveAccountsAndTransactions(
 	// This is necessary to ensure the data is in the correct format for Prisma
 	const dbAccounts = convertToDB<
 		Accounts.CreateAccountInput[],
-		Prisma.AccountCreateManyInput[]
+		AccountCreateManyInput[]
 	>(accounts);
 
 	const dbTransactions = convertToDB<
 		Transactions.CreateTransactionInput[],
-		Prisma.TransactionCreateManyInput[]
+		TransactionCreateManyInput[]
 	>(uniqBy(transactions, 'id'));
 
 	const createdAccounts = await prisma.account.createManyAndReturn({

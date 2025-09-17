@@ -1,11 +1,16 @@
 'use server';
 
 import type {
-	Prisma,
-	SampleDocument as SampleDocumentModel,
-} from '@/lib/db/generated/prisma';
+	SampleDocumentCreateInput,
+	SampleDocumentModel,
+	SampleDocumentUpdateInput,
+	SampleTransactionCreateInput,
+	SampleTransactionUpdateInput,
+} from '@/lib/db/generated/prisma/models';
 
-import type { Accounts, Documents, Transactions } from '@/types';
+import type { Accounts } from '@/types/accounts';
+import type { Documents } from '@/types/documents';
+import type { Transactions } from '@/types/transactions';
 
 type SampleAccount = Accounts.Account & {
 	lastSyncedAt?: Date;
@@ -86,12 +91,12 @@ export async function getSampleData(userId: string): Promise<{
 						...t,
 						lastSyncedAt,
 						expiresAt,
-					} as Prisma.SampleTransactionUpdateInput,
+					} as SampleTransactionUpdateInput,
 					create: {
 						...t,
 						lastSyncedAt,
 						expiresAt,
-					} as Prisma.SampleTransactionCreateInput,
+					} as SampleTransactionCreateInput,
 				});
 			}),
 		]);
@@ -122,12 +127,12 @@ export async function getSampleData(userId: string): Promise<{
 						...d,
 						lastSyncedAt,
 						expiresAt,
-					} as Prisma.SampleDocumentUpdateInput,
+					} as SampleDocumentUpdateInput,
 					create: {
 						...d,
 						lastSyncedAt,
 						expiresAt,
-					} as Prisma.SampleDocumentCreateInput,
+					} as SampleDocumentCreateInput,
 				});
 			}),
 		]);

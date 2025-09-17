@@ -19,7 +19,8 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 
-import type { Accounts, Transfers } from '@/types';
+import type { Accounts } from '@/types/accounts';
+import type { Transfers } from '@/types/transfers';
 
 interface TransferModalProps extends Transfers.TransferContext {
 	children?: React.ReactNode;

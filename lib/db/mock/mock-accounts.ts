@@ -1,6 +1,8 @@
 import { LocalVectorStore } from '@/lib/ai/rag/vector-store';
 
-import type { Accounts, Documents, Transactions } from '@/types';
+import type { Accounts } from '@/types/accounts';
+import type { Documents } from '@/types/documents';
+import type { Transactions } from '@/types/transactions';
 
 // Should not be used outside of this function.
 const sampleUserIds = [

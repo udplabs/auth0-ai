@@ -4,7 +4,8 @@ import type { UIMessage, UIMessageStreamWriter } from 'ai';
 import { getLastPart } from './get-last-part';
 import { withStreamingJitter } from './with-streaming-jitter';
 
-import type { Chat, UISettings } from '@/types';
+import type { Chat } from '@/types/chat';
+import type { UISettings } from '@/types/settings';
 
 export interface WithStaticContentOptions<
 	UI_MESSAGE extends UIMessage = Chat.UIMessage,

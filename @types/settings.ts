@@ -1,7 +1,8 @@
-import type { Settings } from '@/lib/db/generated/prisma';
+import type { SettingsModel } from '@/lib/db/generated/prisma/models';
 import type { Geo } from '@vercel/functions';
 
-export interface UISettings extends Pick<Settings, 'id' | 'currentLabStep'> {
+export interface UISettings
+	extends Pick<SettingsModel, 'id' | 'currentLabStep'> {
 	createdAt: string;
 	updatedAt: string;
 	nextLabStep?: string;
