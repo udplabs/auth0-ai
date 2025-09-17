@@ -1,7 +1,7 @@
 // lib/auth0/fga/get-account-permissions.ts
 import { getFgaClient } from './client';
 
-import type { Accounts } from '@/types';
+import type { Accounts } from '@/types/accounts';
 import type { ClientBatchCheckItem } from '@openfga/sdk';
 
 const fga = await getFgaClient();
@@ -94,9 +94,9 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 					// Check the types for ClientBatchCheckItem
 					// OR... ask Aiya for a hint
 
-					//..., 👈 who?
+					user: ``, //..., 👈 who?
 					relation, // 👈 can do what?
-					//..., 👈 to or with what?
+					object: ``, // 👈 to or with what?
 				}) as ClientBatchCheckItem
 		);
 	});
@@ -148,6 +148,7 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 		if (!permissions.includes('can_view_balances')) {
 			// 👈 What other fields should be stripped?
 			delete copy.balance;
+			// ...👈 anything else?
 			// HINT: availableBalance
 			// Not sure? Check @types/accounts.d.ts and decide for yourself
 		}
