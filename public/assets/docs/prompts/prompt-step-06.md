@@ -60,7 +60,7 @@
 - STEP 7
   - Completed for them
 - STEP 8 & STEP 9
-  - Add to `lib/ai/tools/tool-registry.ts`
+  - Add to `lib/ai/tool-registry.ts`
   ```ts
   import type { ToolSet } from 'ai';
 

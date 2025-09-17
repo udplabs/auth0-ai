@@ -56,9 +56,8 @@ Not entirely sure? We'll figure it out!
 - You may occasionally see an odd item in the chat. That's to help you with debugging and will appear anytime I use a tool to perform a task (*feel free to expand it to see more details*).
 
   <!-- TODO: UPDATE THIS -->
-  ![Tools Widget Example](http://localhost:3000/assets/images/ui-tool-widget.png)
-   <!-- FUTURE IMAGE LOCATION? -->
-   <!-- https://cdn.demo.okta.com/labs/devcamp-agentic/assets/images/ui-tool-widget.png -->
+![Tools Widget Example](http://localhost:3000/assets/images/ui-tool-widget.png)
+  <!-- https://cdn.demo.okta.com/labs/devcamp-agentic/assets/images/ui-tool-widget.png -->
 
 > [!IMPORTANT]
 >

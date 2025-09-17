@@ -23,6 +23,10 @@
   export async function createClient() {
     try {
       const options: UserClientConfigurationParams = {
+        retryParams: {
+          maxRetry: 2,
+          minWaitInMs: 300,
+        },
         apiUrl: process.env.FGA_API_URL,
         storeId: process.env.FGA_STORE_ID,
         authorizationModelId: process.env.FGA_MODEL_ID,
