@@ -3,7 +3,6 @@ import { Slot } from '@radix-ui/react-slot';
 import { type VariantProps, cva } from 'class-variance-authority';
 import Link from 'next/link';
 import * as React from 'react';
-import type { LabelProps } from '@/components/ui/label';
 
 import { cn } from '@/lib/utils';
 
@@ -42,26 +41,18 @@ const buttonVariants = cva(
 export interface ButtonProps
 	extends React.ButtonHTMLAttributes<HTMLButtonElement>,
 		VariantProps<typeof buttonVariants> {
-	animated?: boolean;
 	asChild?: boolean;
-	icon?: React.ReactNode;
 	href?: string;
 	loading?: boolean;
-	label?: string;
-	LabelProps?: LabelProps
 	target?: React.HTMLAttributeAnchorTarget;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 	(
 		{
-			animated = false,
 			children,
 			className,
-			icon,
 			href,
-			label,
-			LabelProps,
 			loading = false,
 			variant,
 			size,
@@ -73,68 +64,30 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 	) => {
 		const Comp = !loading && asChild ? Slot : 'button';
 
-		let buttonChildren: React.ReactNode[] = [];
-
-		if (icon) {
-			buttonChildren.push(icon);
-		}
-
-		if (animated) {
-
-			if (!variant) {
-				variant = 'outline';
-			}
-
-			if ((label && children) || (!label && typeof children !== 'string')) {
-				console.warn('Either provide `label` OR a string as `children`, not both. Ignoring `children`');
-			}
-
-			buttonChildren.push(
-				<span
-					{...{
-						...LabelProps,
-						className: cn(
-							LabelProps?.className,
-							'pointer-events-none ml-0 max-w-0 overflow-hidden whitespace-nowrap opacity-0 w-fit',
-							'motion-safe:transition-all motion-safe:duration-350 motion-safe:delay-100',
-							'group-hover:max-w-[160px] group-hover:pe-2 group-hover:opacity-100',
-							'group-focus-within:max-w-[160px] group-focus-within:pe-2 group-focus-within:opacity-100'
-						),
-					}}
-				>
-					{!label && typeof children === 'string' ? children : label}
-				</span>
-			);
-		} else {
-			buttonChildren.push(children);
-		}
-
-
 		return (
 			<Comp
-				aria-label={label}
-				className={
-					cn(
-						buttonVariants({ variant, size, className }),
-						{ 'ps-2 pe-0 md:h-fit -py-2 min-h-[34px] min-w-[34px]': animated },
-						{ 'group inline-flex items-center overflow-hidden transition-all motion-safe:duration-350': animated }
-					)
-				}
+				className={cn(buttonVariants({ variant, size, className }))}
 				ref={ref}
 				{...props}
 			>
-				{loading ? (
-					<>
-						<span className={cn({ 'opacity-0': loading })}>{children}</span>
-						<span className='absolute flex items-center justify-center'>
-							<Loader />
-						</span>
-					</>
-				) : href ? (
-					<Link {...{ href, target }}>{buttonChildren}</Link>
-				) : (
-					buttonChildren
-				)}
+				{(() => {
+					if (loading) {
+						return (
+							<>
+								<span className={cn({ 'opacity-0': loading })}>{children}</span>
+								<span className='absolute flex items-center justify-center'>
+									<Loader />
+								</span>
+							</>
+						);
+					}
+
+					if (href) {
+						return <Link {...{ href, target }}>{children}</Link>;
+					} else {
+						return children;
+					}
+				})()}
 			</Comp>
 		);
 	}

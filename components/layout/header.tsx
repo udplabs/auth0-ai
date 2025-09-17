@@ -26,7 +26,7 @@ export function Header({
 }: HeaderProps) {
 	const { open } = useSidebar();
 	const { width: windowWidth } = useWindowSize();
-	const { data: user, isAuthenticated } = useUserProfile();
+	const { isAuthenticated } = useUserProfile();
 	const pathname = usePathname();
 
 	const showIcons = !open || windowWidth < 768;
@@ -40,11 +40,10 @@ export function Header({
 			{showIcons && (
 				<>
 					{!pathname.includes('accounts') && (
-						<Button
+						<AnimatedButton
 							icon={<PiggyBankIcon />}
 							label='Account Dashboard'
 							className='order-2'
-							animated
 						/>
 					)}
 					<NewChatButton
@@ -64,12 +63,15 @@ export function Header({
 			</div>
 			{!hideSecondaryActions && (
 				<div className='order-5 flex flex-1 items-center justify-end gap-2 md:ml-auto'>
-					{isAuthenticated ? <Button
+					{isAuthenticated ? (
+						<Button
 							className='order-1 h-[34px]'
 							href='/auth/logout'
 						>
 							Log Out
-						</Button> : <>
+						</Button>
+					) : (
+						<>
 							<Button
 								className='order-1 h-[34px]'
 								href='/auth/login?screen_hint=signup'
@@ -85,7 +87,8 @@ export function Header({
 									Log In
 								</Button>
 							)}
-						</>}
+						</>
+					)}
 					<ModeToggle
 						className='order-2'
 						variant='dropdown'
