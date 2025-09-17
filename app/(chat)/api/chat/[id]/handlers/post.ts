@@ -108,7 +108,7 @@ export async function POST(
 			execute: withStaticContent(
 				({ writer: dataStream }) => {
 					const result = streamText({
-						model: openai('gpt-5-nano'),
+						model: openai('gpt-5-mini'),
 						system: systemPrompts,
 						messages: modelMessages,
 						temperature: 0.2, // deterministic mode
