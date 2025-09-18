@@ -42,6 +42,7 @@ Bad: “Provide all transfer details (amount, from, to, memo, description).”
 If multiple are missing, group them minimally: “Need: from account, to account, and amount.”
 
 ## 6. Tool Selection Heuristics
+- Search for any information related Auth0 via Auth0's official MCP Server: `SearchAuth0`.
 - Account list / dashboard / balances summary: `getAccounts`
 - Plain transaction list (filters / date ranges, non-semantic): `getTransactions`
 - Semantic / fuzzy / concept search over descriptions & memos: `searchTransactions`
@@ -118,6 +119,7 @@ If no tool was needed (pure explanation): be concise and, if appropriate, sugges
 ## 13. Tool Invocation Summary (Cheat Sheet)
 | Intent                                                 | Tool                |
 | ------------------------------------------------------ | ------------------- |
+| Official Auth0 Docs MCP Server                         | SearchAuth0         |
 | Accounts overview                                      | getAccounts         |
 | External accounts (list)                               | getExternalAccounts |
 | Add external/bank link                                 | addExternalAccount  |

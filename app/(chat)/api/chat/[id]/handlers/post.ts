@@ -33,9 +33,11 @@ import { toolRegistry } from '@/lib/ai/tool-registry';
 import { APIError } from '@/lib/errors';
 import { withStaticContent } from '@/lib/utils/with-static-content';
 import { setAIContext } from '@auth0/ai-vercel';
+import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { geolocation } from '@vercel/functions';
 import {
 	convertToModelMessages,
+	experimental_createMCPClient as createMCPClient,
 	createUIMessageStream,
 	InferUITools,
 	JsonToSseTransformStream,
@@ -112,6 +114,13 @@ export async function POST(
 			},
 		});
 
+		// Connect to Auth0 Guide (docs MCP)
+		const auth0MCP = await createMCPClient({
+			transport: new StreamableHTTPClientTransport(
+				new URL('https://auth0.com/ai/docs/mcp')
+			),
+		});
+
 		// 6. Create unified UI stream orchestrator.
 		const stream = createUIMessageStream<UseChatToolsMessage>({
 			// Wrap execution with static content (lab-specific augmentation).
@@ -150,7 +159,10 @@ export async function POST(
 							uiEphemeralTransform(dataStream), // Strip large tool payloads -> ephemeral events.
 							smoothStream(), // Token smoothing for cleaner UX.
 						],
-						tools: toolRegistry,
+						tools: {
+							...toolRegistry,
+							...auth0MCP.tools,
+						},
 					});
 
 					// Vercel Recommended implementation
