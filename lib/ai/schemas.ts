@@ -529,16 +529,28 @@ export const Document = z.object({
 			'The stringified contents of some data, typically an account or transaction.'
 		),
 	metadata: z.object({
-		accountId: z.string().optional(),
-		transactionId: z.string().optional(),
-		accountType: z.string().optional(),
-		customerId: z.string().optional(),
+		accountId: TransactionSchema.shape.accountId.optional(),
+		transactionId: TransactionSchema.shape.id.optional(),
+		accountType: AccountTypeSchema.optional(),
+		customerId: TransactionSchema.shape.customerId.optional(),
 		modelId: z
 			.string()
 			.optional()
 			.describe('The AI model used to generate the embeddings for a document.'),
 		createdAt: z.string().optional(),
 		updatedAt: z.string().optional(),
+		date: TransactionSchema.shape.date.optional(),
+		amount: TransactionSchema.shape.amount.optional(),
+		type: TransactionSchema.shape.type.optional(),
+		categoryId: TransactionSchema.shape.categoryId.optional(),
+		categoryName: TransactionSchema.shape.categoryName.optional(),
+		budgetCategory: TransactionSchema.shape.budgetCategory.optional(),
+		budgetSubCategory: TransactionSchema.shape.budgetSubcategory.optional(),
+		payee: TransactionSchema.shape.payee.optional(),
+		isExternal: TransactionSchema.shape.isExternal.optional(),
+		externalConnectionId:
+			TransactionSchema.shape.externalConnectionId.optional(),
+		currencyCode: TransactionSchema.shape.currencyCode.optional(),
 	}),
 });
 
