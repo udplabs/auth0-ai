@@ -93,7 +93,7 @@ export async function getChat({
 
 	const cached = unstable_cache(
 		() => getChatById(id, { userId, includeMessages }),
-		tags,
+		[key],
 		{ revalidate: 150, tags } // revalidation config
 	);
 

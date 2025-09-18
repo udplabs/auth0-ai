@@ -11,10 +11,10 @@ type UseAccountsResponse = SWRResponse<Accounts.Account[]> & {
 };
 
 export const useAccounts = () => {
-	const { isAuthenticated } = useUserProfile();
+	const { isAuthenticated, isFetching, isLoading } = useUserProfile();
 
 	const { mutate, ...swrRest } = useSWR<Accounts.Account[]>(
-		isAuthenticated ? KEY : null
+		!isLoading && !isFetching && isAuthenticated ? KEY : null
 	);
 
 	const resetPermissions = async () => {

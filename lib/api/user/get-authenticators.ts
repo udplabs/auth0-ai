@@ -31,7 +31,7 @@ export async function getAuthenticators({ userId, key, tags }: ActionOptions) {
 
 	tags = [...new Set(tags)];
 
-	const cached = unstable_cache(() => fetchAuthenticators(userId), tags, {
+	const cached = unstable_cache(() => fetchAuthenticators(userId), [key], {
 		revalidate: 150,
 		tags,
 	});
