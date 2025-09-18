@@ -35,7 +35,7 @@ export async function getUserProfile({ userId, key, tags }: ActionOptions) {
 
 	tags = [...new Set(tags)];
 
-	const cached = unstable_cache(() => fetchUserProfile(userId), tags, {
+	const cached = unstable_cache(() => fetchUserProfile(userId), [key], {
 		revalidate: 150,
 		tags,
 	});

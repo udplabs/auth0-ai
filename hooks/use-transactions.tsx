@@ -4,10 +4,10 @@ import { useUserProfile } from './use-user-profile';
 import type { Transactions } from '@/types/transactions';
 
 export const useTransactions = (accountId?: string) => {
-	const { isAuthenticated } = useUserProfile();
+	const { isAuthenticated, isFetching, isLoading } = useUserProfile();
 
 	return useSWR<Transactions.Transaction[]>(
-		isAuthenticated && accountId
+		!isLoading && !isFetching && isAuthenticated && accountId
 			? `/api/accounts/${accountId}/transactions`
 			: null
 	);

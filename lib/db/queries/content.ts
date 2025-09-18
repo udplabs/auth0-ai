@@ -237,6 +237,12 @@ export async function getStepPrompts(
 	});
 }
 
+export async function getAllStepPrompts() {
+	return await findAllContent({
+		contentType: 'prompt/step',
+	});
+}
+
 interface GetStepGuidesParams {
 	query: string;
 	contentType?: Content.UIType;

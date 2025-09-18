@@ -1,6 +1,6 @@
 // lib/auth0/fga/get-account-permissions.ts
 // FINAL CODE
-import { getFgaClient } from './_client';
+import { getFgaClient } from './client';
 
 import type { Accounts } from '@/types/accounts';
 import type { ClientBatchCheckItem } from '@openfga/sdk';
@@ -121,7 +121,6 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 		// Record the granted relation for this account.
 		granted[accountId]?.push(request.relation as Accounts.AccountPermissions);
 	}
-
 	// ---------------------------------------------------------------------------
 	// ✅ STEP 6: Build the final accounts array. (rudimentary implementation)
 	//

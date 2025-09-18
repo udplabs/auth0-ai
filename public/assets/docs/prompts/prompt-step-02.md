@@ -5,6 +5,6 @@
 - Implementation code: none
 - Reference Code: none
 
-Expected Outcome:
-- Running application at `http://localhost:3000`
-- Welcome message sent and static content returned.
+Completion Criteria
+- [x] Running application at `http://localhost:3000`
+- [x] 'Hi Aiya! This is my first message' auto-sent.

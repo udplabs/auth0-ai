@@ -39,7 +39,7 @@ export async function getAccounts({
 
 	const cached = unstable_cache(
 		() => fetchAccounts(userId, includeTransactions),
-		tags,
+		[key],
 		{ revalidate: 150, tags }
 	);
 

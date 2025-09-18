@@ -25,9 +25,8 @@ export const TransactionsList = ({
 	}
 
 	return transactions.map((transaction, i) => (
-		<>
+		<div key={`${transaction.id}-${i}`}>
 			<div
-				key={transaction.id}
 				{...{
 					...props,
 					className: cn(
@@ -52,7 +51,11 @@ export const TransactionsList = ({
 						)}
 					</div>
 					<div>
-						<p className='font-medium'>{transaction.description}</p>
+						<p className='font-medium'>{transaction.payee}</p>
+						<p className='text-sm font-medium'>{transaction.description}</p>
+						{transaction?.memo && (
+							<p className='text-sm font-medium'>{transaction.memo}</p>
+						)}
 						<p className='text-muted-foreground text-xs'>
 							<DateField>{transaction.date}</DateField>
 						</p>
@@ -76,6 +79,6 @@ export const TransactionsList = ({
 				</div>
 			</div>
 			{i < transactions.length - 1 && <Separator className='my-2' />}
-		</>
+		</div>
 	));
 };

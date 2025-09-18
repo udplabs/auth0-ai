@@ -26,6 +26,7 @@
  * - Consider reintroducing resumable streams.
  */
 import { saveMessagesAction } from '@/app/(chat)/api/actions';
+import { StepGuru } from '@/lib/ai/agents/step-guru';
 import { openai } from '@/lib/ai/openai';
 import { getSystemPrompts } from '@/lib/ai/prompts/system-prompt';
 import { toolRegistry } from '@/lib/ai/tool-registry';
@@ -34,14 +35,14 @@ import { withStaticContent } from '@/lib/utils/with-static-content';
 import { setAIContext } from '@auth0/ai-vercel';
 import { geolocation } from '@vercel/functions';
 import {
-	InferUITools,
-	JsonToSseTransformStream,
-	UIMessage,
 	convertToModelMessages,
 	createUIMessageStream,
+	InferUITools,
+	JsonToSseTransformStream,
 	smoothStream,
 	stepCountIs,
 	streamText,
+	UIMessage,
 	validateUIMessages,
 	type StreamTextTransform,
 	type TextStreamPart,
@@ -91,18 +92,27 @@ export async function POST(
 		// 3. Convert UI messages -> model format.
 		const modelMessages = convertToModelMessages(uiMessages);
 
-		// 4. Load system prompts (dynamic hints).
+		// 4. Derive lab step either directly or via Agent StepGuru.
+		const currentLabStep =
+			lastUserMessage?.metadata?.labStep ??
+			(
+				await StepGuru.generate({
+					messages: modelMessages,
+				})
+			)?.text;
+
+		// 5. Load system prompts (dynamic hints).
 		const systemPrompts = await getSystemPrompts({
 			requestHints: {
 				geolocation: geolocation(request),
 				userId,
 				settings: {
-					currentLabStep: lastUserMessage?.metadata?.labStep,
+					currentLabStep,
 				},
 			},
 		});
 
-		// 5. Create unified UI stream orchestrator.
+		// 6. Create unified UI stream orchestrator.
 		const stream = createUIMessageStream<UseChatToolsMessage>({
 			// Wrap execution with static content (lab-specific augmentation).
 			execute: withStaticContent(
@@ -111,12 +121,13 @@ export async function POST(
 						model: openai('gpt-5-mini'),
 						system: systemPrompts,
 						messages: modelMessages,
-						temperature: 0.2, // deterministic mode
+						// OpenAI GPT 5 models no longer support temperature
+						// temperature: 0.2, // deterministic mode
 						stopWhen: (ctx) => {
 							// Custom stop logic: either tool produced hasOwnUI OR step count exceeded.
 							const { steps } = ctx;
+
 							const lastMessage = steps.at(-1);
-							let hasOwnUI = false;
 
 							if (lastMessage) {
 								const results =
@@ -124,9 +135,16 @@ export async function POST(
 									lastMessage.dynamicToolResults ??
 									[];
 								const lastResult = results.at(-1);
-								hasOwnUI = (lastResult?.output as any)?.hasOwnUI;
+
+								// Return to prevent calling getTransactions
+								if (lastResult?.toolName === 'searchTransactions') return true;
+
+								// Return if `hasOwnUI`
+								if ((lastResult?.output as any)?.hasOwnUI) {
+									return true;
+								}
 							}
-							return hasOwnUI || stepCountIs(5)(ctx); // Hard cap to prevent runaway loops.
+							return stepCountIs(5)(ctx); // Hard cap to prevent runaway loops.
 						},
 						experimental_transform: [
 							uiEphemeralTransform(dataStream), // Strip large tool payloads -> ephemeral events.

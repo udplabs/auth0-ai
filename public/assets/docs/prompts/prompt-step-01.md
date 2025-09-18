@@ -4,6 +4,6 @@
 - Static Aiya response: none
 - Reference Code: none
 
-Expected Outcome:
-- Activated Auth0 tenant
-- Repo cloned
+Completion Criteria:
+- [x] Activated Auth0 tenant
+- [x] Repo cloned

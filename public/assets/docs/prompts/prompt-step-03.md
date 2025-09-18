@@ -1,11 +1,12 @@
 ## LAB STEP CONTEXT
 - Lab Step: `step-03`
 - Lab Guide Name: `get-auth0-configured`
+- Static Aiya response auto-sent: `aiya-post-auth`
 - Implementation Code:
   - `.env`
 
 Reference snippet `.env` applicable to this step:
-```dotenv
+```env
 # .env
 # ========== Auth0 ==========
 # Auth0 tenant domain (*without* https://)
@@ -24,6 +25,6 @@ Reference snippet `.env` applicable to this step:
 # =================================================
 ```
 
-Expected Outcome:
-- Running application at `http://localhost:3000`
-- User can authenticate.
+Completion Criteria:
+- [x] User successfully authenticated.
+- [x] 'Successfully authenticated' message sent.
