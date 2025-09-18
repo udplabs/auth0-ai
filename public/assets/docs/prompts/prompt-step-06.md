@@ -98,14 +98,15 @@
   } satisfies ToolSet;
 ```
 
-Expected Outcome:
-- Implemented `fgaRetriever`
-- Implemented `fgaRetriever.filter()`
-- Able to request transactional analysis (i.e. 'how much did I spend on rideshare this year?')
-- `searchTrasactions` is used to query LocalVectorStore and provide results.
+Completion Criteria
+- [x] Fully implemented/initialized `fgaRetriever`
+- [x] Fully implemented `fgaRetriever.filter()` functionality
+- [x] Able to request transactional analysis via `searchTransactions` tool
+  - i.e. 'how much did I spend on rideshare this year?'
+- [x] `searchTrasactions` is used to query LocalVectorStore and provide results.
 
-Troubleshooting
+TROUBLESHOOTING STEPS
 - If they are unable to see account data, ensure they have 'reset' account permissions using the built in tool in the app.
-- They can verify if the LocalVectorStore is initialized using the built-in devtools 'Get Vector Store Summary'. If it is not, they can also reinitialize it.
+- They can verify if the LocalVectorStore is initialized using the built-in devtools 'Get Vector Store Summary'. If it is not, they can also reinitialize it using the tools.
 - They may not understand the 'why' behind the exercise. You may need to explain how to use the `searchTransactions` tool and potentially provide a sample query.
-- At any point they can run `pnpm db:studio` in the console to open the Prisma SQLite Studio in case they need to look at what data is available. This may be necessary to confirm documents/embeddings exist (the `Documents` table.)
+- At any point they can run `npm run db:studio` in the console to open the Prisma SQLite Studio in case they need to look at what data is available. This may be necessary to confirm documents/embeddings exist (the `Documents` table.)
