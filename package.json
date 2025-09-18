@@ -21,9 +21,9 @@
 		"db:schema:validate": "prisma validate"
 	},
 	"dependencies": {
-		"@ai-sdk/openai": "2.0.19",
+		"@ai-sdk/openai": "2.0.32",
 		"@ai-sdk/provider": "2.0.0",
-		"@ai-sdk/react": "2.0.22",
+		"@ai-sdk/react": "2.0.45",
 		"@auth0/ai": "^3.4.1",
 		"@auth0/ai-vercel": "3.8.0",
 		"@auth0/nextjs-auth0": "^4.8.0",
@@ -48,7 +48,7 @@
 		"@radix-ui/react-toggle-group": "^1.1.10",
 		"@radix-ui/react-tooltip": "^1.2.7",
 		"@vercel/functions": "^2.0.0",
-		"ai": "5.0.22",
+		"ai": "5.0.45",
 		"auth0": "^4.27.0",
 		"better-sqlite3": "^11.10.0",
 		"class-variance-authority": "^0.7.1",
@@ -114,8 +114,8 @@
 		"typescript-eslint": "^8.38.0"
 	},
 	"overrides": {
-		"ai": "5.0.22",
-		"@ai-sdk/react": "2.0.22",
+		"ai": "5.0.45",
+		"@ai-sdk/react": "2.0.45",
 		"@auth0-ai/vercel": {
 			"ai": "4.3.19"
 		},
@@ -125,7 +125,7 @@
 	"pnpm": {
 		"overrides": {
 			"@auth0-ai/vercel>ai": "4.3.19",
-			"ai": "5.0.22",
+			"ai": "5.0.45",
 			"@ai-sdk/react": "2.0.22"
 		},
 		"patchedDependencies": {
@@ -145,7 +145,7 @@
 		]
 	},
 	"resolutions": {
-		"ai": "5.0.22",
+		"ai": "5.0.45",
 		"@ai-sdk/react": "2.0.22"
 	}
 }
