@@ -53,7 +53,7 @@ function buildEmbeddingDoc(tx: Transactions.Transaction) {
 			categoryName: tx.categoryName,
 			budgetCategory: tx.budgetCategory,
 			budgetSubcategory: tx.budgetSubcategory,
-			payee: normalizePayee(tx.payee),
+			payee: normalizePayee(tx.rawPayee),
 			isExternal: !!tx.isExternal,
 			externalConnectionId: tx.externalConnectionId,
 			externalConnectionName: tx.externalConnectionName,
