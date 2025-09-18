@@ -60,8 +60,11 @@ export const searchTransactions = tool<
 	{ query: string },
 	z.infer<typeof outputSchema>
 >({
-	description:
-		'This tool is used for semantic search (Retrieval-Augmented Generation) of transaction data for the authenticated customer from a local vector store. Unlike `getTransactions`, which returns all data belonging to a user, this tool utilizes fine-grained authorization capabilities to ensure that only the authorized account and transaction data is made available for RAG purposes and only includes semantic search data (i.e. descriptions, memos, etc.)',
+	description: `\
+	This tool is used for semantic search (Retrieval-Augmented Generation) of transaction data for the authenticated customer from a local vector store. Unlike \`getTransactions\`, which returns all data belonging to a user, this tool utilizes fine-grained authorization capabilities to ensure that only the authorized account and transaction data is made available for RAG purposes and only includes semantic search data (i.e. descriptions, memos, etc.)
+
+	This tool returns the same data as \`getTransactions\` contained in the metadata. DO NOT FOLLOW THIS TOOL WITH \`getTransactions\`.
+	`.trim(),
 	name: 'searchTransactions',
 	inputSchema: z.object({
 		query: z.string().describe('The query to search for transactions.'),
