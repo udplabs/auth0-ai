@@ -39,7 +39,12 @@ export function SuggestedActions({
 	onSubmit,
 	...props
 }: SuggestedActionsProps) {
-	const { open = _open, labStep, suggestedActions } = useSuggestions();
+	const {
+		open = _open,
+		labStep,
+		suggestedActions,
+		toggleSuggestions,
+	} = useSuggestions();
 
 	suggestedActions.push(
 		...[
@@ -67,6 +72,7 @@ export function SuggestedActions({
 					<Button
 						variant='ghost'
 						type='button'
+						onClick={() => toggleSuggestions(!open)}
 					>
 						{open ? 'Hide suggestions' : 'Show suggestions'}
 						<ArrowIcon
@@ -104,6 +110,7 @@ export function SuggestedActions({
 										},
 										label,
 										suggestion,
+										...ButtonProps,
 									}}
 								/>
 							</motion.div>
