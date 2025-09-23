@@ -143,10 +143,6 @@ export async function POST(
 					// PromptMiddleware will prepend `prompt` with the appropriate system prompt(s) with the help of Agent StepGuru
 					prompt: 'null',
 					providerOptions,
-					prepareStep: (ctx) => {
-						console.log(ctx);
-						return undefined;
-					},
 					// OpenAI GPT 5 models no longer support temperature
 					// Farewell determinism 😢
 					// temperature: 0.2, // deterministic mode

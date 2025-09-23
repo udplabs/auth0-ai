@@ -66,11 +66,9 @@ export function useAuthenticators() {
 
 	useEffect(() => {
 		if (!isLoading) {
-			console.log(data);
 			const pushExists = data.some(
 				(f) => f.type === 'push' && f.enrolled === true
 			);
-			console.log('pushExists:', pushExists);
 			hasPushMfa.value = pushExists;
 		}
 	}, [isLoading, data]);
