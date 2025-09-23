@@ -5,23 +5,12 @@
 			"name": "Next.js: debug server-side",
 			"type": "node-terminal",
 			"request": "launch",
-			"command": "pnpm dev",
-			"skipFiles": [
-				"${workspaceFolder}/node_modules/**",
-				"!${workspaceFolder}/node_modules/.pnpm_patches/**", // allow your patched pkgs
-				"!${workspaceFolder}/node_modules/@auth0/**",
-				"${workspaceFolder}/lib/db/generated/prisma/runtime/**",
-				"${workspaceFolder}/lib/db/generated/supabase/runtime/**"
-			],
-			"resolveSourceMapLocations": [
-				"${workspaceFolder}/**",
-				"${workspaceFolder}/.next/**",
-				"!**/node_modules/**",
-				"${workspaceFolder}/node_modules/.pnpm_patches/**",
-				"${workspaceFolder}/node_modules/@auth0/**"
-			],
+			"command": "npm run dev",
+
+			"sourceMaps": true,
+			"skipFiles": ["<node_internals>/**"],
 			"sourceMapPathOverrides": {
-				"/turbopack/[project]/*": "${webRoot}/*"
+				"/turbopack/[project]/*": "${workspaceFolder}/*"
 			}
 		},
 		{
@@ -39,7 +28,8 @@
 			"skipFiles": ["<node_internals>/**", "**/node_modules/**"],
 			"sourceMaps": true,
 			"sourceMapPathOverrides": {
-				"/turbopack/[project]/*": "${webRoot}/*"
+				"/turbopack/[project]/*": "${webRoot}/*",
+				"turbopack://[project]/*": "${workspaceFolder}/*" // Adjust based on your project structure
 			},
 			"serverReadyAction": {
 				"action": "debugWithChrome",
