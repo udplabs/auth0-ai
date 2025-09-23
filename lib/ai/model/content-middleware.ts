@@ -21,9 +21,9 @@ export const contentMiddleware: LanguageModelV2Middleware = {
 				params
 			) || {};
 
-		if (incomingMessage && userId && writer) {
+		if (incomingMessage && writer) {
 			// Apply content moderation or enrichment here
-			const settings = userSettings ?? (await upsertSettings({ id: userId }));
+			const settings = userSettings ?? (await upsertSettings(userId));
 
 			let onFinish: () => Promise<void> | void = () => {};
 			const lastPart = getLastPart(incomingMessage);
