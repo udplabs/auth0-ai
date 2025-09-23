@@ -63,10 +63,12 @@ export async function updateSession(session: SessionData) {
  * - getSession(): Promise<SessionData | null> — returns null when not authenticated.
  * - getSession(true): Promise<SessionData>   — throws APIError('unauthorized:auth') when missing.
  */
-export async function getSession(): Promise<SessionData | null>;
-export async function getSession(throwError: true): Promise<SessionData>;
+export async function getSession(): Promise<SessionData>;
 export async function getSession(
-	throwError?: boolean
+	throwError: false
+): Promise<SessionData | null>;
+export async function getSession(
+	throwError = false
 ): Promise<SessionData | null> {
 	if (!auth0) {
 		return null;
@@ -78,29 +80,6 @@ export async function getSession(
 	}
 
 	return session;
-}
-
-/**
- * Return the refresh token if present in the session.
- *
- * Requirements
- * - Your Auth0 application must be configured to issue refresh tokens (offline_access).
- *
- * Returns
- * - A string refresh token, or undefined if not present.
- */
-export async function getRefreshToken() {
-	console.debug('getRefreshToken called');
-
-	const { tokenSet } = (await getSession()) || {};
-
-	if (tokenSet?.refreshToken) {
-		const result = tokenSet?.refreshToken;
-
-		console.debug('getRefreshToken result:', result);
-
-		return result;
-	}
 }
 
 /**
