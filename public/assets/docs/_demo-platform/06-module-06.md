@@ -5,6 +5,9 @@
 
 Implement **Human-in-the-Loop approval(s)** in your application to secure agentic actions using asynchronous authorization via **Client-Initiated Backchannel Authorization (CIBA)**. This will allow the AI agent to engage a user on demand for sensitive actions. Auth0 will be used to request the user’s permission to complete an authorization request.
 
+#### Technical Details
+The Auth0 AI SDK offers a few different convenience methods to help with Vercel’s AI SDK. In this module we will be implementing a wrapped version of <kbd>withAsyncAuthorization</kbd> as well as the <kbd>getCIBACredentials</kbd> method.
+
 ## Scenario
 
 **the bAInk** currently requires all users to transfer their funds through the online web portal or mobile application. The process is traditional and the team feels this experience could be improved. The executives at **the bAInk** have determined that they would like to allow Aiya to transfer funds on behalf of their customers but they emphasized that this was extremely risky. They need to ensure that Aiya is capable of completing this action in a secure fashion. This is where Auth0 and <abbr title='Client-Initiated Backchannel Authorization'>CIBA</abbr> can help bridge the gap.
@@ -246,13 +249,13 @@ Because our application has security! Or, at least a demonstration of security. 
 
 1.  Click **Update** and **Continue**.
 
-### Great! Now everything should work, right? 🤣
+---
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed Task 1.*
 
-<mark><i>Let’s keep moving…</i></mark>
+Everything works now, right? 🤣 <mark><i>Let’s keep moving…</i></mark>
 
-## Require Async Authorization for your tool
-
-The Auth0 AI SDK offers a few different convenience methods to help with Vercel’s AI SDK. In this module we will be implementing withAsyncAuthorization (slightly modified) and getCIBACredentials.
+---
 
 ## Task 2: Init AI Client
 
@@ -261,26 +264,36 @@ The Auth0 AI SDK offers a few different convenience methods to help with Vercel�
    	- We used a very similar pattern when implementing the <abbr title='Fine-grained Authorization'>FGA</abbr> client in `lib/auth0/fga/client.ts`.
 1. ***There isn’t anything to do here*** – we just wanted you to be aware that in order to proceed you would need to instantiate the Auth0AI SDK (somewhere).
 
-#### Congrats! You completed **Task 2**. 😁🥳
+---
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed Task 2.* 😁🥳
+
+---
 
 ## Task 3: Create Wrapper
 
-### GOAL
+### <span style="font-variant: small-caps">Goal</span>
 Return an instance of `auth0AI.withAsyncUserConfirmation` that:
-	- Properly handles when the user starts authorization and streams status updates/messages to ensure the UX is good.
-	- Properly handles errors/failures.
+- Properly handles when the user starts authorization and streams status updates/messages to ensure the UX is good.
 
-*This one is a doozy! Ready to learn?*
+- Properly handles errors/failures.
+
+***This one is a doozy! Ready to learn?***
 
 1. In your code editor, open `lib/auth0/ai/with-async-authorization.ts`.
 
-*Similar to previous modules, you will notice the code is heavily documented with numerous instructions/guides to aid you in completing the task.*
+	<br>
+
+	> [!TIP]
+	> *Similar to previous modules, you will notice the code is heavily documented with numerous instructions/guides to aid you in completing the task.*
+
+	<br>
 
 2. ~~Initialize Auth0AI client singleton.~~ _<span style='color: green; font-variant: small-caps'>← Done for you</span>_
 
 3. ~~Guard against a missing Auth0AI client (*defensive coding*)~~ _<span style='color: green; font-variant: small-caps'>← Done for you</span>_
 
-4. Add the custom scope (permission) we created earlier to the existing scopes array.
+4. Add the custom scope (aka 'permission') we created earlier to the existing scopes array.
 
 5. Ensure the <kbd>userID</kbd> parameter is a <mark>promise</mark> that returns the user’s ID.
 
@@ -290,11 +303,13 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 
 7. Enhance `onAuthorizationRequest` by using our custom `handleOnAuthorize` helper function.
 
+<br>
 
 > [!NOTE]
 >
 > TODO: EXPLAIN FUNCTION
 
+<br>
 
 8. Ensure any errors (i.e. from `onUnauthorized`) are *normalized*.
 
@@ -322,6 +337,15 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 	```diff
 	- // })(tool) /** ✅ Step 3.7: Don't forget to inject the `tool` being wrapped! */;
 	+ })(tool);
+
+---
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed Task 3.*
+
+### TODO: Add summary of what we did
+You successfully...
+
+---
 
 ### Task 3 : Inject datastream writer using a "<i>higher-order factory</i>"
 
