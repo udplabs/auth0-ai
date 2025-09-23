@@ -16,4 +16,6 @@ declare global {
 	interface Window {
 		__dbSyncPromise?: Promise<void>;
 	}
+
+	type SortOrder = 'asc' | 'desc';
 }

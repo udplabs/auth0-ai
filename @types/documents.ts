@@ -29,6 +29,7 @@ export namespace Documents {
 					| 'budgetCategory'
 					| 'budgetSubcategory'
 					| 'payee'
+					| 'rawPayee'
 					| 'isExternal'
 					| 'externalConnectionId'
 					| 'externalConnectionName'
