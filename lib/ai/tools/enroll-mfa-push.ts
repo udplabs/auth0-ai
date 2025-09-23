@@ -2,13 +2,14 @@ import { createMFAEnrollment } from '@/lib/api/user/create-mfa-enrollment';
 import { getUser } from '@/lib/auth0/client';
 import { tool } from 'ai';
 import { z } from 'zod';
-export const pushEnrollment = tool({
+
+export const enrollMfaPush = tool({
 	description:
 		'Generates an Auth0 enrollment ticket URL to initiate enrollment in push notifications for MFA.',
-	name: 'pushEnrollment',
+	name: 'enrollMfaPush',
 	inputSchema: z.object({}),
 	execute: async () => {
-		console.log('pushEnrollment tool called!');
+		console.log('enrollMfaPush tool called!');
 		try {
 			const user = await getUser();
 

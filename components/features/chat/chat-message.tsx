@@ -8,7 +8,6 @@ import {
 import {
 	Message,
 	MessageContent,
-	type MessageAvatarProps,
 	type MessageContentProps,
 	type MessageProps,
 } from '@/components/ui/ai-elements/message';
@@ -32,7 +31,6 @@ export interface ChatMessageProps extends React.ComponentProps<'div'> {
 	isThinking?: boolean;
 	MessageProps?: Omit<MessageProps, 'from'>;
 	MessageContentProps?: MessageContentProps;
-	MessageAvatarProps?: MessageAvatarProps;
 	ResponseProps?: ResponseProps;
 	ToolResultProps?: ToolResultProps;
 }
@@ -45,12 +43,15 @@ export const ChatMessage = ({
 	isThinking = false,
 	MessageProps,
 	MessageContentProps,
-	MessageAvatarProps,
 	ResponseProps,
 	ToolResultProps,
 	...props
 }: ChatMessageProps) => {
 	const isAssistant = message.role === 'assistant';
+
+	// Hide certain system/generated messages
+	if (message.metadata?.isHidden) return null;
+
 	return (
 		<div {...props}>
 			<Message {...{ ...MessageProps, from: message.role }}>
@@ -79,10 +80,16 @@ export const ChatMessage = ({
 
 							// Handle tool calls
 							if (isToolUIPart(part)) {
+								if (part.type.includes('transferFunds')) {
+								}
 								return (
 									<ToolResult
 										key={key}
-										{...{ ...ToolResultProps, toolPart: part as ToolPart }}
+										{...{
+											...ToolResultProps,
+											toolPart: part as ToolPart,
+											parts: message.parts,
+										}}
 									/>
 								);
 							}

@@ -19,7 +19,7 @@ export interface UserProfile extends GetUsers200ResponseOneOfInner {
 
 interface UserProfileSWROptions extends SWRConfiguration {
 	fallbackData: UserProfile;
-	onSuccess: (data: UserProfile, key: string) => Promise<void>;
+	// onSuccess: (data: UserProfile, key: string) => Promise<void>;
 }
 
 type UseUserProfileResponse = SWRResponse<
@@ -62,7 +62,7 @@ export const useUserProfile = () => {
 				user_id,
 				...claims,
 			} as UserProfile,
-			onSuccess,
+			// onSuccess,
 		}
 	);
 
@@ -95,7 +95,7 @@ export const useUserProfile = () => {
 						? error.toJSON()
 						: new APIError(error).toJSON();
 
-				console.log(err);
+				console.error(err);
 			}
 		},
 		[mutate, data]
@@ -105,7 +105,7 @@ export const useUserProfile = () => {
 		async (updateData: UserUpdate) => {
 			if (!data || !KEY) return;
 
-			let toastId: string | number | undefined = undefined;
+			const toastId: string | number | undefined = undefined;
 
 			try {
 				const updated = await mutate(
@@ -164,7 +164,7 @@ export const useUserProfile = () => {
 						type: 'error',
 					});
 				} else {
-					console.log(err);
+					console.error(err);
 				}
 				return undefined;
 			}
@@ -172,22 +172,23 @@ export const useUserProfile = () => {
 		[mutate, data]
 	);
 
-	async function onSuccess(data: UserProfile) {
-		const { user_id, app_metadata } = data || {};
+	// async function onSuccess(data: UserProfile) {
+	// 	const { user_id, app_metadata } = data || {};
 
-		const { has_accounts = false } = app_metadata || {};
+	// 	const { has_accounts = 'false' } = app_metadata || {};
 
-		// Check if this is the user's first login
-		if (user_id && (!has_accounts || has_accounts === 'false')) {
-			// Initialize fake account data!
-			await createMockAccountsAction(user_id);
+	// 	// Check if this is the user's first login
+	// 	if (user_id && (!has_accounts || has_accounts == 'false')) {
+	// 		// Initialize fake account data!
+	// 		console.log('useUserProfile: creating mock accounts for user:', user_id);
+	// 		await createMockAccountsAction(user_id);
 
-			// Update the user profile to indicate accounts have been created
-			await updateUserProfile({
-				app_metadata: { has_accounts: true },
-			});
-		}
-	}
+	// 		// Update the user profile to indicate accounts have been created
+	// 		await updateUserProfile({
+	// 			app_metadata: { has_accounts: true },
+	// 		});
+	// 	}
+	// }
 
 	return {
 		data: {

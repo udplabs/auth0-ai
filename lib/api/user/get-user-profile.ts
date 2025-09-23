@@ -12,7 +12,7 @@ async function fetchUserProfile(id: string): Promise<UserProfile | undefined> {
 			return;
 		}
 
-		console.log('fetching profile...');
+		console.debug('fetching profile...');
 
 		const { data: user } = await auth0Management.users.get({ id });
 
@@ -24,7 +24,12 @@ async function fetchUserProfile(id: string): Promise<UserProfile | undefined> {
 	}
 }
 
-export async function getUserProfile({ userId, key, tags }: ActionOptions) {
+export async function getUserProfile({
+	userId,
+	key,
+	tags,
+	cached: useCache = true,
+}: ActionOptions) {
 	if (!key) {
 		key = getCacheKey({ userId, resource: ['profile'] });
 	}
@@ -35,10 +40,14 @@ export async function getUserProfile({ userId, key, tags }: ActionOptions) {
 
 	tags = [...new Set(tags)];
 
-	const cached = unstable_cache(() => fetchUserProfile(userId), [key], {
-		revalidate: 150,
-		tags,
-	});
+	if (useCache) {
+		const cached = unstable_cache(() => fetchUserProfile(userId), [key], {
+			revalidate: 150,
+			tags,
+		});
 
-	return cached();
+		return cached();
+	}
+
+	return fetchUserProfile(userId);
 }

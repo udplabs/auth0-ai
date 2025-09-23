@@ -1,7 +1,10 @@
 // lib/ai/tools/transfer-funds.ts
+// FINAL CODE
 import { AccountSchema } from '@/lib/api/schemas/accounts';
 import { ToolResponseSchema } from '@/lib/api/schemas/chat';
 import { CreateTransferSchema } from '@/lib/api/schemas/transfers';
+import { withAsyncAuthorization } from '@/lib/auth0/ai/with-async-authorization';
+import { getCIBACredentials } from '@auth0/ai-vercel';
 import { tool, type UIMessageStreamWriter } from 'ai';
 import { z } from 'zod';
 
@@ -58,60 +61,64 @@ export const outputSchema = ToolResponseSchema(TransferResultSchema);
  *  - You should see real-time messaging in the chat informing you of progress.
  */
 export const transferFunds =
-	/* ❌ STEP 3: (slightly odd order!) Transform into higher-order factory (wrap `withAsyncAuthorization`)*/
-	/* ❌ STEP 1: Wrap with `withAsyncAuthorization` */ tool<
-		z.infer<typeof inputSchema>,
-		z.infer<typeof outputSchema>
-	>({
-		name: 'transferFunds',
-		// ❌ STEP 4: Update the tool description.
-		description:
-			'Use this tool to transfer funds on behalf of a user. It requires both the to and from internal account identifiers (ULIDs) in addition to the fully qualified account numbers. DO NOT ASK THE USER FOR ACCOUNT NUMBERS OR IDs. Use `getAccountList` to fetch the necessary data and determine which accounts based on `name` and `displayName`. If still unable to determine the specific account, ask for clarification for that account only. The user will receive a push notification to provide confirmation. Always confirm the details of the transfer with the user before continuing.',
-		inputSchema,
-		outputSchema,
-		execute: async (payload) => {
-			try {
-				// ---------------------------------------------------------------------------
-				// ❌ STEP 2: Retrieve access token using `getCIBACredentials` and add to Authorization header.
-				// You will need to:
-				// [2.1] Import `getCIBACredentials` from `@auth0/ai-vercel`
-				// [2.2] Call the method to get a TokenSet (and accessToken).
-				//---------------------------------------------------------------------------
+	/*  ✅ STEP 3: (slightly odd order!) Transform into higher-order factory (wrap `withAsyncAuthorization`)*/ (
+		writer: UIMessageStreamWriter
+	) =>
+		/* ✅ STEP 1: Wrap with `withAsyncAuthorization` */ withAsyncAuthorization({
+			writer,
+			bindingMessage: 'Please approve the transfer',
+			tool: tool<z.infer<typeof inputSchema>, z.infer<typeof outputSchema>>({
+				name: 'transferFunds',
+				// ✅ STEP 4: Update the tool description.
+				description:
+					'Use this tool to transfer funds on behalf of a user. It requires both the to and from internal account identifiers (ULIDs) in addition to the fully qualified account numbers. DO NOT ASK THE USER FOR ACCOUNT NUMBERS OR IDs. Use `getAccountList` to fetch the necessary data and determine which accounts based on `name` and `displayName`. If still unable to determine the specific account, ask for clarification for that account only. The user will receive a push notification to provide confirmation. DO NOT require confirmation from the user -- they will confirm via push notification.',
+				inputSchema,
+				outputSchema,
+				execute: async (payload) => {
+					try {
+						// ---------------------------------------------------------------------------
+						// ✅ STEP 2: Retrieve access token using `getCIBACredentials` and add to Authorization header.
+						// You will need to:
+						// [2.1] Import `getCIBACredentials` from `@auth0/ai-vercel`
+						// [2.2] Call the method to get a TokenSet (and accessToken).
+						//---------------------------------------------------------------------------
+						const { accessToken } = (await getCIBACredentials()) || {};
 
-				const response = await fetch(
-					`${process.env.APP_BASE_URL}/api/accounts/${payload.fromAccountId}`,
-					{
-						method: 'POST',
-						headers: {
-							// ❌ [2.3] Ensure the accessToken is sent to the API
-							Authorization: `Bearer `,
-						},
-						body: JSON.stringify(payload),
+						const response = await fetch(
+							`${process.env.APP_BASE_URL}/api/accounts/${payload.fromAccountId}`,
+							{
+								method: 'POST',
+								headers: {
+									// ✅ [2.3] Ensure the accessToken is sent to the API
+									Authorization: `Bearer ${accessToken}`,
+								},
+								body: JSON.stringify(payload),
+							}
+						);
+
+						if (!response.ok) {
+							throw new Error(`API responded with status ${response.status}`);
+						}
+
+						return {
+							status: 'success',
+							message: 'Transfer successful.',
+							dataCount: 1,
+							data: TransferResultSchema.parse(await response.json()),
+						};
+					} catch (error: unknown) {
+						console.info('error creating transfer...');
+						console.error(error);
+
+						const { APIError } = await import('@/lib/errors');
+
+						return {
+							...new APIError(error).toJSON(),
+							status: 'error',
+							message: 'Failed to create transfer.',
+							dataCount: 0,
+						};
 					}
-				);
-
-				if (!response.ok) {
-					throw new Error(`API responded with status ${response.status}`);
-				}
-
-				return {
-					status: 'success',
-					message: 'Transfer successful.',
-					dataCount: 1,
-					data: TransferResultSchema.parse(await response.json()),
-				};
-			} catch (error: unknown) {
-				console.info('error creating transfer...');
-				console.error(error);
-
-				const { APIError } = await import('@/lib/errors');
-
-				return {
-					...new APIError(error).toJSON(),
-					status: 'error',
-					message: 'Failed to create transfer.',
-					dataCount: 0,
-				};
-			}
-		},
-	});
+				},
+			}),
+		});

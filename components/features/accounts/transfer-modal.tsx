@@ -37,6 +37,7 @@ export const TransferModal = ({
 	toggleModal,
 	transferAmount = 0,
 	transferFunds,
+	transferAmountRaw,
 }: TransferModalProps) => {
 	const getBalanceString = (balance?: number) => {
 		if (balance) {
@@ -125,7 +126,12 @@ export const TransferModal = ({
 									onChange,
 									placeholder: '0.00',
 									type: 'number',
-									value: transferAmount.toString(),
+									value: transferAmountRaw ?? '',
+									onKeyDown: (e) => {
+										if (e.key === 'Enter') {
+											transferFunds();
+										}
+									},
 								}}
 							/>
 						</div>
