@@ -38,7 +38,7 @@ export async function DELETE(
 
 		return new Response(null, { status: 204 });
 	} catch (error) {
-		console.log('API error:', error);
+		console.info('API error:', error);
 		if (error instanceof APIError) {
 			return error.toResponse();
 		}

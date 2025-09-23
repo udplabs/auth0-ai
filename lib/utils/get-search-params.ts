@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server';
 
 export function getSearchParams<T>(req: NextRequest, keys: string[] = []) {
-	console.log('parsing search params...');
+	console.debug('parsing search params...');
 
 	const result: T = {} as T;
 

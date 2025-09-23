@@ -25,7 +25,7 @@ export const getUserProfile = tool<object, Chat.ToolsResponse<UserProfile>>({
 				hasOwnUI: true,
 			};
 		} catch (error: unknown) {
-			console.log(error);
+			console.error(error);
 
 			const { APIError } = await import('@/lib/errors');
 

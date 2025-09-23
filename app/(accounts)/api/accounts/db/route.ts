@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
 
 		return Response.json(null, { status: 201 });
 	} catch (error: unknown) {
-		console.log('[vector-store][GET] error:', error);
+		console.error('[vector-store][GET] error:', error);
 		if (error instanceof APIError) return error.toResponse();
 		return new APIError(error).toResponse();
 	}
@@ -77,7 +77,7 @@ export async function DELETE() {
 		LocalVectorStore.reset();
 		return new Response(null, { status: 204 });
 	} catch (error: unknown) {
-		console.log('[vector-store][DELETE] error:', error);
+		console.error('[vector-store][DELETE] error:', error);
 		if (error instanceof APIError) return error.toResponse();
 		return new APIError(error).toResponse();
 	}

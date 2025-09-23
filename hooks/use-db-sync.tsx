@@ -45,8 +45,8 @@ export const useDbSync = () => {
 		// Fire but ignore errors
 		// Just log
 		window.__dbSyncPromise.catch((e) => {
-			console.log('db sync went wrong... ¯\_(ツ)_/¯');
-			console.log(e);
+			console.info('db sync went wrong... ¯\_(ツ)_/¯');
+			console.error(e);
 		});
 	}, []);
 };

@@ -3,8 +3,8 @@ import { ChatProvider } from '@/components/features/chat/chat-provider';
 import { auth0, getUser } from '@/lib/auth0/client';
 import { getChatById } from '@/lib/db/queries/chat/query-chats';
 import { APIError } from '@/lib/errors';
+import { ulid } from '@/lib/utils';
 import { redirect } from 'next/navigation';
-import { ulid } from 'ulid';
 
 import type { Metadata } from 'next';
 
@@ -74,8 +74,8 @@ export default async function Page({
 	const user = await getUser(false);
 
 	if (!user?.sub) {
-		console.log('no user session');
-		console.log('initiating ephemeral chat...');
+		console.info('no user session');
+		console.info('initiating ephemeral chat...');
 	}
 
 	// Collector for preloaded messages (if existing chat found).
@@ -103,8 +103,8 @@ export default async function Page({
 				isNewChat = true;
 			}
 		} else {
-			console.log('unexpected error loading chat:');
-			console.log(error);
+			console.info('unexpected error loading chat:');
+			console.error(error);
 		}
 	}
 
@@ -113,9 +113,7 @@ export default async function Page({
 			{...{
 				isNewChat,
 				chatId: id,
-				chatOptions: {
-					...(initialMessages.length > 0 ? { messages: initialMessages } : {}),
-				},
+				initialMessages,
 			}}
 		>
 			<Chat hideLogin={auth0 == null} />

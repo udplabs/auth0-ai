@@ -19,7 +19,7 @@ export function EnsureAPIAccessPopup({
 
 	const complete = useCallback(async () => {
 		if (completed) return;
-		console.log('Completing API access...');
+		console.debug('Completing API access...');
 		setCompleted(true);
 		setIsLoading(false);
 		setLoginPopup(null);
@@ -37,12 +37,12 @@ export function EnsureAPIAccessPopup({
 	// Prefer postMessage; fallback to polling
 	useEffect(() => {
 		function onMessage(e: MessageEvent) {
-			console.log('Received message:', e.data);
+			console.debug('Received message:', e.data);
 			if (e.origin !== window.location.origin) return;
 			if (!e.data || e.data.type !== 'auth0-fedconn-complete') return;
 			// Close popup if still open
 			try {
-				console.log('attempting to close popup...');
+				console.debug('attempting to close popup...');
 				if (loginPopup && !loginPopup.closed) loginPopup.close();
 			} catch {}
 			void complete();
@@ -76,7 +76,7 @@ export function EnsureAPIAccessPopup({
 		const url = new URL(authorizePath, window.location.origin);
 		url.search = search.toString();
 
-		console.log('url:', url.toString());
+		console.debug('url:', url.toString());
 
 		const popupWidth = screen.height;
 		const popupHeight = 800;

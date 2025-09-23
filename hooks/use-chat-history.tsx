@@ -8,10 +8,8 @@ import { useState } from 'react';
 import { toast as sonnerToast } from 'sonner';
 import type { SWRResponse } from 'swr';
 import useSWR from 'swr';
-import { ulid } from 'ulid';
 
 import type { Chat } from '@/types/chat';
-import { isEqual } from 'date-fns';
 /**
  * useChatHistory
  *
@@ -128,7 +126,7 @@ export function useChatHistory() {
 
 		// (2) If deleting the currently open chat, navigate to a fresh session.
 		if (chatId === pathId) {
-			console.log('Navigating to new chat...');
+			console.debug('Navigating to new chat...');
 			newChat();
 		}
 
@@ -164,7 +162,7 @@ export function useChatHistory() {
 					}
 				);
 			} else {
-				console.log(err);
+				console.warn(err);
 			}
 			setLoading(false);
 		}

@@ -17,7 +17,7 @@ export async function saveEmbeddings(
 	embeddings: Documents.Embedding[],
 	table: 'sample' | 'dev' = 'sample'
 ): Promise<Documents.DocumentWithEmbedding[]> {
-	console.log('saving embeddings to documents:', embeddings.length);
+	console.info('saving embeddings to documents:', embeddings.length);
 
 	const data = embeddings.map((embedding, index) => {
 		const { metadata = {}, ...doc } = documents[index];
@@ -42,7 +42,7 @@ export async function saveEmbeddings(
 		dbResult = await supabase.remoteSampleDocument.createManyAndReturn({
 			data,
 		});
-		console.log('saved sample documents:', dbResult.length);
+		console.info('saved sample documents:', dbResult.length);
 	} else {
 		dbResult = await prisma.document.createManyAndReturn({
 			data,
@@ -53,7 +53,7 @@ export async function saveEmbeddings(
 		Documents.DocumentWithEmbedding[]
 	>(dbResult);
 
-	console.log('saved embeddings:', uiDocuments.length);
+	console.info('saved embeddings:', uiDocuments.length);
 
 	return uiDocuments;
 }
@@ -61,7 +61,7 @@ export async function saveEmbeddings(
 export async function saveDocuments(
 	documents: Documents.CreateDocumentInput[]
 ) {
-	console.log('saving documents:', documents.length);
+	console.info('saving documents:', documents.length);
 
 	const { count } = await prisma.document.createMany({
 		data: documents.map(({ metadata, embedding, ...rest }) => {
@@ -73,7 +73,7 @@ export async function saveDocuments(
 		}),
 	});
 
-	console.log('saved documents with embeddings:', count);
+	console.info('saved documents with embeddings:', count);
 
 	return;
 }
@@ -81,7 +81,7 @@ export async function saveDocuments(
 // THESE ARE INTERNAL FUNCTIONS
 // DO NOT USE THIS IN ANY API ROUTES
 export async function getDocumentsForVectorStore() {
-	console.log('getting documents for vector store...');
+	console.info('getting documents for vector store...');
 	const dbDocuments = await prisma.document.findMany({
 		orderBy: { createdAt: 'desc' },
 	});
@@ -101,15 +101,15 @@ export async function getDocumentsForVectorStore() {
 		documents.push(doc);
 	}
 
-	console.log('found embeddings:', embeddings.length);
-	console.log('found documents:', documents.length);
+	console.info('found embeddings:', embeddings.length);
+	console.info('found documents:', documents.length);
 
 	return [embeddings, documents] as const;
 }
 export async function getDocuments(): Promise<
 	Documents.DocumentWithEmbedding[]
 > {
-	console.log('getting all documents...');
+	console.info('getting all documents...');
 	const dbDocuments = await prisma.document.findMany({
 		orderBy: { createdAt: 'desc' },
 	});

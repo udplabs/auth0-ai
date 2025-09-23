@@ -13,7 +13,7 @@ const sampleUserIds = [
 ];
 
 export async function createMockAccounts(userId: string) {
-	console.log('Creating mock accounts for user:', userId);
+	console.info('Creating mock accounts for user:', userId);
 
 	const sampleUserId = arrayElement(sampleUserIds);
 
@@ -42,7 +42,7 @@ export async function createMockAccounts(userId: string) {
 	const transactionDocuments: Documents.DocumentWithEmbedding[] = [];
 
 	// Generate new IDs for accounts, transactions, and embeddings
-	console.log('Generating mock accounts and transactions...');
+	console.info('Generating mock accounts and transactions...');
 	for (const account of sampleAccounts) {
 		const originalAccountId = account.id;
 
@@ -104,9 +104,9 @@ export async function createMockAccounts(userId: string) {
 		}
 	}
 
-	console.log('Mock accounts created:', accounts.length);
-	console.log('Mock transactions created:', transactions.length);
-	console.log(
+	console.info('Mock accounts created:', accounts.length);
+	console.info('Mock transactions created:', transactions.length);
+	console.info(
 		'Mock transaction documents created:',
 		transactionDocuments.length
 	);
@@ -149,7 +149,7 @@ export async function generateMockEmbeddings() {
 	]);
 
 	for (const sampleUserId of sampleUserIds) {
-		console.log('Generating mock embeddings for user:', sampleUserId);
+		console.info('Generating mock embeddings for user:', sampleUserId);
 
 		const { transactions = [], documents: _documents = [] } =
 			await getSampleData(sampleUserId);

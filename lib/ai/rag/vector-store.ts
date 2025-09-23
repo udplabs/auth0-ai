@@ -1,4 +1,4 @@
-import { openai } from '@/lib/ai/openai';
+import { openai } from '@/lib/ai/model/openai';
 import { getAllTransactions } from '@/lib/db/queries/accounts/query-transactions';
 import { getDocuments } from '@/lib/db/queries/documents';
 import { cosineSimilarity, embed } from 'ai';
@@ -69,8 +69,8 @@ export class LocalVectorStore {
 
 	/** Log a lightweight summary (dev aid). */
 	static summary() {
-		console.log('LocalVectorStore summary:');
-		console.log('Total documents:', LocalVectorStore.count);
+		console.info('LocalVectorStore summary:');
+		console.info('Total documents:', LocalVectorStore.count);
 	}
 
 	/**
@@ -78,10 +78,10 @@ export class LocalVectorStore {
 	 * Use sparingly—intended for dev / admin endpoints.
 	 */
 	static reset() {
-		console.log('resetting vector store!');
+		console.info('resetting vector store!');
 		LocalVectorStore.db = [];
 		LocalVectorStore.initialized = false;
-		console.log('Vector store reset.');
+		console.info('Vector store reset.');
 	}
 
 	/**
@@ -91,7 +91,7 @@ export class LocalVectorStore {
 	 *              (Current implementation does not auto-clear; call reset() first for a clean slate.)
 	 */
 	static async init(force = false) {
-		console.log(
+		console.info(
 			'LocalVectorStore initialized:',
 			LocalVectorStore.initialized,
 			'Force re-initialize?:',
@@ -100,23 +100,23 @@ export class LocalVectorStore {
 
 		// Idempotent exit unless caller forces rebuild.
 		if (!force && LocalVectorStore.initialized) {
-			console.log('Vector store already initialized, skipping...');
+			console.info('Vector store already initialized, skipping...');
 			return;
 		}
 
-		console.log('checking for existing documents with embeddings...');
+		console.info('checking for existing documents with embeddings...');
 		const existingDocuments = await getDocuments();
-		console.log('existing documents:', existingDocuments.length);
+		console.info('existing documents:', existingDocuments.length);
 
 		// Stage existing embedded docs into memory first.
 		if (existingDocuments.length > 0) {
-			console.log(
+			console.info(
 				`adding ${existingDocuments.length} existing documents to vector store...`
 			);
 			await LocalVectorStore.insert(existingDocuments);
 		}
 
-		console.log('attempting to initialize entire db...');
+		console.info('attempting to initialize entire db...');
 
 		// Collect IDs of docs already embedded to avoid duplicates.
 		const existingTransactionIds = existingDocuments.flatMap(
@@ -127,13 +127,13 @@ export class LocalVectorStore {
 		const transactionsWithoutEmbedding = await getAllTransactions({
 			NOT: { id: { in: existingTransactionIds } },
 		});
-		console.log(
+		console.info(
 			'transactions missing embeddings:',
 			transactionsWithoutEmbedding.length
 		);
 
 		if (transactionsWithoutEmbedding.length > 0) {
-			console.log('Creating documents for new transactions...');
+			console.info('Creating documents for new transactions...');
 			const docs = await createDocumentsWithEmbeddings(
 				transactionsWithoutEmbedding
 			);
@@ -144,7 +144,7 @@ export class LocalVectorStore {
 		}
 
 		LocalVectorStore.initialized = true;
-		console.log('LocalVectorStore initialized successfully.');
+		console.info('LocalVectorStore initialized successfully.');
 	}
 
 	/**
@@ -156,7 +156,7 @@ export class LocalVectorStore {
 	 */
 	static async insert(documents: Documents.DocumentWithEmbedding[]) {
 		if (LocalVectorStore.db.length > 0) {
-			console.log('DB already has documents, merging new ones...');
+			console.info('DB already has documents, merging new ones...');
 			for (const document of documents) {
 				const idx = LocalVectorStore.db.findIndex((d) => d.id === document.id);
 				if (idx !== -1) {
@@ -166,7 +166,7 @@ export class LocalVectorStore {
 				}
 			}
 		} else {
-			console.log('DB is empty, adding all documents:', documents.length);
+			console.info('DB is empty, adding all documents:', documents.length);
 			LocalVectorStore.db.push(...documents);
 		}
 	}
@@ -196,12 +196,14 @@ export class LocalVectorStore {
 		const results = LocalVectorStore.db
 			.map(({ embedding, ...doc }) => {
 				const score = cosineSimilarity(q, embedding);
+
 				return { ...doc, score } as Documents.DocumentWithScore;
 			})
 			.sort((a, b) => b.score - a.score)
+			// .filter((doc) => doc.score >= 0.15)
 			.slice(0, limit);
 
-		console.log('search results found:', results.length);
+		console.info('search results found:', results.length);
 		return results;
 	}
 }
