@@ -1,9 +1,10 @@
+import { ToolResponseSchema } from '@/lib/api/schemas/chat';
+import { ContentSchema } from '@/lib/api/schemas/content';
 import { getUserProfile } from '@/lib/api/user/get-user-profile';
 import { getUser } from '@/lib/auth0/client';
 import { getStepCode as getStepCodeQuery } from '@/lib/db/queries/content';
 import { tool } from 'ai';
 import { z } from 'zod';
-import { ContentSchema, ToolResponseSchema } from '../../schemas';
 
 const inputSchema = z.object({
 	labStep: z
