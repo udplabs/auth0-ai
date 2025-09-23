@@ -3,6 +3,8 @@ import { getAccountsByUserId } from '@/lib/db/queries/accounts/query-accounts';
 import { getCacheKey } from '@/lib/utils/get-cache-key';
 import { unstable_cache } from 'next/cache';
 
+import type { Accounts } from '@/types/accounts';
+
 interface GetAccountsOptions extends ActionOptions {
 	includeTransactions?: boolean;
 }
@@ -44,4 +46,17 @@ export async function getAccounts({
 	);
 
 	return cached();
+}
+
+export async function listAccounts(userId: string) {
+	const accounts = await getAccounts({ userId, includeTransactions: false });
+
+	return accounts.map(({ id, number, displayName, name, type, subType }) => ({
+		id,
+		displayName,
+		name,
+		number,
+		subType,
+		type,
+	})) as Accounts.AccountList[];
 }
