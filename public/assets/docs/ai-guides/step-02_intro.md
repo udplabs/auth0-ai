@@ -8,7 +8,7 @@ If you’re seeing this, you probably did something right. 🎉
 
 🌎 Translate the guide into “do-this-next” steps.
 
-😑 Explain code & concepts (i.e. _wtf is FGA, RAG, and CIBA?_) in plain dev terms.
+😑 Explain code & concepts (i.e. _wtf is <abbr title="Fine-grained Authorization">FGA</abbr>, <abbr title="Retrieval-Augmented Generation">RAG</abbr>, and <abbr title="Client-Initiated Backchannel Authorization">CIBA</abbr>?_) in plain dev terms.
 
 👉 Point you at the right resources, files, and other stuff.
 
@@ -81,11 +81,11 @@ Not entirely sure? We'll figure it out!
 
 - [ ] <span style='font-weight: 900;'>_Step 3: Get [Auth0] Configured_</span> _<span style='color: red; font-variant: small-caps'>📍←You are here</span>_
 
-- [ ] <span style='color: gray'>_Step 4: Configure FGA_</span>
+- [ ] <span style='color: gray'>_Step 4: Configure <abbr title="Fine-grained Authorization">FGA</abbr>_</span>
 
-- [ ] <span style='color: gray'>_Step 5: Setup FGA for RAG_</span>
+- [ ] <span style='color: gray'>_Step 5: Setup <abbr title="Fine-grained Authorization">FGA</abbr> for <abbr title="Retrieval-Augmented Generation">RAG</abbr>_</span>
 
-- [ ] <span style='color: gray'>_Step 6: Advanced FGA for RAG_</span>
+- [ ] <span style='color: gray'>_Step 6: Advanced <abbr title="Fine-grained Authorization">FGA</abbr> for <abbr title="Retrieval-Augmented Generation">RAG</abbr>_</span>
 
 - [ ] <span style='color: gray'>~~_Step 7: Async Auth_~~</span> _<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>_
 
