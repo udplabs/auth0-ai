@@ -17,8 +17,6 @@ import { useEffect, useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 import { SuggestedActions } from './suggested-actions';
 
-import type { Chat } from '@/types/chat';
-
 export interface PromptInputProps extends AIPromptInputProps {
 	ContainerProps?: React.ComponentProps<'div'>;
 	PromptInputTextareaProps?: PromptInputTextareaProps;
@@ -56,7 +54,7 @@ export const PromptInput = ({
 
 	useEffect(() => {
 		setLocalStorageInput(input);
-	}, [input]);
+	}, [input, setLocalStorageInput]);
 
 	useEffect(() => {
 		// If there is a suggestion that should be shown, show it!
@@ -107,6 +105,9 @@ export const PromptInput = ({
 					onOpenChange: toggleSuggestions,
 					onSubmit: submitAction,
 					className: 'py-2',
+					ButtonProps: {
+						disabled: status !== 'ready',
+					},
 				}}
 			/>
 			<AIPromptInput

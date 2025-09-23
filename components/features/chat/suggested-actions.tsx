@@ -26,7 +26,7 @@ interface SuggestedActionsProps extends Omit<CollapsibleProps, 'onSubmit'> {
 }
 
 export interface SuggestedActions {
-	label?: string;
+	label?: React.ReactNode;
 	suggestion: string;
 	variant?: string;
 	preSubmitAction?: () => void;
@@ -48,7 +48,15 @@ export function SuggestedActions({
 
 	suggestedActions.push(
 		...[
-			{ suggestion: 'What is FGA for RAG?' },
+			{
+				label: (
+					<span>
+						What is <abbr title='Fine-grained Authorization'>FGA</abbr> for{' '}
+						<abbr title='Retrieval-Augmented Generation'>RAG</abbr>?
+					</span>
+				),
+				suggestion: 'What is FGA for RAG?',
+			},
 			...(labStep >= 3
 				? [
 						{ suggestion: 'Show me my accounts' },
