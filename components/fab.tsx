@@ -7,13 +7,13 @@ import {
 	PopoverTrigger,
 } from '@/components/ui/popover';
 import { useAccounts } from '@/hooks/use-accounts';
-import { LS_KEY_AUTH, LS_KEY_FIRST } from '@/lib/constants';
+import { authMessageOverride, firstMessageOverride } from '@/lib/signals';
 import { cn } from '@/lib/utils';
+import { useSignals } from '@preact/signals-react/runtime';
 import {
 	CircleArrowOutUpRightIcon,
 	EyeIcon,
 	FileStackIcon,
-	LockIcon,
 	RefreshCcwDot,
 	RotateCcwIcon,
 	WandSparkles,
@@ -37,6 +37,7 @@ const handleEmbeddingsBuild = async () => {
 };
 
 export const FAB = () => {
+	useSignals();
 	const { resetPermissions, mutate } = useAccounts();
 
 	return (
@@ -61,8 +62,7 @@ export const FAB = () => {
 						className='p-0 pl-2'
 						variant='ghost'
 						onClick={() => {
-							localStorage.removeItem(LS_KEY_FIRST);
-							localStorage.removeItem(LS_KEY_AUTH);
+							firstMessageOverride.value = true;
 							redirect('/chat');
 						}}
 					>
@@ -75,7 +75,7 @@ export const FAB = () => {
 						className='p-0 pl-2'
 						variant='ghost'
 						onClick={() => {
-							localStorage.setItem(LS_KEY_AUTH, 'false');
+							authMessageOverride.value = true;
 							redirect('/chat');
 						}}
 					>
