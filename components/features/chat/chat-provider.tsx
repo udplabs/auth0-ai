@@ -4,19 +4,19 @@ import { useChatHistory } from '@/hooks/use-chat-history';
 import { useDataStream } from '@/hooks/use-data-stream';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { APIError } from '@/lib/errors';
-import {
-	authMessageOverride,
-	authMessageSent,
-	firstMessageOverride,
-	firstMessageSent,
-} from '@/lib/signals';
+import { authMessageOverride, firstMessageOverride } from '@/lib/signals';
 import { ulid } from '@/lib/utils';
 import { fetchWithErrorHandlers } from '@/lib/utils/fetch';
 import { Chat as AIChat } from '@ai-sdk/react';
-import { useSignals } from '@preact/signals-react/runtime';
+import {
+	useSignal,
+	useSignalEffect,
+	useSignals,
+} from '@preact/signals-react/runtime';
 import { DefaultChatTransport } from 'ai';
 import React, { createContext, useEffect, useMemo, useRef } from 'react';
 
+import { LS_KEY_AUTH, LS_KEY_FIRST } from '@/lib/constants';
 import type { Chat as ChatType } from '@/types/chat';
 export interface ChatContextValue {
 	chat: AIChat<ChatType.UIMessage>;
@@ -39,6 +39,50 @@ export function ChatProvider({
 	initialMessages: messages,
 }: ChatProviderOptions) {
 	useSignals();
+	// Need to initialize local signals due to some NextJS quirks
+	const firstMessageSent = useSignal<boolean | null>(null);
+	const authMessageSent = useSignal<boolean | null>(null);
+
+	useSignalEffect(() => {
+		if (localStorage) {
+			// No value in signal
+			// Sync with localStorage
+			if (firstMessageSent.value === null) {
+				// This happens on initial load and we only want to do this once
+				// Afterwards we want the signal to be the source of truth
+				const lsFirstMessageSent =
+					(localStorage.getItem(LS_KEY_FIRST) ?? 'false') == 'true';
+
+				firstMessageSent.value = lsFirstMessageSent;
+			} else {
+				localStorage?.setItem(
+					LS_KEY_FIRST,
+					firstMessageSent.value ? 'true' : 'false'
+				);
+			}
+		}
+	});
+
+	useSignalEffect(() => {
+		if (localStorage) {
+			// No value in signal
+			// Sync with localStorage
+			if (authMessageSent.value === null) {
+				// This happens on initial load and we only want to do this once
+				// Afterwards we want the signal to be the source of truth
+				const lsAuthMessageSent =
+					(localStorage.getItem(LS_KEY_AUTH) ?? 'false') == 'true';
+
+				authMessageSent.value = lsAuthMessageSent;
+			} else {
+				localStorage?.setItem(
+					LS_KEY_AUTH,
+					authMessageSent.value ? 'true' : 'false'
+				);
+			}
+		}
+	});
+
 	const { setDataStream } = useDataStream();
 	const { mutate: refreshChatHistory } = useChatHistory();
 	const {
@@ -125,7 +169,7 @@ export function ChatProvider({
 				});
 			}
 		}
-	}, [chatId, isAuthenticated, isLoading, isFetching, chat]);
+	}, [chatId, isAuthenticated, isLoading, firstMessageSent, isFetching, chat]);
 
 	const isFirstLogin = user?.logins_count <= 1;
 	useEffect(() => {
@@ -162,6 +206,7 @@ export function ChatProvider({
 		isFetching,
 		isFirstLogin,
 		updateUserSettings,
+		authMessageSent,
 	]);
 
 	const value = useMemo(() => ({ chat }), [chat]);
