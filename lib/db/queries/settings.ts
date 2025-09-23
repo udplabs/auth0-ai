@@ -1,8 +1,8 @@
 'use server';
+import { ulid } from '@/lib/utils';
 import { createHash } from 'crypto';
 import { promises } from 'fs';
 import path from 'path';
-import { ulid } from 'ulid';
 import { SettingsCreateInput, SettingsModel } from '../generated/prisma/models';
 import { RemoteSettingsCreateInput } from '../generated/supabase/models';
 import { prisma } from '../prisma/client';

@@ -1,17 +1,16 @@
 // lib/ai/rag/create-documents.ts
-import { openai } from '@/lib/ai/openai';
+import { openai } from '@/lib/ai/model/openai';
 import { saveEmbeddings } from '@/lib/db/queries/documents';
-import { embedMany } from 'ai';
-
 import type { Documents } from '@/types/documents';
 import type { Transactions } from '@/types/transactions';
+import { embedMany } from 'ai';
 
 export async function createDocumentsWithEmbeddings(
 	transactions: Transactions.Transaction[],
 	table: 'sample' | 'dev' = 'dev'
 ): Promise<Documents.DocumentWithEmbedding[]> {
-	console.log('creating documents...');
-	console.log('transactions: ', transactions.length);
+	console.info('creating documents...');
+	console.info('transactions: ', transactions.length);
 
 	const docs: Documents.CreateDocumentInput[] = [];
 
@@ -31,7 +30,7 @@ export async function createDocumentsWithEmbeddings(
 		values: docs.map(({ pageContent }) => pageContent),
 	});
 
-	console.log(`Created ${embeddings.length} embeddings.`);
+	console.info(`Created ${embeddings.length} embeddings.`);
 
 	// Persist to database to be retrieved by LocalVectorStore (in-memory) in the future
 	// This is not a scalable model and for demo purposes only!
@@ -53,7 +52,8 @@ function buildEmbeddingDoc(tx: Transactions.Transaction) {
 			categoryName: tx.categoryName,
 			budgetCategory: tx.budgetCategory,
 			budgetSubcategory: tx.budgetSubcategory,
-			payee: normalizePayee(tx.rawPayee),
+			payee: normalizePayee(tx.payee),
+			rawPayee: tx.rawPayee,
 			isExternal: !!tx.isExternal,
 			externalConnectionId: tx.externalConnectionId,
 			externalConnectionName: tx.externalConnectionName,
@@ -74,10 +74,9 @@ function normalizePayee(s: string) {
 function mkSearchText(tx: Transactions.Transaction) {
 	const parts = [
 		tx.payee,
-		tx.description,
-		tx.categoryName,
-		tx.budgetCategory,
-		tx.budgetSubcategory,
+		tx.rawPayee,
+		tx.budgetCategory ?? tx.categoryName,
+		tx.budgetSubcategory ?? '',
 		tx.memo ?? '',
 		(tx.tags ?? []).join(' '),
 	];

@@ -20,7 +20,7 @@ export function getLastPart<
 	> = TextPart,
 	UI_MESSAGE extends UIMessage = Chat.UIMessage,
 >(
-	message: UI_MESSAGE,
+	message?: UI_MESSAGE,
 	options: {
 		from?: 'last' | 'first';
 		partType?: T['type'];
@@ -28,7 +28,7 @@ export function getLastPart<
 ): T | undefined {
 	const { from = 'last', partType = 'text' } = options;
 
-	const { parts = [] } = message;
+	const { parts = [] } = message || {};
 
 	if (!parts.length) return;
 
