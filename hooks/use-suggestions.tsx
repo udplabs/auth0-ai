@@ -60,16 +60,22 @@ export const useSuggestions = (): UseSuggestionsResponse => {
 			shouldShow: labStep === 5,
 		},
 		{
-			label: 'Show me the `fgaRetriever` code',
+			label: 'Show me the `auth0AI` client',
 			suggestion:
-				'Show me the `fgaRetriever` code in `lib/ai/tools/search-transactions.ts`',
+				'Show me the `auth0AI` client code in `lib/auth0/ai/client.ts`',
 			variant: 'info',
 			shouldShow: labStep === 6,
 		},
 		{
-			label: 'Show me the `authorizedResults` code',
+			label: 'Show me the `withAsyncConfirmation` code',
 			suggestion:
-				'Show me the code `authorizedResults` code from `lib/ai/tools/search-transactions.ts`',
+				'Show me the `withAsyncConfirmation` code from `lib/auth0/ai/with-async-authorize.ts`',
+			variant: 'info',
+			shouldShow: labStep === 6,
+		},
+		{
+			label: 'Show me the `transferFunds` code',
+			suggestion: 'Show me the code for `lib/ai/tools/transfer-funds.ts`',
 			variant: 'info',
 			shouldShow: labStep === 6,
 		},
@@ -77,6 +83,20 @@ export const useSuggestions = (): UseSuggestionsResponse => {
 			label: 'Show me the `toolRegistry` code',
 			suggestion: 'Show me the code for `lib/ai/tool-registry.ts`',
 			variant: 'info',
+			shouldShow: labStep === 6,
+		},
+		{
+			label: 'Show me the `POST` chat handler code',
+			suggestion:
+				'Show me the code to change in `app/(chat)/api/chat/[id]/_handlers/post.ts`',
+			variant: 'info',
+			shouldShow: labStep === 6,
+		},
+		{
+			label: 'Explain `handleOnAuthorize`',
+			suggestion:
+				'Show me the code for `lib/auth0/ai/handle-on-authorize.ts` and explain it.',
+			variant: 'default',
 			shouldShow: labStep === 6,
 		},
 		{

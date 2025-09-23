@@ -27,7 +27,7 @@ Not entirely sure? We'll figure it out!
   *“I'm feeling lazy today, show me the final code for `xxx.ts`.”*
 
 #### 📋 Paste errors/logs and I’ll triage.
-  *“`pnpm dev` fails with...”*
+  *“`npm run dev` fails with...”*
 
 #### 🆘 Ask for code help. You can copy/paste the code you've written (*include the filename*).
   *“Show me what I'm missing in `lib/auth0/fga/client.ts`.”*
