@@ -1,7 +1,4 @@
-import { LocalVectorStore } from '@/lib/ai/rag/vector-store';
-
 import type { Accounts } from '@/types/accounts';
-import type { Documents } from '@/types/documents';
 import type { Transactions } from '@/types/transactions';
 
 // Should not be used outside of this function.
@@ -22,24 +19,20 @@ export async function createMockAccounts(userId: string) {
 		{ ulid },
 		{ createOwnerPermissions },
 		{ saveAccountsAndReturnSeparate },
-		{ saveDocuments },
 	] = await Promise.all([
 		import('@/lib/db/queries/mock'),
 		import('ulid'),
 		import('@/lib/auth0/fga/utils'),
 		import('@/lib/db/queries/accounts/mutate-accounts'),
-		import('@/lib/db/queries/documents'),
 	]);
 
 	const {
 		accounts: sampleAccounts = [],
 		transactions: sampleTransactions = [],
-		documents: sampleDocuments = [],
 	} = await getSampleData(sampleUserId);
 
 	const accounts: Accounts.Account[] = [];
 	const transactions: Transactions.Transaction[] = [];
-	const transactionDocuments: Documents.DocumentWithEmbedding[] = [];
 
 	// Generate new IDs for accounts, transactions, and embeddings
 	console.info('Generating mock accounts and transactions...');
@@ -64,16 +57,10 @@ export async function createMockAccounts(userId: string) {
 		);
 
 		for (const transaction of accountTransactions) {
-			const originalTransactionId = transaction.id;
 			// Assign new IDs to transactions
 			transaction.id = ulid();
 			transaction.accountId = account.id;
 			transactions.push(transaction);
-
-			const transactionDocumentIndex = sampleDocuments.findIndex(
-				(e) => e.id === originalTransactionId
-			);
-			const transactionDocument = sampleDocuments[transactionDocumentIndex];
 
 			if (transaction?.lastSyncedAt) {
 				delete transaction.lastSyncedAt;
@@ -82,34 +69,11 @@ export async function createMockAccounts(userId: string) {
 			if (transaction?.expiresAt) {
 				delete transaction.expiresAt;
 			}
-
-			if (transactionDocument) {
-				transactionDocument.id = transaction.id;
-				transactionDocument.metadata.accountId = account.id;
-				transactionDocument.metadata.transactionId = transaction.id;
-				transactionDocument.metadata.customerId = userId;
-
-				if (transactionDocument?.lastSyncedAt) {
-					delete transactionDocument.lastSyncedAt;
-				}
-
-				if (transactionDocument?.expiresAt) {
-					delete transactionDocument.expiresAt;
-				}
-
-				transactionDocuments.push(transactionDocument);
-			} else {
-				transactionDocuments.push(null as any); // Placeholder for missing document to keep indices aligned
-			}
 		}
 	}
 
 	console.info('Mock accounts created:', accounts.length);
 	console.info('Mock transactions created:', transactions.length);
-	console.info(
-		'Mock transaction documents created:',
-		transactionDocuments.length
-	);
 
 	// Save the mock accounts and transactions
 	// This is duplicative since createAccounts does this but we need to keep logic separate.
@@ -121,13 +85,6 @@ export async function createMockAccounts(userId: string) {
 		userId,
 		createdAccounts.map((account) => account.id)
 	);
-
-	// Save the mock documents
-	await saveDocuments([...transactionDocuments]);
-
-	// Initialize (by force) LocalVectorStore with the created accounts and transactions
-	await LocalVectorStore.init(true);
-
 	return createdAccounts.map((account) => {
 		return {
 			...account,
@@ -136,32 +93,6 @@ export async function createMockAccounts(userId: string) {
 			),
 		} as Accounts.Account;
 	});
-}
-
-// This should be a one-time function but you never know
-export async function generateMockEmbeddings() {
-	const [
-		{ deleteSampleDocuments, getSampleData },
-		{ createDocumentsWithEmbeddings },
-	] = await Promise.all([
-		import('../queries/mock'),
-		import('@/lib/ai/rag/create-documents'),
-	]);
-
-	for (const sampleUserId of sampleUserIds) {
-		console.info('Generating mock embeddings for user:', sampleUserId);
-
-		const { transactions = [], documents: _documents = [] } =
-			await getSampleData(sampleUserId);
-
-		// Embeddings should be empty. If not, overwrite it.
-		// Deletes ALL sample documents!
-		if (_documents.length > 0) {
-			await deleteSampleDocuments();
-		}
-
-		await createDocumentsWithEmbeddings(transactions, 'sample');
-	}
 }
 
 function arrayElement<T = string>(array: readonly T[]): T {
