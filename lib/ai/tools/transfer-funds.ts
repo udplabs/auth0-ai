@@ -17,14 +17,19 @@ export const outputSchema = ToolResponseSchema(TransferResultSchema);
 /**
  * LAB EXERCISE: Wrap `transferFunds` with newly minted `withAsyncAuthorization`.
  *
- * GOAL:
+ * OVERALL GOAL:
  * Protect the transferFunds tool with async authorization so that a user is required
  * to approve any transfer performed on their behalf by an agent.
  *
- * WHY:
+ * WHY
  * This is important for ensuring that sensitive operations are properly authorized by the user,
  * thereby improving security and user experience.
  *
+ * WHAT
+ * You will have THREE TASKS each with individually outlined steps.
+ *  - TASK 1:
+ *  - TASK 2:
+ *  - TASK 3:
  * DONE (what has ALREADY been done):
  *  ✔ Core `transferFunds` tool.
  *
