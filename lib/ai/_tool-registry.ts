@@ -24,6 +24,6 @@ export const toolRegistry = {
 	getTransactions,
 	getUserProfile,
 	getWeather,
-	// transferFunds(),
+	// transferFunds(), /* ✅ TASK 9 */
 	userSettings,
 } satisfies ToolSet;

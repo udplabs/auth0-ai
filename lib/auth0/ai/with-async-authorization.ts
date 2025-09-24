@@ -21,7 +21,7 @@ if (auth0AI) {
 }
 
 /**
- * LAB EXERCISE: Implement `withAsyncAuthorization`
+ * LAB TASK: Return a wrapped Auth0AIs `withAsyncConfirmation` wrapper
  *
  * GOAL:
  *  Build a reusable wrapper that applies Auth0 AI’s async user confirmation (CIBA style)
@@ -35,15 +35,15 @@ if (auth0AI) {
  * DONE (what has ALREADY been done):
  *  ✔ 1. Initialize auth0AI singleton client.
  *  ✔ 2. Guard against a missing Auth0AI.
- *    ✔ Hardcodes an available `bindingMessage` (included in `...options`)
- *    ✔ Supplies baseline OIDC scopes (openid, profile, email) [STEP 3.1]
- *    ✔ Handles an advanced streaming mechanism providing push notification instruction during authorization (`handleOnAuthorize`) [STEP 3.4]
- *    ✔ Wraps the provided tool [STEP 3.7]
+ *    ✔ Supplies baseline OIDC scopes (openid, profile, email) [STEP 3]
+ *    ✔ Handles an advanced streaming mechanism providing push notification instruction during authorization (`handleOnAuthorize`) [STEP 6]
+ *    ✔ Hardcodes an available `bindingMessage` (included in `...options`) [STEP 8]
+ *    ✔ Wraps the provided tool [STEP 9]
 *
 * TODO (what you need to implement):
- *  3. Return an instance of `auth0AI.withAsyncUserConfirmation`
- *     - [OPTIONAL] Detect specific interrupt types (i.e. `UserDoesNotHavePushNotificationsInterrupt`,
- *       `AccessDeniedInterrupt`) and do something creative (like stream to the user via `writer`).
+ *  Return an instance of `auth0AI.withAsyncUserConfirmation`
+ *    - [OPTIONAL] Detect specific interrupt types (i.e. `UserDoesNotHavePushNotificationsInterrupt`,
+ *      `AccessDeniedInterrupt`) and do something creative (like stream to the user via `writer`).
 
  *  [BONUS] Externalize `audience` & `scopes` to environment variables (e.g. AUTH0_AUDIENCE, AUTH0_API_SCOPES).
  *
@@ -73,51 +73,28 @@ export function withAsyncAuthorization({
 	}
 
 	// ---------------------------------------------------------------------------
-	// ❌ STEP 3: Return Auth0AI's `withAsyncConfirmation` wrapper.
-	//
 	// HINT: We just checked to ensure `auth0AI` was initialized above. That might be a clue as to what to use...
-	//
-	// You will need:
-	// [3.1] Any extra `scopes` you created (e.g. `create:transfer`).
-	// [3.2] `userID`: An async function that returns the user's (aka `sub`) ID when invoked.
-	// [3.3] The `audience` value you created in the Management Dashboard.
-	//       - For the lab hardcoding is fine.
-	//       - We recommend using environment variables in production (i.e. `AUTH0_API_AUDIENCE`)
-	// [3.4] Make sure that `handleOnAuthorize` is called WITH the `writer`.
-	//		 - Check out `lib/auth/ai/handle-on-authorize.ts`. It's a fun function.
-	//	     - This is what enables streaming status messages to the chat UI.
-	//       - Without it, the UX is not so good.
-	//       - HINT: It handles when authorization is invoked so... 😉
-	// [3.5] An `onUnauthorized` handler that normalizes the returned error shape.
-	//	     - This is where you can handle cases where the user denies authorization.
-	//       - You can differentiate between denial, missing enrollment, and generic errors, etc.
-	//         - The Auth0AI SDK has normalized errors like `AccessDeniedInterrupt` and `UserDoesNotHavePushNotificationsInterrupt`.
-	//         - Check out the SDK types (`node_modules/@auth0/ai/dist/esm/interrupts/CIBAInterrupts.d.ts`) for more.
-	//       - You could even use the `writer` to send a message to the user (like we did w/ `handleOnAuthorize`).
-	//
-	//    - HINT: This wrapper is being called by a tool.
-	//            How does the tool handle errors? 🤔
-	//
-	//    - HINT: The Auth0 error has a `message` and a `code`.
-	//            The model expects an EXACT error `code` to be
-	//            returned otherwise it will not be able to process
-	//            the error correctly.
-	// ✔ [3.6] Spread the remaining provided `options`.
-	// ✔ [3.7] Inject the `tool` we are wrapping.
-	//
 	// ---------------------------------------------------------------------------
 
-	// ---------------------------------------------------------------------------
-
-	// ❌ STEP 3.2: Add newly created scope.
+	// ❌ STEP 3: Add newly created scope.
 	//
 	// TIP: A better practice would be to pull from `process.env.AUTH0_API_SCOPES` or similar.
 	const scopes = ['openid', 'profile', 'email' /** ❌ */];
 
 	// return auth0AI.withAsyncUserConfirmation({
-	// ❌ STEPS 3.1, 3.2, 3.3, 3.4, 3.5
-	// 	...options, /** 👀 ✅ Step 3.6: The Auth0AI wrapper spreads the same options as our wrapper! TypeScript interface to the rescue? 🧐 */
-	// })(tool) /** ✅ Step 3.7: Don't forget to inject the `tool` being wrapped! */;
+	// 	scopes, /* ❌ STEP 3 */
+	// 	userID: /* ❌ STEP 4 */
+	// 	audience: /* ❌ STEP 5 */
+	// 	onAuthorizationRequest: /* ❌ STEP 6 */
+	//
+	//    - HINT 👆🏻: The Auth0 error has a `message` and a `code`.
+	//            The model expects an EXACT error `code` to be
+	//            returned otherwise it will not be able to process
+	//            the error correctly.
+	//
+	// 	onUnauthorized: /* ❌ STEP 7 */
+	// 	...options, /** 👀 ✅ Step 8: The Auth0AI wrapper spreads the same options as our wrapper! TypeScript interface to the rescue? 🧐 */
+	// })(tool) /** ✅ Step 9: Don't forget to inject the `tool` being wrapped! */;
 }
 
 // Must manually define type until SDK is updated with exported types

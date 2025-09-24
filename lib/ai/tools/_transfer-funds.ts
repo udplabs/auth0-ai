@@ -42,17 +42,18 @@ export const outputSchema = ToolResponseSchema(TransferResultSchema);
  *
  *  2. Retrieve an access token using `getCIBACredentials` and add the `accessToken` to the Authorization header as a Bearer token.
  *     - HINT: You will need to import it from `auth0@ai-vercel`.
- *  3. Transform the wrapper into a higher-order factory that accepts a Vercel datastream `writer`.
- *     - Be sure to pass the `writer` along. Free rides for writers! 🚙
  *
- *     HINT: `transferFunds` should now return a function that invokes `withAsyncAuthorization`.
- *     HINT: Refer back to the interface from `withAsyncAuthorization` if you are not sure what arguments to pass.
- *
- * 4. Update the tool description.
+ * 3. Update the tool description.
  *    - Remove the instructions to always require confirmation and, instead, tell Aiya to NEVER ask for confirmation as a push notification will be sent.
  *    - How will you word it? There's not a wrong answer!
  *
  * 		HINT: AI models respond well to simple, concise, but explicit instructions. This is not your best friend -- just tell it what to do (or NOT do).
+ *
+ *  4. Transform the wrapper into a higher-order factory that accepts a Vercel datastream `writer`.
+ *     - Be sure to pass the `writer` along. Free rides for writers! 🚙
+ *
+ *     HINT: `transferFunds` should now return a function that invokes `withAsyncAuthorization`.
+ *     HINT: Refer back to the interface from `withAsyncAuthorization` if you are not sure what arguments to pass.
  *
  * SUCCESS CRITERIA:
  *  - You can ask Aiya to transfer $$$ (i.e. `transfer $50 from checking to savings`)
@@ -60,65 +61,57 @@ export const outputSchema = ToolResponseSchema(TransferResultSchema);
  *  - After approval, the transaction seamlessly resumes (or immediately executes) the original tool logic.
  *  - You should see real-time messaging in the chat informing you of progress.
  */
-export const transferFunds =
-	/*  ✅ STEP 3: (slightly odd order!) Transform into higher-order factory (wrap `withAsyncAuthorization`)*/ (
-		writer: UIMessageStreamWriter
-	) =>
-		/* ✅ STEP 1: Wrap with `withAsyncAuthorization` */ withAsyncAuthorization({
-			writer,
-			bindingMessage: 'Please approve the transfer',
-			tool: tool<z.infer<typeof inputSchema>, z.infer<typeof outputSchema>>({
-				name: 'transferFunds',
-				// ✅ STEP 4: Update the tool description.
-				description:
-					'Use this tool to transfer funds on behalf of a user. It requires both the to and from internal account identifiers (ULIDs) in addition to the fully qualified account numbers. DO NOT ASK THE USER FOR ACCOUNT NUMBERS OR IDs. Use `getAccountList` to fetch the necessary data and determine which accounts based on `name` and `displayName`. If still unable to determine the specific account, ask for clarification for that account only. The user will receive a push notification to provide confirmation. DO NOT require confirmation from the user -- they will confirm via push notification.',
-				inputSchema,
-				outputSchema,
-				execute: async (payload) => {
-					try {
-						// ---------------------------------------------------------------------------
-						// ✅ STEP 2: Retrieve access token using `getCIBACredentials` and add to Authorization header.
-						// You will need to:
-						// [2.1] Import `getCIBACredentials` from `@auth0/ai-vercel`
-						// [2.2] Call the method to get a TokenSet (and accessToken).
-						//---------------------------------------------------------------------------
-						const { accessToken } = (await getCIBACredentials()) || {};
+export const transferFunds = /* ✅ TASK 8 */ (writer: UIMessageStreamWriter) =>
+	/* ✅ TASK 7 - STEP 1 */ withAsyncAuthorization({
+		writer,
+		bindingMessage: 'Please approve the transfer',
+		tool: tool<z.infer<typeof inputSchema>, z.infer<typeof outputSchema>>({
+			name: 'transferFunds',
+			// ✅ TASK 7 - STEP 3
+			description:
+				'Use this tool to transfer funds on behalf of a user. It requires both the to and from internal account identifiers (ULIDs) in addition to the fully qualified account numbers. DO NOT ASK THE USER FOR ACCOUNT NUMBERS OR IDs. Use `getAccountList` to fetch the necessary data and determine which accounts based on `name` and `displayName`. If still unable to determine the specific account, ask for clarification for that account only. The user will receive a push notification to provide confirmation. DO NOT require confirmation from the user -- they will confirm via push notification.',
+			inputSchema,
+			outputSchema,
+			execute: async (payload) => {
+				try {
+					// ✅ TASK 7 - STEP 2
+					const { accessToken } = (await getCIBACredentials()) || {};
 
-						const response = await fetch(
-							`${process.env.APP_BASE_URL}/api/accounts/${payload.fromAccountId}`,
-							{
-								method: 'POST',
-								headers: {
-									// ✅ [2.3] Ensure the accessToken is sent to the API
-									Authorization: `Bearer ${accessToken}`,
-								},
-								body: JSON.stringify(payload),
-							}
-						);
-
-						if (!response.ok) {
-							throw new Error(`API responded with status ${response.status}`);
+					const response = await fetch(
+						`${process.env.APP_BASE_URL}/api/accounts/${payload.fromAccountId}`,
+						{
+							method: 'POST',
+							headers: {
+								// ✅ TASK 7 - STEP 2
+								Authorization: `Bearer ${accessToken}`,
+							},
+							body: JSON.stringify(payload),
 						}
+					);
 
-						return {
-							status: 'success',
-							message: 'Transfer successful.',
-							dataCount: 1,
-							data: TransferResultSchema.parse(await response.json()),
-						};
-					} catch (error: unknown) {
-						console.info('error creating transfer...');
-						console.error(error);
-
-						const { APIError } = await import('@/lib/errors');
-
-						return {
-							...new APIError(error).toJSON(),
-							status: 'error',
-							message: 'Failed to create transfer.',
-							dataCount: 0,
-						};
+					if (!response.ok) {
+						throw new Error(`API responded with status ${response.status}`);
 					}
-				},
-			}),
-		});
+
+					return {
+						status: 'success',
+						message: 'Transfer successful.',
+						dataCount: 1,
+						data: TransferResultSchema.parse(await response.json()),
+					};
+				} catch (error: unknown) {
+					console.info('error creating transfer...');
+					console.error(error);
+
+					const { APIError } = await import('@/lib/errors');
+
+					return {
+						...new APIError(error).toJSON(),
+						status: 'error',
+						message: 'Failed to create transfer.',
+						dataCount: 0,
+					};
+				}
+			},
+		}),
+	});

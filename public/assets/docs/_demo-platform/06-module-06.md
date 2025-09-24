@@ -112,7 +112,7 @@ Client-Initiated Backchannel Authentication (<abbr title='Client-Initiated Backc
 
     ![Guardian](./assets/images/Module06/images/guardian.png)
 
-## Pre-work: Try It
+## Task 3: Try It Out
 
 Before we move forward with this module's task, let’s see what the app can do and learn a few things.
 
@@ -210,9 +210,9 @@ Because our application has security! Or, at least a demonstration of security. 
 
 <br>
 
-***Let’s get to work!***
+<mark>Let's keep moving!</mark>
 
-## Task 1: Create an API
+## Task 4: Create an API
 
 1. From your Auth0 management dashboard, navigate to **Applications**  > **APIs**.
 2. Click **+Create API**.
@@ -257,7 +257,7 @@ Everything works now, right? 🤣 <mark><i>Let’s keep moving…</i></mark>
 
 ---
 
-## Task 2: Init AI Client
+## Task 5: Init AI Client
 
 1. In your code editor, open `lib/auth0/ai/client.ts`.
 1. Take a moment to review the code. *It should look familiar!*
@@ -270,38 +270,42 @@ Everything works now, right? 🤣 <mark><i>Let’s keep moving…</i></mark>
 
 ---
 
-## Task 3: Create Wrapper
+## Task 6: Create Wrapper
 
 ### <span style="font-variant: small-caps">Goal</span>
 Return an instance of `auth0AI.withAsyncUserConfirmation` that:
-- Properly handles when the user starts authorization and streams status updates/messages to ensure the UX is good.
+1. Properly handles when the user starts authorization and streams status updates/messages to ensure the UX is good.
 
-- Properly handles errors/failures.
+2. Properly handles errors/failures.
 
 ***This one is a doozy! Ready to learn?***
 
-1. In your code editor, open `lib/auth0/ai/with-async-authorization.ts`.
+<span style="font-variant: small-caps; font-weight: 700">Setup</span>
 
-	<br>
+- Open your code editor and open `lib/auth0/ai/with-async-authorization.ts`.
 
-	> [!TIP]
-	> *Similar to previous modules, you will notice the code is heavily documented with numerous instructions/guides to aid you in completing the task.*
+<br>
 
-	<br>
+> [!TIP]
+> *Similar to previous modules, you will notice the code is heavily documented with numerous instructions/guides to aid you in completing the task.*
 
-2. ~~Initialize Auth0AI client singleton.~~ _<span style='color: green; font-variant: small-caps'>← Done for you</span>_
+<br>
 
-3. ~~Guard against a missing Auth0AI client (*defensive coding*)~~ _<span style='color: green; font-variant: small-caps'>← Done for you</span>_
+<span style="font-variant: small-caps; font-weight: 700">Steps</span>
 
-4. Add the custom scope (aka 'permission') we created earlier to the existing scopes array.
+1. ~~Initialize Auth0AI client singleton.~~ _<span style='color: green; font-variant: small-caps'>← Done for you</span>_
 
-5. Ensure the <kbd>userID</kbd> parameter is a <mark>promise</mark> that returns the user’s ID.
+2. ~~Guard against a missing Auth0AI client (*defensive coding*)~~ _<span style='color: green; font-variant: small-caps'>← Done for you</span>_
+
+3. Add the custom scope (aka 'permission') we created earlier to the existing scopes array.
+
+4. Ensure the <kbd>userID</kbd> parameter is a <mark>promise</mark> that returns the user’s ID.
 
 	i.e. <kbd>getUser</kbd> → <kbd>user.sub</kbd>
 
-6. Insert the <kbd>audience</kbd> value we created earlier.
+5. Insert the <kbd>audience</kbd> value we created earlier.
 
-7. Enhance `onAuthorizationRequest` by using our custom `handleOnAuthorize` helper function.
+6. Enhance <kbd>onAuthorizationRequest</kbd> by using our custom <kbd>handleOnAuthorize</kbd> helper function.
 
 <br>
 
@@ -311,7 +315,15 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 
 <br>
 
-8. Ensure any errors (i.e. from `onUnauthorized`) are *normalized*.
+7. Ensure any errors (i.e. from `onUnauthorized`) are *normalized*.
+
+  	This is where you *could* handle cases where the user denies authorization.
+
+	You could differentiate between denial, missing enrollment, and generic errors, etc. by using the normalized errors from the SDK, for example:
+      - <kbd>AccessDeniedInterrupt</kbd>
+      - <kbd>UserDoesNotHavePushNotificationsInterrupt</kbd>
+
+		*Check out the SDK types (`node_modules/@auth0/ai/dist/esm/interrupts/CIBAInterrupts.d.ts`) for more.*
 
 	<br>
 
@@ -327,16 +339,17 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 
 	<br>
 
-9. Spread the incoming options so they are passed along to ```withAsyncUserConfirmation```
+8. Spread the incoming options so they are passed along to <kbd>withAsyncUserConfirmation</kbd>
 
 	```diff
-	- // ...options, /** 👀 ✅ Step 3.6: The Auth0AI wrapper spreads the same options as our wrapper! TypeScript interface to the rescue? 🧐 */
+	- // 	...options, /** 👀 ✅ Step 8: The Auth0AI wrapper spreads the same options as our wrapper! TypeScript interface to the rescue? 🧐 */
 	+ ...options,
 
-10. Ensure the tool being wrapped is *actually injected*!
+9.  Ensure the tool being wrapped is *actually injected*!
 	```diff
-	- // })(tool) /** ✅ Step 3.7: Don't forget to inject the `tool` being wrapped! */;
+	- // })(tool) /** ✅ Step 9: Don't forget to inject the `tool` being wrapped! */;
 	+ })(tool);
+	```
 
 ---
 #### <span style="font-variant: small-caps">Congrats!</span>
@@ -347,87 +360,221 @@ You successfully...
 
 ---
 
-### Task 3 : Inject datastream writer using a "<i>higher-order factory</i>"
+## Task 7: Wrap the Tool
 
-**Goal**<br>
-We need a way to inject the streaming writer into ```withAsyncAuthorization``` so the authorization phase (push MFA) can stream status messages to the chat UI. This requires using the datastream writer.
-The plain exported tool has no place to accept that writer. So we “lift” (wrap) it in a function that takes writer and returns the authorized tool instance.
+#### <span style="font-variant: small-caps">Goal</span>
+Use the Auth0AI <kbd>withAsyncConfirmation</kbd> we just wrapped to ensure the <kbd>transferFunds</kbd> tool does not run without proper authorization by requiring it to fetch a fresh *and ephemeral* access token.
 
-***What’s a “higher-order factory”?***<br>
-Just a fancy word for a fancy function! Let’s not dive too deep into Javascript, but maybe let’s learn a few things.
+<span style="font-variant: small-caps; font-weight: 700">Steps</span>
 
-*So what is it?* And, what is it **not**?
-- It is not a ```class```.
-	- Javascript is not an object-oriented programming language – there was no such thing as a class until introduced in ES6.
-	- A ```class``` is a syntactic sugar coating around constructor functions + prototypes. An alternative way.
-	- Classes…
-		- create instances with methods shared on the prototype;
-		- support ```extends```, ```super```, static methods, and now (as of ES2022) #```private``` fields;
-- It is a ```factory```.
-	- A factory is a function that returns an object, often containing methods and/or private state (via closures).
+1. Wrap <kbd>transferFunds</kbd> with <kbd>withAsyncAuthorization</kbd>.
 
+	You will need to:
+      - import the function from the `lib/auth0/ai` directory.
+      - *wrap the tool* -- instead of simply returning it, pass it as the <kbd>tool</kbd> parameter of <kbd>withAsyncAuthorization</kbd>.
+      - <kbd>transferFunds</kbd> should ultimately *still return* the original tool.
+      - <kbd>bindingMessage</kbd> can be a simple string like `Please approve the transfer.`
 
-- It is a ***wrapper***. Or, more accurately, a *wrapper* around a *wrapper*.
-- It is not a [<i>currying</i> function](https://javascript.info/currying-partials)
+	<br>
 
-***If you are still unsure, please flag down a lab attendant for further guidance.***
+	> [!NOTE]
+	>
+	> ***What is <kbd>bindingMessage</kbd>?***
+	>
+	> When using the Auth0 Guardian SDK this message can be displayed to the user in order to provide context about the request. It is *not* used in our demo but still required.
 
-***Let's begin implementing!***
+	<br>
 
-Open ```lib/ai/tools/transfer-funds.ts```. This is the tool that Aiya uses to transfer funds.
+2. Import <kbd>getCIBACredentials</kbd> and use it to retrieve an <kbd>accessToken</kbd> to be sent in the <kbd>Authorization</kbd> header of the API call.
 
-You will notice the code is *heavily* documented. Follow the in-code ‘guide’ to complete the **four** steps.
-
-1. Wrap the existing tool with ```withAsyncAuthorization```.
-	- You will need to import the method from the ```lib/auth0/ai``` directory.
-	- ```transferFunds``` should be the result of invoking ```withAsyncAuthorization```.
-	- ```bindingMessage``` can just be a simple string like ```Please approve the transfer```.
-
-		> [!NOTE]
-		>
-		> What is bindingMessage?
-		> When using the Auth0 Guardian SDK this message can be displayed to the user in order to provide context about the request.
-
-2. Import ```getCIBACredentials``` and use it to retrieve an ```accessToken``` to be sent in the ```Authorization``` header of the API call.
-
-3. Implement a “higher-order factory” (*fancy name for a fancy function*) that injects a datastream ```writer``` into the ```withAsyncAuthorization``` function.
-
-	*This step might be confusing. What are we actually doing?*
-	 - We need to pass the datastream ```writer``` into the withAsyncAuthorization so that we can use it in the ```onAuthorizationRequest``` to stream updates to the user.
-	 - *But we also need to keep the tool response in the expected shape for the Vercel SDK.*
-	 - ***SOLUTION***: “higher-order factory” of sorts. We need to “wrap the wrapper”!
-	 - The outcome will be a factory function that will return the *result of* ```withAsyncAuthorization```.
-
-
-4. Update the <kbd>tool description</kbd> *(line 68)*.
+3. Update the tool <kbd>description</kbd>.
 	- Right now the tool states to always require confirmation. However, we are implementing confirmation via push notification so having Aiya confirm first would be very annoying.
-	- Change the instructions so Aiya never asks for confirmation.
+	- Read the <kbd>description</kbd> and modify the instructions so Aiya *never* asks for confirmation.
+
+		<br>
+
+		> [!TIP]
+		> When instructing <abbr title='large language models'>LLMs</abbr> be explicit but concise.
+
+		<br>
+
+---
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed Task 4.*
+
+At this point you could *technically* use the tool. If Aiya attempted to run the tool, the Auth0 AI <kbd>withAsyncConfirmation</kbd> would be triggered and the user would receive a push notification.
+
+However, the user experience is lacking. Feel free to give it a try, just know you'll be missing out on a better UX!
+
+We recommend you *wait* until you have finished the module.
+
+*Let's make the UX better.*
+
+---
+
+## Task 8: Enhance the UX
+
+> [!NOTE]
+> *This task is technically **optional***.
+>
+> **However**, learning how to use the Vercel AI SDK's datastream writer almost anyway in your app is pretty useful and cool.
+>
+> Not feeling up for it? Skip ahead to testing.
+>
+> ***Just be aware your experience may vary slightly from the experience outlined in this guide.***
+
+#### <span style="font-variant: small-caps">Goal</span>
+To enhance the user's experience we need a way to *inject* the streaming writer into `withAsyncAuthorization` so the authorization portion of the flow (where the push notification gets sent) can stream *status messages* to the chat UI.
+
+The plain exported tool has no place to accept that writer.
+
+Although this is *not* a requirement to enable the feature functionality, it sure does make for a better user experience!
+
+#### <span style="font-variant: small-caps"><em>What</em> are we doing?</span>
+
+I'm glad you asked...
+- We “lift” (aka *wrap*) the existing wrapper in a function that takes <kbd>writer</kbd> and returns the authorized tool instance.
+- Then we call it a "higher-order factory" to sound cool. 😎
+
+---
+##### What is a “higher-order factory”?***
+
+*A long, long time ago...* 🤭
+
+It is just a *fancy word for a fancy function*!
+
+##### What a higher-order factory <span style="font-variant: small-caps"><em>is</em></span> and what it is <span style="font-variant: small-caps"><em>not</em></span>
+
+Let’s not dive *too deep* into Javascript, but maybe we can learn a few things:
+
+- It is <span style="font-variant: small-caps; font-weight: 700">not</span> a <kbd>class</kbd>.
+- Javascript is not an object-oriented programming language – there was no such thing as a class until introduced in ES6.
+- A <kbd>class</kbd> is *a syntactic sugar coating* around constructor functions + prototypes. In other words, just *an alternative way* of doing things.
+- Classes…
+	- create instances with methods shared on the prototype;
+	- support <kbd>extends</kbd>, <kbd>super</kbd>, static methods, and now (as of ES2022) <kbd>#private</kbd> fields.
+- It <span style="font-variant: small-caps; font-weight: 700">is</span> a <kbd>factory</kbd>.
+- A factory is a function that returns an object, often containing methods and/or private state (via closures).
+- Although it is similar to one, it is <span style="font-variant: small-caps; font-weight: 700">not</span> a [*currying function*](https://javascript.info/currying-partials)
+- It <span style="font-variant: small-caps; font-weight: 700">is</span> technically a *wrapper*.
+- Or, more accurately, a *wrapper* around a *wrapper*.
+
+***If you are wanting to know more, ask Aiya or flag down a lab attendant for further guidance.***
+
+---
+
+#### <span style="font-variant: small-caps"><em>Why</em> are we doing this?</span>
+
+In the Vercel AI SDK, the datastream writer is what streams messages from Aiya to the chat interface. To control the datastream writer, you control the world!
+
+OR, maybe just Aiya? ¯\\\_(ツ)_/¯
+
+Either way, it's a powerful tool. In order to properly update the UI and provide a better user experience, <kbd>withAsyncAuthorization</kbd> needs the datastream writer (specifically for <kbd>onAuthorizationRequest</kbd>).
+
+Without being able to stream message updates, the user is left with a loading indicator and no indication of what is happening. Not good!
+
+<br>
+
+<mark>***Let's begin!***</mark>
+
+<br>
+
+
+<br>
+
+#### <span style="font-variant: small-caps">Steps</span>
+
+1. Open `lib/ai/tools/transfer-funds.ts`. *This is the tool that Aiya uses to transfer funds.*
+
+   <br>
 
 	> [!TIP]
-	> When instructing <abbr title=”large language models”>LLMs</abbr> be explicit but concise.
+	> *Similar to previous modules, you will notice the code is heavily documented with numerous instructions/guides to aid you in completing the task.*
 
-### Task 4
+	<br>
 
-This last one is an easy one, promise! In order for Aiya to know that a tool exists, it needs to be added to the *tool registry*.
+2. Implement a “higher-order factory” (*fancy name for a fancy function*) that injects a datastream <kbd>writer</kbd> into the <kbd>withAsyncAuthorization</kbd> function.
 
-We attempted a transfer with Aiya earlier so the tool is clearly in the registry. However, we have changed the tool. Let’s make sure it is entered into the registry correctly.
+	<br>
 
-1. Open ```lib/ai/tool-registry.ts```
+	> [!IMPORTANT]
+	> ***This can be a confusing concept, but it's an incredibly easy task. Stay with us!***
+	>
+	> <span style="font-variant: small-caps; font-weight: 900">tl/dr</span>
+	>
+	> **Before Factory**
+	>
+	>  We would have used the <kbd>Auth0AI</kbd> wrapper, which, similar to our wrapper, permits passing additional arguments while maintaining the original tool's shape.
+	>
+	> **After Factory**
+	>
+	> We can pass <kbd>writer</kbd> into the <kbd>Auth0AI</kbd> function to be used before returning the original tool.
+
+	<br>
+
+	*What are we actually doing?*
+      - We need to pass the datastream <kbd>writer</kbd> into the <kbd>withAsyncAuthorization</kbd> so that we can *use it* in the <kbd>onAuthorizationRequest</kbd> to stream updates to the user.
+      - *But we also need to keep the tool response in the expected shape for the Vercel SDK.*
+
+	***SOLUTION***: “higher-order factory”! We need to “wrap the wrapper”!
+		- Simply create a function that *returns* the wrapped tool.
+
+	<br>
+
+	> [!TIP]
+	>
+	> We will give you a hint...
+	>
+	>
+	> ```diff
+	> - export const transferFunds = /* ✅ TASK 7 - STEP 1: */ withAsyncAuthorization({
+	> + export const transferFunds = /* ✅ TASK 8 */ () => withAsyncAuthorization({...
+	> ```
+
+	<br>
+
+---
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed Task 8.*
+
+Super easy, right? It just sounds complicated.
+
+*Now you know how to 'inject' the datastream writer. Imagine all the things you can do now!*
+
+---
+
+### Task 9: Update Registry
+
+This one is an easy one, promise! In order for Aiya to know that a tool exists, the needs to be added to the *tool registry*.
+
+We attempted a transfer with Aiya earlier so the tool is *clearly in the registry*. However, we have ***changed*** the tool.
 
 In the previous task we transformed ```transfer-funds``` into a higher-order factory function. ***Now we need to call it***.
 
-1. Simply change ```transferFunds``` → ```transferFunds()```
+*Let’s make sure it is entered into the registry correctly.*
+
+<span style="font-variant: small-caps; font-weight: 700">Steps</span>
+
+1. Open `lib/ai/tool-registry.ts`.
+2. Simply change ```transferFunds``` → ```transferFunds()```
 	```diff
 	- transferFunds
 	+ transferFunds()
 	```
-2. Open ```app/(chat)/api/chat/[id]/_handlers/post.ts```
-3. Scroll to **line 81** and ***uncomment*** ```transferFunds()```. You may see a red underline, this can be ignored. ```transferFunds()``` does not require an arg to compile and run. The writer arg is optional
+3. Open ```app/(chat)/api/chat/[id]/_handlers/post.ts```
+4. Scroll to **line 81** and ***uncomment*** ```transferFunds()```. You may see a red underline, this can be ignored. ```transferFunds()``` does not require an arg to compile and run. The writer arg is *optional*
 	```diff
 	- // transferFunds: transferFunds(),
 	+ transferFunds: transferFunds(),
 	```
-4. Scroll to **line 110** and ***uncomment*** ```transferFunds: transferFunds(dataStream)```, and remove the line above it.
+
+	***But, where is the datastream writer?***
+
+	Ultimately we want to call <kbd>transferFunds</kbd> with a datastream writer, but we do not have that available *yet*. That is why it was necessary to make the <kbd>writer</kbd> *optional*.
+
+	Once the datastream writer is available, in the actual <kbd>createUIMessageStream</kbd> execute function, we can *re-initialize* transferFunds with the datastream writer. Nifty trick, *right*? 🤓
+
+5. Let's do that now! Scroll to **line 110** and ***uncomment*** ```transferFunds: transferFunds(dataStream)```, and remove the line above it.
 
 	```diff
 	- transferFunds,
@@ -435,19 +582,24 @@ In the previous task we transformed ```transfer-funds``` into a higher-order fac
 	+ transferFunds: transferFunds(dataStream),
 	```
 
-***But, why?***
+> [!NOTE]
+>
+> The code in the <kbd>POST</kbd> function is on the ***advanced*** side of the Vercel SDK implementation.
+>
+> If you are not familiar with Vercel’s AI SDK, it might seem overwhelming – but it’s not as crazy as you’d think.
+>
+> If you’re interested in learning more, ask Aiya (*or a lab attendant*).
 
-Ultimately we want to call ```transferFunds``` with a datastream writer, but we do not have that available yet. That is why it was necessary to make the ```writer``` *optional*.
+---
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed Task 9.*
 
-Once the datastream writer is available, in the actual ```createUIMessageStream``` execute function, we can re-initialize transferFunds with the datastream writer. Nifty trick, *right*? 🤓
+Only one more to go...
 
-This <kbd>POST</kbd> code is on the ***advanced*** side. If you are not familiar with Vercel’s AI SDK, it might seem overwhelming – but it’s not as crazy as you’d think.
-
-If you’re interested in learning more, ask Aiya (or a lab attendant).
+---
 
 
-
-## Initiate funds transfer with Aiya!
+## Task 10: Try it
 
 1. Restart the application with:
 
@@ -455,9 +607,9 @@ If you’re interested in learning more, ask Aiya (or a lab attendant).
 	npm run dev
 	```
 
-2. Navigate to http://localhost:3000
+2. Navigate to `http://localhost:3000`
 
-3. Ask the Aiya to transfer funds from your checkings to savings, or whichever accounts you would like.
+3. Ask the Aiya to transfer funds from your checking to savings, (*or whichever accounts you would like*).
 
 	![Aiya Init Transfer](./assets/images/Module06/images/init-transfer.png)
 
@@ -473,8 +625,8 @@ If you’re interested in learning more, ask Aiya (or a lab attendant).
 
 	![Funds Transfer Confirm](./assets/images/Module06/images/confirm-transfer.png)
 
-
-## Conclusion of Module 6
-Thank you for sticking with us!
+---
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed the entire module.* Thank you for sticking with us!
 
 This was a very engaging module with quite a bit of code to analyze and refactor. Throughout this module, we were able to set up successfully the funds transfer functionality through Aiya. To accomplish this, we incorporated **CIBA** into the application and successfully used Auth0 Guardian Push to provide secure funds transfers!

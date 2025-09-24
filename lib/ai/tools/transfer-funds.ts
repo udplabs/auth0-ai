@@ -17,19 +17,14 @@ export const outputSchema = ToolResponseSchema(TransferResultSchema);
 /**
  * LAB EXERCISE: Wrap `transferFunds` with newly minted `withAsyncAuthorization`.
  *
- * OVERALL GOAL:
+ * GOAL:
  * Protect the transferFunds tool with async authorization so that a user is required
  * to approve any transfer performed on their behalf by an agent.
  *
- * WHY
+ * WHY:
  * This is important for ensuring that sensitive operations are properly authorized by the user,
  * thereby improving security and user experience.
  *
- * WHAT
- * You will have THREE TASKS each with individually outlined steps.
- *  - TASK 1:
- *  - TASK 2:
- *  - TASK 3:
  * DONE (what has ALREADY been done):
  *  ✔ Core `transferFunds` tool.
  *
@@ -44,17 +39,18 @@ export const outputSchema = ToolResponseSchema(TransferResultSchema);
  *
  *  2. Retrieve an access token using `getCIBACredentials` and add the `accessToken` to the Authorization header as a Bearer token.
  *     - HINT: You will need to import it from `auth0@ai-vercel`.
- *  3. Transform the wrapper into a higher-order factory that accepts a Vercel datastream `writer`.
- *     - Be sure to pass the `writer` along. Free rides for writers! 🚙
  *
- *     HINT: `transferFunds` should now return a function that invokes `withAsyncAuthorization`.
- *     HINT: Refer back to the interface from `withAsyncAuthorization` if you are not sure what arguments to pass.
- *
- * 4. Update the tool description.
+ * 3. Update the tool description.
  *    - Remove the instructions to always require confirmation and, instead, tell Aiya to NEVER ask for confirmation as a push notification will be sent.
  *    - How will you word it? There's not a wrong answer!
  *
  * 		HINT: AI models respond well to simple, concise, but explicit instructions. This is not your best friend -- just tell it what to do (or NOT do).
+ *
+ *  4. Transform the wrapper into a higher-order factory that accepts a Vercel datastream `writer`.
+ *     - Be sure to pass the `writer` along. Free rides for writers! 🚙
+ *
+ *     HINT: `transferFunds` should now return a function that invokes `withAsyncAuthorization`.
+ *     HINT: Refer back to the interface from `withAsyncAuthorization` if you are not sure what arguments to pass.
  *
  * SUCCESS CRITERIA:
  *  - You can ask Aiya to transfer $$$ (i.e. `transfer $50 from checking to savings`)
@@ -63,13 +59,13 @@ export const outputSchema = ToolResponseSchema(TransferResultSchema);
  *  - You should see real-time messaging in the chat informing you of progress.
  */
 export const transferFunds =
-	/* ❌ STEP 3: (slightly odd order!) Transform into higher-order factory (wrap `withAsyncAuthorization`)*/
-	/* ❌ STEP 1: Wrap with `withAsyncAuthorization` */ tool<
+	/* ⚠️ TASK 8: Transform into higher-order factory (wrap `withAsyncAuthorization`)*/
+	/* ❌ TASK 7 - STEP 1: Wrap with `withAsyncAuthorization` */ tool<
 		z.infer<typeof inputSchema>,
 		z.infer<typeof outputSchema>
 	>({
 		name: 'transferFunds',
-		// ❌ STEP 4: Update the tool description.
+		// ❌ TASK 7 - STEP 3: Update the tool description.
 		description:
 			'Use this tool to transfer funds on behalf of a user. It requires both the to and from internal account identifiers (ULIDs) in addition to the fully qualified account numbers. DO NOT ASK THE USER FOR ACCOUNT NUMBERS OR IDs. Use `getAccountList` to fetch the necessary data and determine which accounts based on `name` and `displayName`. If still unable to determine the specific account, ask for clarification for that account only. The user will receive a push notification to provide confirmation. Always confirm the details of the transfer with the user before continuing.',
 		inputSchema,
@@ -77,10 +73,10 @@ export const transferFunds =
 		execute: async (payload) => {
 			try {
 				// ---------------------------------------------------------------------------
-				// ❌ STEP 2: Retrieve access token using `getCIBACredentials` and add to Authorization header.
+				// ❌ TASK 7 - STEP 2: Retrieve access token using `getCIBACredentials` and add to Authorization header.
 				// You will need to:
-				// [2.1] Import `getCIBACredentials` from `@auth0/ai-vercel`
-				// [2.2] Call the method to get a TokenSet (and accessToken).
+				// - Import `getCIBACredentials` from `@auth0/ai-vercel`
+				// - Call the method to get a TokenSet (and accessToken).
 				//---------------------------------------------------------------------------
 
 				const response = await fetch(
@@ -88,7 +84,7 @@ export const transferFunds =
 					{
 						method: 'POST',
 						headers: {
-							// ❌ [2.3] Ensure the accessToken is sent to the API
+							// ❌ TASK 7 - STEP 2: Ensure the accessToken is sent to the API
 							Authorization: `Bearer `,
 						},
 						body: JSON.stringify(payload),
