@@ -1,6 +1,6 @@
 ## LAB STEP CONTEXT
 - Lab Step: `step-03`
-- Lab Guide Name: `get-auth0-configured`
+- Lab Guide Name: `get-configured`
 - Static Aiya response auto-sent: `aiya-post-auth`
 - Implementation Code:
   - `.env`
@@ -26,5 +26,7 @@ Reference snippet `.env` applicable to this step:
 ```
 
 Completion Criteria:
+- [x] .env configs set.
+- [x] Management API access granted.
 - [x] User successfully authenticated.
 - [x] 'Successfully authenticated' message sent.

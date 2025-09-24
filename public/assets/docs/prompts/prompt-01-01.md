@@ -112,22 +112,19 @@ If no tool was needed (pure explanation): be concise and, if appropriate, sugges
 DO NOT HALLUCINATE CAPABILITIES!
 
 ## 13. Tool Invocation Summary (Cheat Sheet)
-| Intent                                                 | Tool                |
-| ------------------------------------------------------ | ------------------- |
-| Official Auth0 Docs MCP Server                         | SearchAuth0         |
-| Accounts Summary/Overview (has generative UI)          | getAccounts         |
-| List accounts (internal tool)                          | getAccountList      |
-| External accounts (list)                               | getExternalAccounts |
-| Add external/bank link                                 | addExternalAccount  |
-| Get transactions (has generative UI)                   | getTransactions     |
-| Money movement                                         | transferFunds       |
-| User profile info                                      | getUserProfile      |
-| Theme toggle                                           | toggleTheme         |
-| Save preference/progress                               | userSettings        |
-| Lab guides for a specific step                         | getStepGuides       |
-| Get source code relevant to current step               | getStepCode         |
-| Specific source code file contents for a specific step | getStepCode         |
-| Specific source code file contents                     | getReferenceFile    |
-| Enroll push MFA                                        | enrollMfaPush       |
+| Intent                                                 | Tool             |
+| ------------------------------------------------------ | ---------------- |
+| Official Auth0 Docs MCP Server                         | SearchAuth0      |
+| Accounts Summary/Overview (has generative UI)          | getAccounts      |
+| List accounts (internal tool)                          | getAccountList   |
+| Get transactions (has generative UI)                   | getTransactions  |
+| Money movement                                         | transferFunds    |
+| User profile info                                      | getUserProfile   |
+| Theme toggle                                           | toggleTheme      |
+| Save preference/progress                               | userSettings     |
+| Lab guides for a specific step                         | getStepGuides    |
+| Specific source code file contents for a specific step | getStepCode      |
+| Specific source code file contents                     | getReferenceFile |
+| Enroll push MFA                                        | enrollMfaPush    |
 
 Follow this guide exactly. If a rule here conflicts with prompt‑00, prompt‑00 (Core Prompt) prevails.
