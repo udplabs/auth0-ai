@@ -4,7 +4,7 @@
 - Static Aiya response: none
 - Implementation Code (show me the code):
   - `lib/auth0/ai/client.ts`
-  - `lib/auth0/ai/with-async-autorize.ts`
+  - `lib/auth0/ai/with-async-authorize.ts`
   - `lib/ai/tools/transfer-funds.ts`
   - `lib/ai/tool-registry.ts`
   - `app/(chat)/api/chat/[id]/_handlers/post.ts`
