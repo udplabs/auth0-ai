@@ -53,11 +53,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 			children,
 			className,
 			href,
+			asChild = !!href ? true : false,
 			loading = false,
-			variant,
 			size,
-			asChild = !!href,
 			target,
+			variant,
 			...props
 		},
 		ref
