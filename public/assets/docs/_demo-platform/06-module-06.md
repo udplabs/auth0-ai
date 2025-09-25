@@ -162,7 +162,7 @@ In a real-world application this may not make sense, but we are not in the real-
 
 #### *But what about Aiya?*
 
-3. Navigate back to the app (`https://localhost:3000`), and start a new chat by clicking the <kbd>+</kbd> button.
+3. Navigate back to the app (https://localhost:3000), and start a new chat by clicking the <kbd>+</kbd> button.
 1. Ask Aiya to transfer $25 from one account to another - for example: ```transfer $25 from checking to savings``` (*or whatever account you have available*).
 1. Wait…
    - Aiya is fetching an account list behind the scenes to be able to build the request payload (account ids, etc.).
@@ -224,7 +224,7 @@ Because our application has security! Or, at least a demonstration of security. 
 
 1. From your Auth0 management dashboard, navigate to **Applications**  > **APIs**.
 2. Click **+Create API**.
-3. Enter `http://localhost:3000/api/accounts/transfers` for both the **Name** and **Identifier**.
+3. Enter ```http://localhost:3000/api/accounts/transfers``` for both the **Name** and **Identifier**.
 
   	***You are welcome to change this value, just make sure to update it elsewhere throughout the application**.*
 
@@ -315,11 +315,15 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 
 6. Enhance <kbd>onAuthorizationRequest</kbd> by using our custom <kbd>handleOnAuthorize</kbd> helper function.
 
-<br>
+	<br>
 
-> [!NOTE]
->
-> TODO: EXPLAIN FUNCTION
+	> [!NOTE]
+	>
+	> TODO: REVIEW EXPLANATION
+	>
+	> The <kbd>handleOnAuthorize</kbd> helper function was designed to provide a more intuitive user experience by displaying a user-facing notification message in the Aiya chat UI during the CIBA flow. 
+	>
+	> This greatly enhances user responsiveness and ultimately improves interaction with Aiya.
 
 <br>
 
@@ -365,7 +369,18 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 
 ### TODO: Add summary of what we did
 You successfully...
-
+<ul>
+  <li style="list-style-type:'✅ ';">
+    enriched the object passed to <kbd>auth0AI.withAsyncUserConfirmation</kbd> with values for the custom scope and audience
+  </li>
+  <li style="list-style-type:'✅ '">
+    implemented and passed custom async functions for <kbd>userID, onAuthorizationRequest, onUnauthorized</kbd>
+  </li>
+  <li style="list-style-type:'✅ '">
+    laid the groundwork and implemented the wrapper function needed to allow Aiya to transfer funds on your behalf!
+  </li>
+  
+</ul>
 ---
 
 ## Task 7: Wrap the Tool
