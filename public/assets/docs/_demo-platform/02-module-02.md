@@ -1,11 +1,11 @@
 # Prepare App Environment
 
-**Module 2 Objective**
+## Objective
 
 Verify that a bootstrapped Regular Web Application is created in your Auth0 tenant with the correct configuration details. Successfully clone the project folder from the provided github repository. Install all the project dependencies, generate the database, and successfully start the application locally. 
 
 
-**Description**
+## Description
 
 As a recap, an Auth0 tenant was created for you when you initially started the lab. Make sure you can access the tenant and can see the management dashboard. Also important to note, you will have access to this tenant for 30 days. In this module, we will be cloning the bAInk’s demo project files from the provided github repo for local development. We will be meeting Aiya shortly at the end of this module. 
 
@@ -27,6 +27,8 @@ As a recap, an Auth0 tenant was created for you when you initially started the l
 ## Clone the Repo
 You can clone the repo using the UI or via command line. Need a refresher on cloning a repo? No worries. We [got you](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
 
+If you do not have <kbd>git</kbd> installed on your machine, download it from [here](https://git-scm.com/downloads).
+
 ### Command Line (easiest)
 
 1. Clone from the repo 
@@ -44,8 +46,15 @@ You can clone the repo using the UI or via command line. Need a refresher on clo
 3. Verify project files are all present
 
     ```bash 
-    ls auth0-ai 
+    ls 
     ```
+
+    > [!NOTE]
+    >
+    > If you're on a windows machine and not running PowerShell, run the following command
+    >```bash
+    > dir
+    >```
 
     <br>
 
@@ -97,7 +106,7 @@ You can clone the repo using the UI or via command line. Need a refresher on clo
     > [!NOTE]
     > If application started successfully, you should see the following:
     >
-    > ![Running App](./assets/images/Module02/images/image2.png)
+    > ![Running App](./assets/images/Module02/images/image1.png)
     >
     > *If you’re having some trouble, please ask for some assistance from a lab attendant.*
 
@@ -116,5 +125,7 @@ If everything is working as expected, Aiya will kick off a conversation with you
 
 ![First Aiya message](./assets/images/the-bAInk-first-message.gif)
 
-## Conclusion of Module 2
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed the entire module.*
+
 We successfully cloned the lab project and set up the initial portion of the application. We also managed to get the app up and running on localhost. We met Aiya!

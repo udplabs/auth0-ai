@@ -1,11 +1,11 @@
 # Configure App Settings
 
-**Module 3 Objective**
+## Objective
 
 Copy the correct Auth0 tenant server-side variables into our local environment variable file.  Enable Auth0’s management API through the Auth0 management dashboard. Accomplishing the prior tasks will allow us to successfully verify user authentication. 
 
 
-**Description**
+## Description
 
 Now that we have successfully set up the application and it’s running in our local environment, let’s go ahead and start configuring the correct variables to ensure Aiya is able to properly respond to user prompts. We pull these variable values directly from our Auth0 tenant through the dashboard. Subsequently, we also dive into the dashboard to ensure that Aiya has access to the Auth0 management API in order to communicate directly with Auth0 to manage tenant resources. Finally, we will conclude by verifying that our application is set up properly to handle user authentication and registration. 
 
@@ -43,6 +43,15 @@ Now that we have successfully set up the application and it’s running in our l
 
 ## Add Auth0/NextJS .env secret
 Next, we need to generate a secret that the Auth0 NextJS SDK uses to encrypt the session and transaction cookies.
+
+> [!CAUTION]
+> ***You will need <kbd>openssl</kbd> to complete this step.***
+>
+> Windows PC user? No <kbd>>openssl</kbd>? No worries!
+>
+> Check out this [cool tool](https://www.cryptool.org/en/cto/openssl/) and run `openssl rand -base64 32` in the on-screen terminal.
+>
+> *Otherwise, continue on.*
 
 1. In your terminal, copy and run the following command:
 
@@ -182,7 +191,9 @@ Before it can be used, it needs to be enabled.
 
 
 
-## Conclusion of Module 3
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed the entire module.*
+
 We properly configured the application with the correct environment variables pulled from our Auth0 tenant. We also enabled access to Auth0’s management API through the console. Finally, we were able to successfully test user authentication in the application. 
 
 

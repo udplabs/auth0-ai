@@ -1,15 +1,15 @@
 # Implement FGA for RAG
 
-**Module 5 Objective**
+## Objective
 
 Integrate a functioning FGA client into the demo application. This will enable you to verify that Aiya can correctly return sensitive account information with valid results.
 
 
-**Scenario**
+## Scenario
 
 As a customer of The bAInk, it is expected that you should be able to see your own account information, assuming you have already been successfully authenticated into the application. After logging into The bAInk web portal and asking Aiya for your account information, you should be able to see the relevant and valid information being returned.
 
-**Description**
+## Description
 
 At this point we are moving into actual code. This module is designed to encourage you to write your own code rather than copy/paste.
 
@@ -213,5 +213,7 @@ But don't worry, to save time, we've created a shortcut for you.
 >
 > ***We encourage you to try on your own first.***
 
-## Conclusion of Module 5
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed the entire module.*
+
 We successfully installed and initialized Auth0 FGA client, implemented permission retrieval, seeded relationship tuples via Dev Tools into FGA, verified behavior when specific permissions are missing and confirmed that no data is returned until valid tuples exist.

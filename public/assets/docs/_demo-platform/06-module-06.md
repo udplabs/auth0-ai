@@ -91,7 +91,7 @@ Client-Initiated Backchannel Authentication (<abbr title='Client-Initiated Backc
 
     ![Launch Pad](./assets/images/Module06/images/launchpad.png)
 
-2. In the Auth0 tenant, navigate to Applications
+2. In the Auth0 tenant, navigate to **Applications** > **Applications**
 
     ![Apps](./assets/images/Module06/images/apps.png)
 
@@ -105,6 +105,8 @@ Client-Initiated Backchannel Authentication (<abbr title='Client-Initiated Backc
 
 5. Click **Save**.
 
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed Task 1.*
 
 ## Task 2: Enable Guardian Push
 1. From the **Auth0 Management Dashboard** navigate to **Security** > **Multi-factor Auth** > **Push Notification using Auth0 Guardian**.
@@ -112,11 +114,14 @@ Client-Initiated Backchannel Authentication (<abbr title='Client-Initiated Backc
 
     ![Guardian](./assets/images/Module06/images/guardian.png)
 
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed Task 2.*
+
 ## Task 3: Try It Out
 
 Before we move forward with this module's task, let’s see what the app can do and learn a few things.
 
-1. Return to the app (http://localhost:3000) and click on **Accounts**.
+1. Return to the app (http://localhost:3000), open the upper left sidebar menu, and click on **Accounts**.
 2. Choose an account, any account, and click on **Transfer**.
 3. Select an account to transfer to as well as a dollar amount (go crazy!).
 4. Click **Transfer Now**.
@@ -158,10 +163,10 @@ In a real-world application this may not make sense, but we are not in the real-
 #### *But what about Aiya?*
 
 3. Navigate back to the app (`https://localhost:3000`), and start a new chat by clicking the <kbd>+</kbd> button.
-1. Ask Aiya to transfer $25 from one account to another - for example: <kbd>transfer $25 from checking to savings</kbd> (*or whatever account you have available*).
+1. Ask Aiya to transfer $25 from one account to another - for example: ```transfer $25 from checking to savings``` (*or whatever account you have available*).
 1. Wait…
    - Aiya is fetching an account list behind the scenes to be able to build the request payload (account ids, etc.).
-1. Aiya will ask to confirm the transaction. Go ahead and **confirm**.
+1. Aiya will ask to confirm the transaction. Go ahead and **confirm** by typing ```Yes``` or something similar.
 
 	![Transfer Confirmation](./assets/images/Module06/images/prelim-init-transfer.png)
 
@@ -212,6 +217,9 @@ Because our application has security! Or, at least a demonstration of security. 
 
 <mark>Let's keep moving!</mark>
 
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed Task 3.*
+
 ## Task 4: Create an API
 
 1. From your Auth0 management dashboard, navigate to **Applications**  > **APIs**.
@@ -228,10 +236,10 @@ Because our application has security! Or, at least a demonstration of security. 
 
 1. Under **Add a Permission** enter:
 
- | Field           | Value                 |
- | --------------- | --------------------- |
- | **Name**        | `create:transfer`     |
- | **Description** | `Initiate a transfer` |
+ 	| Field           | Value                 |
+ 	| --------------- | --------------------- |
+ 	| **Name**        | `create:transfer`     |
+ 	| **Description** | `Initiate a transfer` |
 
 7. Click **+ Add**
 
@@ -251,7 +259,7 @@ Because our application has security! Or, at least a demonstration of security. 
 
 ---
 #### <span style="font-variant: small-caps">Congrats!</span>
-*You have completed Task 1.*
+*You have completed Task 4.*
 
 Everything works now, right? 🤣 <mark><i>Let’s keep moving…</i></mark>
 
@@ -266,7 +274,7 @@ Everything works now, right? 🤣 <mark><i>Let’s keep moving…</i></mark>
 
 ---
 #### <span style="font-variant: small-caps">Congrats!</span>
-*You have completed Task 2.* 😁🥳
+*You have completed Task 5.* 😁🥳
 
 ---
 
@@ -353,7 +361,7 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 
 ---
 #### <span style="font-variant: small-caps">Congrats!</span>
-*You have completed Task 3.*
+*You have completed Task 6.*
 
 ### TODO: Add summary of what we did
 You successfully...
@@ -364,6 +372,10 @@ You successfully...
 
 #### <span style="font-variant: small-caps">Goal</span>
 Use the Auth0AI <kbd>withAsyncConfirmation</kbd> we just wrapped to ensure the <kbd>transferFunds</kbd> tool does not run without proper authorization by requiring it to fetch a fresh *and ephemeral* access token.
+
+<span style="font-variant: small-caps; font-weight: 700">Setup</span>
+
+- From your code editor, open `lib/auth0/ai/transfer-funds.ts`.
 
 <span style="font-variant: small-caps; font-weight: 700">Steps</span>
 
@@ -400,7 +412,7 @@ Use the Auth0AI <kbd>withAsyncConfirmation</kbd> we just wrapped to ensure the <
 
 ---
 #### <span style="font-variant: small-caps">Congrats!</span>
-*You have completed Task 4.*
+*You have completed Task 7.*
 
 At this point you could *technically* use the tool. If Aiya attempted to run the tool, the Auth0 AI <kbd>withAsyncConfirmation</kbd> would be triggered and the user would receive a push notification.
 
@@ -617,6 +629,14 @@ Only one more to go...
 
 	![Aiya Poll](./assets/images/Module06/images/poll-push.png)
 
+	> [!NOTE]
+	>
+	> If Aiya isn't sending you a push notification, or you know that you haven't enrolled in push yet, follow Aiya's prompts. 
+	>
+	> You will be prompted to enroll in push notification through **Auth0 Guardian**. 
+
+	<br>
+
 5. Now look for a push notification in the **Auth0 Guardian app**.
 
 	![Guardian Push](./assets/images/Module06/images/push.jpg)
@@ -624,6 +644,8 @@ Only one more to go...
 5. Once you approve the notification, the funds should transfer and you will see a response from Aiya!
 
 	![Funds Transfer Confirm](./assets/images/Module06/images/confirm-transfer.png)
+
+	
 
 ---
 #### <span style="font-variant: small-caps">Congrats!</span>

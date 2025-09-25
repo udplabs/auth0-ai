@@ -1,14 +1,14 @@
 # Configure Auth0 FGA
 
-**Module 4 Objective**
+## Objective
 
 Register for a FGA account and set up the corresponding FGA store. Configure the FGA store with the appropriate settings. Define a valid authorization model in the FGA model explorer. By setting up the FGA account, we will be able to verify that Aiya is not returning sensitive account data. Gain a general understanding of Retrieval Augmented Generation (RAG).
 
-**Scenario**
+## Scenario
 
 While the focus for The bAInk is to implement AI functionality to streamline their users’ experience in their existing product lines, reigning in AI access to sensitive data is critical. This notion is crucial for The bAInk developers to understand, in order to ensure that Aiya does not return any sensitive data that it isn’t supposed to! As an end user, if you try to access your account information when you do not have the necessary permissions, Aiya should not return any results.
 
-**Important Information and Context**
+### Important Information and Context
 
 What is RAG?
 That’s a great question! The more important question though is, “What isn’t RAG?”
@@ -20,14 +20,14 @@ The process involves two main steps:
 - **Retrieval**: The system fetches relevant documents or data from an external source (knowledge base, database, file system, etc.) based on the user’s query
 - **Generation**: The generative model uses both the retrieved information and the original query to generate a response.
 
-**Important Takeaways**
+### Important Takeaways
 
 - RAG is a pattern, not a product or a single tool
 - Retrieval can use any method to fetch relevant data, not just vector (semantic) search
 - Augmentation means the model’s output is improved by grounding it in external often dynamic, information
 - Generation is performed by an LLM, which uses both the query and retrieved context 
 
-**The Challenge: Securing data in RAG pipelines**
+### The Challenge: Securing data in RAG pipelines
 
 While RAG is a powerful technique that enhanced LLMs, without proper access control, a RAG pipeline could retrieve information containing sensitive data and use them to generate a response for a user who should not have access to that data. 
 
@@ -38,13 +38,13 @@ Consequently, this could lead to serious data breaches and compliance violations
 >
 >In a real world situation, you can imagine how complex account access can get -- think of financial advisors, family accounts, even third-party aggregation software (i.e. Mint, Copilot, Lunchmoney, etc. ).
 
-**The Solution: Auth0 Fine-Grained Authorization (FGA)**
+### The Solution: Auth0 Fine-Grained Authorization (FGA)
 
 To solve this challenge, Auth for AI Agents uses Auth0 FGA. This platform is a flexible, high-performance authorization service for applications that require a sophisticated permissions system. It implements relationship-based access control (ReBAC) to manage permissions at large-scale. 
 
 Auth0 FGA allows you to decouple your authorization logic from your application code. Instead of embedding complex permission rules directly into your application, you define an authorization model and store relationship data in Auth0 FGA. Your application can then query Auth0 FGA at runtime to make real-time access decisions. 
 
-**How it works with RAG**
+### How it works with RAG
 
 Integrating FGA into your RAG pipeline ensures that every “document” is checked against the user’s permissions before it’s passed to the LLM (or presented to the user). 
 
@@ -253,7 +253,9 @@ I know, you were expecting actual results, but this is a good thing. It means yo
 
 Head to the next step so we can work on wiring up <abbr title='Fine-Grained Authorization'>FGA</abbr> to manage our account and transaction permissions.
 
-## Conclusion of Module 4
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed the entire module.*
+
 We got a glimpse of what RAG is and how Auth0’s FGA product can help bridge the gap of securing data passed through RAG pipelines. Additionally, we successfully set up an FGA store and created an authorized client to be able to communicate securely with FGA from our application’s backend. Finally, we were able to successfully test that Aiya was not returning sensitive account data. 
 
 

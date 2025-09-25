@@ -1,10 +1,10 @@
 # Review Env Setup
 
-**Module 1 Objective**
+## Objective
 
 Verify that you have access to your Auth0 tenant and your local environment meets all of the requirements that are laid out in the prerequisites section of this module. It is important that the requirements are met in order for your participation in the lab to be successful.
 
-**Prerequisites for this lab**
+## Prerequisites for this lab
 
 You must have the following:
  - **System requirements**
@@ -63,7 +63,9 @@ Make sure to download the Auth0 Guardian app on your mobile device
 | --------------------------------------------------- | ----------------------------------------------------- |
 | ![App Store](./assets/images/Module01/images/4.png) | ![Google Play](./assets/images/Module01/images/5.png) |
 
-## Conclusion of Module 1
+#### <span style="font-variant: small-caps">Congrats!</span>
+*You have completed the entire module.*
+
 This module was entirely focused on making sure your access and environment were all properly configured.
 
 You should have successfully verified your system requirements, accessed your Auth0 tenant, verified installation of v22 or v23 of node.js, verified installation of an IDE, and downloaded the Auth0 guardian application on your mobile device.
