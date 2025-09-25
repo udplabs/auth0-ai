@@ -13,9 +13,9 @@ While the focus for the bAInk is to implement AI functionality to streamline the
 As an end user, if you try to access your account information when you do not have the necessary permissions, Aiya should not return any results.
 
 ---
-## Learnings
+### Background
 #### What <span style="font-variant: small-caps;font-weight: 900"><i>is</i></span> <abbr title="Retrieval-Augmented Generation">RAG</abbr>?
-That’s a great question! The more important question though is, “What is <span style="font-variant: small-caps;font-weight: 900"><i>not</i></span> <abbr title="Retrieval-Augmented Generation">RAG</abbr>?”
+That’s a great question! The more important question though is, “What is <span style="font-variant: small-caps;font-weight: 900"><i>not</i></span> <abbr title="Retrieval-Augmented Generation">RAG</abbr>?” 🤔 But let's focus...
 
 What it <span style="font-variant: small-caps;font-weight: 900"><i>IS</i></span>
 
