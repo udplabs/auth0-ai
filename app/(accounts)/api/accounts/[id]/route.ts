@@ -1,3 +1,4 @@
+// app/(accounts)/accounts/api/accounts/[id]/route.ts
 import { transferFunds } from '@/lib/api/accounts/transfer-funds';
 import { APIError, handleApiError } from '@/lib/errors';
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose';
