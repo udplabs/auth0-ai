@@ -1,9 +1,8 @@
-import type { TransferModel } from '@/lib/db/generated/prisma/models';
+import type { TransferCreateInput } from '@/lib/db/generated/prisma/models';
 import type { Accounts } from './accounts';
 
 export namespace Transfers {
-	export interface TransferContext
-		extends Omit<TransactionCreateInput, 'createdAt' | 'updatedAt' | 'amount'> {
+	export interface TransferContext extends Partial<CreateTransferInput> {
 		onChange: React.ChangeEventHandler<HTMLInputElement>;
 		open?: boolean;
 		selectAccount: ({
@@ -14,11 +13,16 @@ export namespace Transfers {
 			toAccount?: Accounts.Account;
 		}) => void;
 		transferAmount?: number;
+		transferAmountRaw?: string;
 		toggleModal: (options?: ToggleModalOptions) => void;
 		transferFunds: (options?: ToggleModalOptions) => void;
+		fromAccountId?: string;
+		fromAccountDisplayName?: string;
+		toAccountId?: string;
+		toAccountDisplayName?: string;
 	}
 
-	interface ToggleModalOptions extends TransactionCreateInput {
+	interface ToggleModalOptions extends Partial<CreateTransferInput> {
 		open?: boolean;
 	}
 
@@ -26,14 +30,23 @@ export namespace Transfers {
 		type: 'OPEN' | 'CLOSE' | 'UPDATE';
 	}
 
-	interface Transaction extends Omit<TransferModel, 'createdAt' | 'updatedAt'> {
+	// interface Transaction extends Omit<TransferModel, 'createdAt' | 'updatedAt'> {
+	// 	fromAccountNumber: string;
+	// 	toAccountNumber: string;
+	// 	createdAt: string;
+	// 	updatedAt: string;
+	// }
+
+	export interface CreateTransferInput
+		extends Omit<TransferCreateInput, 'customerId' | 'memo' | 'description'> {
+		customerId?: string;
 		fromAccountNumber: string;
+		fromAccountDisplayName: string;
 		toAccountNumber: string;
-		createdAt: string;
-		updatedAt: string;
+		toAccountDisplayName: string;
+		memo?: string;
+		description?: string;
 	}
 
-	export type TransactionCreateInput = Partial<Transaction>;
-
-	export type CreateTransactionInput = Omit<Transaction, 'id'>;
+	// export type CreateTransactionInput = Omit<Transaction, 'id'>;
 }

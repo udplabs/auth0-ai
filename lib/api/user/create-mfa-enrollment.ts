@@ -16,8 +16,6 @@ export const createMFAEnrollment = async (
 		data: { ticket_url },
 	} = await auth0Management.guardian.createEnrollmentTicket({
 		user_id,
-		// SDK passes through body as-is and types are not correct. Endpoint will accept.
-		// @ts-ignore
 		factor: getAuthenticatorType(authenticator),
 		allow_multiple_enrollments: true,
 		send_mail: false,

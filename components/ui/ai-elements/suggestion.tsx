@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import type React from 'react';
 import type { ComponentProps } from 'react';
 
 export type SuggestionsProps = ComponentProps<typeof ScrollArea>;
@@ -28,7 +29,7 @@ export const Suggestions = ({
 
 export type SuggestionProps = ComponentProps<typeof Button> & {
 	suggestion: string;
-	label?: string;
+	label?: React.ReactNode;
 };
 
 export const Suggestion = ({

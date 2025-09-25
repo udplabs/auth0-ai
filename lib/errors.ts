@@ -266,7 +266,7 @@ function getStatusCodeByType(type: Errors.Type) {
 }
 
 export function handleApiError(error: unknown) {
-	console.log(error);
+	console.info(error);
 	if (error instanceof APIError) {
 		return error.toResponse();
 	}

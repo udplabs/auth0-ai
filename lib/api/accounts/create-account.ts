@@ -1,14 +1,10 @@
 import type { Accounts } from '@/types/accounts';
-import type { Documents } from '@/types/documents';
 import type { Transactions } from '@/types/transactions';
 
 interface CreateAccountsOptions {
 	userId: string;
 	accounts: Accounts.CreateAccountInput[];
 	transactions?: Transactions.CreateTransactionInput[];
-	accountDocuments?: Documents.DocumentWithEmbedding[];
-	transactionDocuments?: Documents.DocumentWithEmbedding[];
-	createEmbeddings?: boolean;
 }
 
 /**
@@ -16,10 +12,6 @@ interface CreateAccountsOptions {
  *
  * 1) Save data to DB
  * 2) Write permissions
- * 3) Chunk account data
- * 4) Create embeddings
- *    - This will create/update a vector store with the embeddings
- *    - This will also save the embeddings to the database
  * 5) Return accounts with transactions
  *
  * @param options - The options for creating accounts.
@@ -32,7 +24,6 @@ export async function createAccounts({
 	userId,
 	accounts,
 	transactions = [],
-	createEmbeddings = false,
 }: CreateAccountsOptions) {
 	const { saveAccountsAndReturnSeparate } = await import(
 		'@/lib/db/queries/accounts/mutate-accounts'
@@ -47,15 +38,6 @@ export async function createAccounts({
 		userId,
 		newAccounts.map((account) => account.id)
 	);
-
-	if (createEmbeddings) {
-		const { createDocumentsWithEmbeddings } = await import(
-			'@/lib/ai/rag/create-documents'
-		);
-
-		await createDocumentsWithEmbeddings(newTransactions);
-	}
-
 	return newAccounts.map((account) => {
 		return {
 			...account,

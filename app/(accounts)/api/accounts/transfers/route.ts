@@ -1,9 +1,9 @@
-import { getUser } from '@/lib/auth0/client';
-import { createTransfer } from '@/lib/db/queries/accounts/mutate-transactions';
+import { transferFunds } from '@/lib/api/accounts/transfer-funds';
 import { APIError, handleApiError } from '@/lib/errors';
 import { revalidateTag } from 'next/cache';
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 
+import { getUser } from '@/lib/auth0/client';
 import type { Transfers } from '@/types/transfers';
 /**
  * POST /api/accounts/transfers
@@ -34,9 +34,9 @@ export async function POST(request: NextRequest) {
 		// 1. Auth: fails (throws) if session invalid.
 		const user = await getUser();
 
-		// 2. Parse body (ASSUMPTION: client sends valid JSON matching Transfers.CreateTransactionInput).
+		// 2. Parse body (ASSUMPTION: client sends valid JSON matching Transfers.CreateTransferInput).
 		//    Consider wrapping in a safeParse with zod for stronger guarantees.
-		const body = (await request.json()) as Transfers.CreateTransactionInput;
+		const body = (await request.json()) as Transfers.CreateTransferInput;
 
 		if (!body) {
 			// Defensive: request.json() would normally throw if invalid JSON.
@@ -47,16 +47,16 @@ export async function POST(request: NextRequest) {
 		const customerId = user.sub;
 
 		// 4. Domain action: create the transfer. Should internally:
-		//    - Validate ownership
 		//    - Check balances / limits
 		//    - Create ledger / transactions atomically
-		const transferId = await createTransfer({ ...body, customerId });
+		// const transferId = await createTransfer({ ...body, customerId });
+		const result = await transferFunds({ ...body, customerId });
 
 		// 5. Invalidate cached account summary data (ISR / fetch cache keyed with tag 'accounts').
 		revalidateTag('accounts');
 
 		// 6. Success response: minimal JSON (could wrap in { id: transferId } for extensibility).
-		return NextResponse.json(transferId);
+		return NextResponse.json(result);
 	} catch (error: unknown) {
 		return handleApiError(error);
 	}

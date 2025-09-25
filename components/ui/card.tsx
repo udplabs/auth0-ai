@@ -110,8 +110,12 @@ export type CardHeaderProps = React.ComponentProps<'div'>;
 export type CardFooterProps = React.ComponentProps<'div'>;
 export type CardTitleProps = React.ComponentProps<'div'> & {
 	loading?: boolean;
+	skeleton?: boolean;
 };
 export type CardDescriptionProps = React.ComponentProps<'div'> & {
 	loading?: boolean;
+	skeleton?: boolean;
 };
-export type CardContentProps = React.ComponentProps<'div'>;
+export type CardContentProps = React.ComponentProps<'div'> & {
+	skeleton?: boolean;
+};

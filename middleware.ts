@@ -20,7 +20,6 @@ export async function middleware(request: NextRequest) {
 
 	// If the user does not have a session, redirect to login
 	if (!session) {
-		console.log('not logged in!');
 		const returnTo = encodeURIComponent(request.nextUrl.pathname);
 		return NextResponse.redirect(`${origin}/auth/login?returnTo=${returnTo}`);
 	}

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ProfilePage() {
-	const { tokenSet, user } = (await getSession()) || {};
+	const { tokenSet, user } = (await getSession(false)) || {};
 
 	if (!user?.sub) {
 		redirect('/');

@@ -32,10 +32,10 @@ export function SidebarHeader({
 					}}
 					className='flex flex-row items-center gap-3'
 				>
-					{theme.resolvedTheme === 'dark' ? (
-						<DarkLogo className='w-full pe-5' />
-					) : (
+					{theme.resolvedTheme === 'light' ? (
 						<LightLogo />
+					) : (
+						<DarkLogo className='w-full pe-5' />
 					)}
 				</Link>
 			</SidebarMenu>

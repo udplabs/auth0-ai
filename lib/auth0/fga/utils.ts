@@ -33,8 +33,8 @@ export async function createOwnerPermissions(
 		return;
 	}
 
-	console.log('=== CREATE OWNER PERMISSIONS ===');
-	console.log('userId:', userId, '| accountIds:', accountIds);
+	console.debug('=== CREATE OWNER PERMISSIONS ===');
+	console.debug('userId:', userId, '| accountIds:', accountIds);
 
 	const permissions = generateTuples(userId, accountIds);
 
@@ -120,7 +120,7 @@ export async function deleteAllUserTuples(
 
 	if (tuples.length === 0) return 0;
 
-	console.log('Attempting to delete', tuples.length, 'user tuples...');
+	console.info('Attempting to delete', tuples.length, 'user tuples...');
 	// Chunk deletes to avoid size limits
 	try {
 		for (let i = 0; i < tuples.length; i += batchSize) {
@@ -128,7 +128,7 @@ export async function deleteAllUserTuples(
 				deletes: tuples.slice(i, i + batchSize),
 			});
 		}
-		console.log('Deleted ', tuples.length, ' user tuples');
+		console.info('Deleted ', tuples.length, ' user tuples');
 	} catch (error: unknown) {
 		if (error instanceof FgaApiValidationError) {
 			console.warn('Deletion failed: ', error.message);

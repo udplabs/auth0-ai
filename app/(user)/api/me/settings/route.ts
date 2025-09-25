@@ -14,7 +14,7 @@ export async function POST() {
 		// Set a sync cookie
 		const cookieStore = await cookies();
 
-		console.log('syncing remote content...');
+		console.info('syncing remote content...');
 
 		await syncContent();
 

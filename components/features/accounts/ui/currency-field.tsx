@@ -1,19 +1,16 @@
+import { currencyFormatter } from '@/lib/utils';
 import type { Accounts } from '@/types/accounts';
 
 export const CurrencyField = ({
 	children = '**hidden**',
-	currencyCode = 'USD',
+	currencyCode,
 	...props
 }: CurrencyProps) => {
-	const formatter = new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency: currencyCode,
-		minimumFractionDigits: 2,
-	}).format;
-
 	return (
 		<span {...props}>
-			{typeof children === 'string' ? children : formatter(children)}
+			{typeof children === 'string'
+				? children
+				: currencyFormatter(children, { currencyCode })}
 		</span>
 	);
 };

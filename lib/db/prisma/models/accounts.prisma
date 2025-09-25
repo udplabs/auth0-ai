@@ -57,15 +57,19 @@ model Account {
 }
 
 model Transfer {
-  id            String   @id @default(ulid())
-  customerId    String
-  fromAccountId String
-  toAccountId   String
-  description   String
-  memo          String?
-  amount        Float
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                  String   @id @default(ulid())
+  customerId          String
+  fromAccountId       String
+  toAccountId         String
+  description         String
+  memo                String?
+  amount              Float
+  currencyCode        String?  @default("USD")
+  currencyName        String?  @default("US Dollar")
+  currencySymbol      String?  @default("$")
+  currencyNumericCode Float?   @default(840)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   @@index([fromAccountId])
   @@index([toAccountId])

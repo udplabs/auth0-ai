@@ -1,31 +1,34 @@
 'use server';
+import { ulid } from '@/lib/utils';
 import { createHash } from 'crypto';
 import { promises } from 'fs';
 import path from 'path';
-import { ulid } from 'ulid';
 import { SettingsCreateInput, SettingsModel } from '../generated/prisma/models';
 import { RemoteSettingsCreateInput } from '../generated/supabase/models';
 import { prisma } from '../prisma/client';
 import { supabase } from '../supabase/client';
 
 import type { UICreateSettingsInput, UISettings } from '@/types/settings';
+
 export async function upsertSettings(
 	data: UICreateSettingsInput
-): Promise<UISettings> {
-	const { id, ...rest } = data;
-
-	// Decide intent:
-	// - isUpsert = at least one provided field besides `id`
-	//   (null counts as a provided value; undefined does not)
-	const isUpsert = Object.values(rest).some((v) => v !== undefined);
-
-	// GET flow
-	// If GET fails, upsert will be called
-	if (!isUpsert) {
-		return await getSettings(id, true);
+): Promise<UISettings>;
+export async function upsertSettings(
+	userId?: string
+): Promise<UISettings | void>;
+export async function upsertSettings(
+	data?: UICreateSettingsInput | string
+): Promise<UISettings | void> {
+	if (!data) {
+		// We can't do anything with nothing
+		return;
 	}
 
-	const { createdAt, updatedAt } = rest || {};
+	if (typeof data === 'string') {
+		return await getSettings(data);
+	}
+
+	const { id, createdAt, updatedAt, ...rest } = data;
 
 	// Build base data object
 	// - coerce ISO strings to Date for createdAt/updatedAt
@@ -66,29 +69,19 @@ export async function upsertSettings(
 }
 
 // Call upsertSettings
-async function getSettings(id?: string): Promise<UISettings | undefined>;
-async function getSettings(id?: string, upsert?: true): Promise<UISettings>;
-async function getSettings(
-	id?: string,
-	upsert?: boolean
-): Promise<UISettings | undefined> {
-	if (!id) return;
-
+async function getSettings(id: string): Promise<UISettings> {
 	const settings = await prisma.settings.findUnique({ where: { id } });
 
 	if (settings?.createdAt && settings?.updatedAt) {
 		return UISettings(settings);
 	}
-
-	if (upsert) {
-		// NO settings found, otherwise we would have returned already
-		// Create placeholder
-		return await upsertSettings({
-			id,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		});
-	}
+	// NO settings found, otherwise we would have returned already
+	// Create placeholder
+	return await upsertSettings({
+		id,
+		createdAt: new Date(),
+		updatedAt: new Date(),
+	});
 }
 export async function saveAppInstance() {
 	const filename = '.app-instance.local';

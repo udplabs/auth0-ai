@@ -23,7 +23,7 @@ import {
  *
  * ---------------------------------------------------------------------------
  * 1. Install dependency
- *    `pnpm add @openfga/sdk`
+ *    `npm install @openfga/sdk`
  *
  * 2. Required environment variables:
  *    FGA_STORE_ID=           # Your store UUID

@@ -254,6 +254,11 @@ export namespace Accounts {
 		type: Type;
 		subType: Accounts.SubTypeOf<Type>;
 	}
+
+	export type AccountList = Pick<
+		Account,
+		'id' | 'displayName' | 'name' | 'number' | 'type' | 'subType'
+	>;
 }
 
 export interface ExternalConnection {

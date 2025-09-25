@@ -3,14 +3,16 @@
 import { CountDownButton } from '@/components/countdown-button';
 import { toast } from '@/components/toast';
 import { APIError } from '@/lib/errors';
+import { hasPushMfa, mfaEnrollPending, transferInterrupt } from '@/lib/signals';
 import { useUser } from '@auth0/nextjs-auth0';
-import { useCallback } from 'react';
+import { useSignals } from '@preact/signals-react/runtime';
+import { useCallback, useEffect } from 'react';
 import { toast as sonnerToast } from 'sonner';
 import useSWR from 'swr';
 
 import type { Factor } from '@/lib/auth0/management-client';
 
-const key = '/api/me/authenticators';
+export const key = '/api/me/authenticators';
 
 /**
  * useAuthenticators
@@ -47,7 +49,10 @@ const key = '/api/me/authenticators';
  * - Track pending deletes to disable duplicate clicks.
  */
 export function useAuthenticators() {
+	useSignals();
 	const { user, isLoading: isAuthLoading } = useUser();
+
+	const useCache = !mfaEnrollPending.value && !transferInterrupt.value;
 
 	// SWR fetch: only run once we know user id or auth has definitively finished.
 	const {
@@ -55,7 +60,18 @@ export function useAuthenticators() {
 		isLoading,
 		mutate,
 		...swrRest
-	} = useSWR<Factor[]>(user?.sub || !isAuthLoading ? key : null);
+	} = useSWR<Factor[]>(
+		user?.sub || !isAuthLoading ? `${key}?cached=${useCache}` : null
+	);
+
+	useEffect(() => {
+		if (!isLoading) {
+			const pushExists = data.some(
+				(f) => f.type === 'push' && f.enrolled === true
+			);
+			hasPushMfa.value = pushExists;
+		}
+	}, [isLoading, data]);
 
 	const deleteAuthenticator = useCallback(
 		(authenticatorId: string) => {
@@ -110,7 +126,7 @@ export function useAuthenticators() {
 							type: 'error',
 						});
 					} else {
-						console.log(err);
+						console.warn(err);
 					}
 				}
 			};

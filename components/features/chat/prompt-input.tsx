@@ -14,9 +14,8 @@ import { useSuggestions } from '@/hooks/use-suggestions';
 import { cn } from '@/lib/utils';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useLocalStorage } from 'usehooks-ts';
 import { SuggestedActions } from './suggested-actions';
-
-import type { Chat } from '@/types/chat';
 
 export interface PromptInputProps extends AIPromptInputProps {
 	ContainerProps?: React.ComponentProps<'div'>;
@@ -36,19 +35,26 @@ export const PromptInput = ({
 
 	const pathId = _id && Array.isArray(_id) ? _id[0] : _id;
 
-	const {
-		id: chatId,
-		messages,
-		sendMessage,
-		status,
-	} = useChat<Chat.UIMessage>();
+	const { id: chatId, messages, sendMessage, status } = useChat();
 	const {
 		open: showSuggestions,
 		toggleSuggestions,
 		shouldShow,
 	} = useSuggestions();
 
-	const [input, setInput] = useState('');
+	const [localStorageInput, setLocalStorageInput] = useLocalStorage(
+		'chat-input',
+		''
+	);
+	const [input, setInput] = useState(localStorageInput);
+
+	useEffect(() => {
+		setInput(localStorageInput);
+	}, [localStorageInput]);
+
+	useEffect(() => {
+		setLocalStorageInput(input);
+	}, [input, setLocalStorageInput]);
 
 	useEffect(() => {
 		// If there is a suggestion that should be shown, show it!
@@ -59,7 +65,7 @@ export const PromptInput = ({
 		) {
 			toggleSuggestions(true);
 		}
-	}, [showSuggestions, shouldShow, status, messages.length]);
+	}, [showSuggestions, toggleSuggestions, shouldShow, status, messages.length]);
 
 	const submitAction = (value: string) => {
 		if (!pathId || pathId !== chatId) {
@@ -69,6 +75,7 @@ export const PromptInput = ({
 		if (value.trim()) {
 			sendMessage({ text: value });
 			setInput('');
+			setLocalStorageInput('');
 
 			if (showSuggestions) {
 				toggleSuggestions(false);
@@ -98,6 +105,9 @@ export const PromptInput = ({
 					onOpenChange: toggleSuggestions,
 					onSubmit: submitAction,
 					className: 'py-2',
+					ButtonProps: {
+						disabled: status !== 'ready',
+					},
 				}}
 			/>
 			<AIPromptInput

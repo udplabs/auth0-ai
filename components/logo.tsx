@@ -1,5 +1,3 @@
-'use client';
-
 export const LightLogo = ({ ...props }: React.ComponentProps<'svg'>) => {
 	return (
 		<svg

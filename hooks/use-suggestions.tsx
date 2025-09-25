@@ -29,53 +29,73 @@ export const useSuggestions = (): UseSuggestionsResponse => {
 	// Placed in front of other suggestions in order
 	const stepSuggestions: SuggestedActions[] = [
 		{
-			suggestion: 'Show me the .env settings',
-			variant: 'default',
+			suggestion: 'Show me the `.env` settings',
+			variant: 'info',
 			shouldShow: labStep === 3,
 		},
 		{
-			suggestion: 'Show me the createClient() code',
-			variant: 'default',
+			suggestion: 'Show me the `createClient()` code',
+			variant: 'info',
 			shouldShow: labStep === 5,
 		},
 		{
 			label: 'Show me the `RELATIONS` code',
 			suggestion:
-				'Show me the code for the RELATIONS array in lib/auth0/fga/get-account-permissions.ts.',
-			variant: 'default',
+				'Show me the code for the `RELATIONS` array in `lib/auth0/fga/get-account-permissions.ts`.',
+			variant: 'info',
 			shouldShow: labStep === 5,
 		},
 		{
 			label: 'Show me the `checks` code',
 			suggestion:
-				'Show me the code for checks flatMap in lib/auth0/fga/get-account-permissions.ts',
-			variant: 'default',
+				'Show me the code for `checks` flatMap in `lib/auth0/fga/get-account-permissions.ts`',
+			variant: 'info',
 			shouldShow: labStep === 5,
 		},
 		{
 			label: 'Show me the `output` code',
 			suggestion:
-				'Show me the code for the output account mapping in lib/auth0/fga/get-account-permissions.ts',
-			variant: 'default',
+				'Show me the code for the `output` account mapping in lib/auth0/fga/get-account-permissions.ts',
+			variant: 'info',
 			shouldShow: labStep === 5,
 		},
 		{
-			label: 'Show me the `fgaRetriever` code',
+			label: 'Show me the `auth0AI` client',
 			suggestion:
-				'Show me the fgaRetriever code in lib/ai/tools/search-transactions.ts',
-			variant: 'default',
+				'Show me the `auth0AI` client code in `lib/auth0/ai/client.ts`',
+			variant: 'info',
 			shouldShow: labStep === 6,
 		},
 		{
-			label: 'Show me the `authorizedResults` code',
+			label: 'Show me the `withAsyncConfirmation` code',
 			suggestion:
-				'Show me the code authorizedResults code from lib/ai/tools/search-transactions.ts',
-			variant: 'default',
+				'Show me the `withAsyncConfirmation` code from `lib/auth0/ai/with-async-authorize.ts`',
+			variant: 'info',
+			shouldShow: labStep === 6,
+		},
+		{
+			label: 'Show me the `transferFunds` code',
+			suggestion: 'Show me the code for `lib/ai/tools/transfer-funds.ts`',
+			variant: 'info',
 			shouldShow: labStep === 6,
 		},
 		{
 			label: 'Show me the `toolRegistry` code',
-			suggestion: 'Show me the code for lib/ai/tool-registry.ts',
+			suggestion: 'Show me the code for `lib/ai/tool-registry.ts`',
+			variant: 'info',
+			shouldShow: labStep === 6,
+		},
+		{
+			label: 'Show me the `POST` chat handler code',
+			suggestion:
+				'Show me the code to change in `app/(chat)/api/chat/[id]/_handlers/post.ts`',
+			variant: 'info',
+			shouldShow: labStep === 6,
+		},
+		{
+			label: 'Explain `handleOnAuthorize`',
+			suggestion:
+				'Show me the code for `lib/auth0/ai/handle-on-authorize.ts` and explain it.',
 			variant: 'default',
 			shouldShow: labStep === 6,
 		},

@@ -1,34 +1,28 @@
+// lib/ai/tool-registry.ts
 import type { ToolSet } from 'ai';
 
-import { pushEnrollment } from './tools/_push-enroll';
-import { getAccounts } from './tools/get-accounts';
-import { getTransactions } from './tools/get-transactions';
-import { getUserProfile } from './tools/get-user-profile';
-import { getWeather } from './tools/get-weather';
-import { getReferenceFile } from './tools/system/get-reference-file';
-import { getStepCode } from './tools/system/get-step-code';
-import { getStepGuides } from './tools/system/get-step-guides';
-import { userSettings } from './tools/system/user-settings';
-import { transferFunds } from './tools/transfer-funds';
-
-// ---------------------------------------------------------------------------
-// ✅ STEP 8: Import searchTransactions tool
-import { searchTransactions } from './tools/search-transactions';
-// ---------------------------------------------------------------------------
+import { enrollMfaPush } from '@/lib/ai/tools/enroll-mfa-push';
+import { getAccountList } from '@/lib/ai/tools/get-account-list';
+import { getAccounts } from '@/lib/ai/tools/get-accounts';
+import { getTransactions } from '@/lib/ai/tools/get-transactions';
+import { getUserProfile } from '@/lib/ai/tools/get-user-profile';
+import { getWeather } from '@/lib/ai/tools/get-weather';
+import { getReferenceFile } from '@/lib/ai/tools/system/get-reference-file';
+import { getStepCode } from '@/lib/ai/tools/system/get-step-code';
+import { getStepGuides } from '@/lib/ai/tools/system/get-step-guides';
+import { userSettings } from '@/lib/ai/tools/system/user-settings';
+import { transferFunds } from '@/lib/ai/tools/transfer-funds';
 
 export const toolRegistry = {
+	enrollMfaPush,
 	getAccounts,
+	getAccountList,
 	getStepGuides,
 	getReferenceFile,
 	getStepCode,
 	getTransactions,
 	getUserProfile,
 	getWeather,
-	pushEnrollment,
-	transferFunds,
+	transferFunds /* ⚠️ TASK 9: Modify to call higher-order function (see `transfer-funds.ts`) */,
 	userSettings,
-	// ---------------------------------------------------------------------------
-	// ❌ STEP 9: Add searchTransactions tool
-	//
-	// ---------------------------------------------------------------------------
 } satisfies ToolSet;

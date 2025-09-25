@@ -8,7 +8,7 @@ export async function DELETE() {
 	try {
 		const user = await getUser();
 
-		console.log('=== RESETTING ACCOUNT PERMISSIONS ===');
+		console.info('=== RESETTING ACCOUNT PERMISSIONS ===');
 
 		await resetAccountPermissions(user.sub);
 

@@ -1,7 +1,7 @@
+import { openai } from '@/lib/ai/model/openai';
 import { getAllStepPrompts } from '@/lib/db/queries/content';
 import { sortBy } from '@/lib/utils';
 import { Experimental_Agent as Agent } from 'ai';
-import { openai } from '../openai';
 
 async function getSystemPrompt() {
 	const prompts = await getAllStepPrompts();
@@ -24,5 +24,4 @@ async function getSystemPrompt() {
 export const StepGuru = new Agent({
 	model: openai('gpt-5-nano'),
 	system: await getSystemPrompt(),
-	temperature: 0,
 });

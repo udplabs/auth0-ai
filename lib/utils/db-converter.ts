@@ -68,8 +68,8 @@ export function convertToDB<UI = any, DB = any>(
 
 		return result as DB;
 	} catch (error: unknown) {
-		console.log('convertToDB error');
-		console.log(error);
+		console.info('convertToDB error');
+		console.error(error);
 		if (error instanceof APIError) {
 			throw error;
 		}
@@ -155,8 +155,8 @@ export function convertToUI<DB = any, UI = any>(dbItem: DB): UI {
 		}
 		return result as UI;
 	} catch (error: unknown) {
-		console.log('convertToUI error');
-		console.log(error);
+		console.info('convertToUI error');
+		console.error(error);
 		if (error instanceof APIError) {
 			throw error;
 		}

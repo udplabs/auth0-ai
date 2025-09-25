@@ -1,7 +1,8 @@
+import { ToolResponseSchema } from '@/lib/api/schemas/chat';
+import { ContentSchema } from '@/lib/api/schemas/content';
 import { findFirstContent } from '@/lib/db/queries/content';
 import { tool } from 'ai';
 import { z } from 'zod';
-import { ContentSchema, ToolResponseSchema } from '../../schemas';
 
 const inputSchema = z.object({
 	filename: z

@@ -2,10 +2,8 @@
 import { getAccounts } from '@/lib/api/accounts/get-accounts';
 import { getUser } from '@/lib/auth0/client';
 import { deleteAllUserTuples } from '@/lib/auth0/fga/utils';
-import { generateMockEmbeddings } from '@/lib/db/mock/mock-accounts';
 import { deleteAccountData } from '@/lib/db/queries/accounts/mutate-accounts';
 import { handleApiError } from '@/lib/errors';
-import { type NextRequest } from 'next/server';
 /**
  * Accounts API
  *
@@ -26,7 +24,6 @@ import { type NextRequest } from 'next/server';
  * SIDE EFFECTS (DELETE):
  * 1. deleteAccountData(userId)      → removes accounts, transactions, related documents from db.
  * 2. deleteAllUserTuples(userId)    → purges FGA tuples for this user.
- * 3. generateMockEmbeddings()       → repopulates vector store + sample domain data.
  *
  * ERROR HANDLING
  * - Known domain / validation errors throw APIError → converted to structured response.
@@ -67,11 +64,10 @@ export async function GET() {
  * - Keep server-only; do NOT expose in a public UI without confirmation safeguards.
  *
  * Possible Enhancements:
- * - Return a JSON summary (e.g., { deletedAccounts, deletedTransactions, regeneratedDocuments }).
  * - Require a confirmation token/header (e.g. X-Confirm-Reset: true).
  * - Wrap each phase in try/catch and partial rollback if necessary (here we rely on idempotent regeneration).
  */
-export async function DELETE(_request: NextRequest) {
+export async function DELETE() {
 	try {
 		const user = await getUser(); // Resolve early; fail fast if no auth
 
@@ -82,9 +78,6 @@ export async function DELETE(_request: NextRequest) {
 
 		// 2. Purge authorization tuples for user (removes grants/ownership)
 		await deleteAllUserTuples(userId);
-
-		// 3. Recreate mock data + embeddings (vector store & sample documents)
-		await generateMockEmbeddings();
 
 		// 204: success, intentionally no body
 		return new Response(null, { status: 204 });

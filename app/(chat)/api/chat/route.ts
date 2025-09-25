@@ -10,7 +10,7 @@ interface GetChatsParams extends ApiQueryParams {
 // Fetches chat history [for sidebar].
 export async function GET(request: NextRequest) {
 	try {
-		console.log('fetching chat history...');
+		console.info('fetching chat history...');
 		const user = await getUser();
 
 		const {

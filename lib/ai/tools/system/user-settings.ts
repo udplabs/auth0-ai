@@ -1,8 +1,9 @@
+import { ToolResponseSchema } from '@/lib/api/schemas/chat';
+import { SettingsSchema } from '@/lib/api/schemas/settings';
 import { getUser } from '@/lib/auth0/client';
 import { upsertSettings } from '@/lib/db/queries/settings';
 import { tool } from 'ai';
 import { z } from 'zod';
-import { SettingsSchema, ToolResponseSchema } from '../../schemas';
 
 const outputSchema = ToolResponseSchema(SettingsSchema);
 const inputSchema = z.object({

@@ -26,7 +26,7 @@ interface SuggestedActionsProps extends Omit<CollapsibleProps, 'onSubmit'> {
 }
 
 export interface SuggestedActions {
-	label?: string;
+	label?: React.ReactNode;
 	suggestion: string;
 	variant?: string;
 	preSubmitAction?: () => void;
@@ -39,11 +39,24 @@ export function SuggestedActions({
 	onSubmit,
 	...props
 }: SuggestedActionsProps) {
-	const { open = _open, labStep, suggestedActions } = useSuggestions();
+	const {
+		open = _open,
+		labStep,
+		suggestedActions,
+		toggleSuggestions,
+	} = useSuggestions();
 
 	suggestedActions.push(
 		...[
-			{ suggestion: 'What is FGA for RAG?' },
+			{
+				label: (
+					<span>
+						What is <abbr title='Fine-grained Authorization'>FGA</abbr> for{' '}
+						<abbr title='Retrieval-Augmented Generation'>RAG</abbr>?
+					</span>
+				),
+				suggestion: 'What is FGA for RAG?',
+			},
 			...(labStep >= 3
 				? [
 						{ suggestion: 'Show me my accounts' },
@@ -67,6 +80,7 @@ export function SuggestedActions({
 					<Button
 						variant='ghost'
 						type='button'
+						onClick={() => toggleSuggestions(!open)}
 					>
 						{open ? 'Hide suggestions' : 'Show suggestions'}
 						<ArrowIcon
@@ -104,6 +118,7 @@ export function SuggestedActions({
 										},
 										label,
 										suggestion,
+										...ButtonProps,
 									}}
 								/>
 							</motion.div>

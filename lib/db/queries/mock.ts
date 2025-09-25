@@ -1,15 +1,11 @@
 'use server';
 
 import type {
-	SampleDocumentCreateInput,
-	SampleDocumentModel,
-	SampleDocumentUpdateInput,
 	SampleTransactionCreateInput,
 	SampleTransactionUpdateInput,
 } from '@/lib/db/generated/prisma/models';
 
 import type { Accounts } from '@/types/accounts';
-import type { Documents } from '@/types/documents';
 import type { Transactions } from '@/types/transactions';
 
 type SampleAccount = Accounts.Account & {
@@ -20,10 +16,6 @@ type SampleTransaction = Transactions.Transaction & {
 	lastSyncedAt?: Date;
 	expiresAt?: Date;
 };
-type SampleDocument = Documents.DocumentWithEmbedding & {
-	lastSyncedAt?: Date;
-	expiresAt?: Date;
-};
 
 // Looks up locally first.
 // If not found, fetches remotely and stores locally.
@@ -31,7 +23,6 @@ type SampleDocument = Documents.DocumentWithEmbedding & {
 export async function getSampleData(userId: string): Promise<{
 	accounts: SampleAccount[];
 	transactions: SampleTransaction[];
-	documents: SampleDocument[];
 }> {
 	const [{ prisma }, { supabase }, { convertToUI }] = await Promise.all([
 		import('@/lib/db/prisma/client'),
@@ -106,58 +97,8 @@ export async function getSampleData(userId: string): Promise<{
 		});
 	}
 
-	const lookupIds = [...localSampleTransactions.map((t) => t.id)];
-
-	let localSampleDocuments = await prisma.sampleDocument.findMany({
-		where: {
-			AND: [{ id: { in: lookupIds } }, { expiresAt: { gt: new Date() } }],
-		},
-	});
-
-	if (localSampleDocuments.length === 0) {
-		const remoteSampleDocuments = await supabase.remoteSampleDocument.findMany({
-			where: { id: { in: lookupIds } },
-		});
-
-		await prisma.$transaction([
-			...remoteSampleDocuments.map(({ updatedAt: _, ...d }) => {
-				return prisma.sampleDocument.upsert({
-					where: { id: d.id },
-					update: {
-						...d,
-						lastSyncedAt,
-						expiresAt,
-					} as SampleDocumentUpdateInput,
-					create: {
-						...d,
-						lastSyncedAt,
-						expiresAt,
-					} as SampleDocumentCreateInput,
-				});
-			}),
-		]);
-
-		localSampleDocuments = await prisma.sampleDocument.findMany({
-			where: { id: { in: lookupIds } },
-		});
-	}
-
 	return {
 		accounts: convertToUI(localSampleAccounts),
 		transactions: convertToUI(localSampleTransactions),
-		documents: convertToUI<SampleDocumentModel[], SampleDocument[]>(
-			localSampleDocuments
-		),
 	};
-}
-
-export async function deleteSampleDocuments() {
-	const [{ prisma }, { supabase }] = await Promise.all([
-		import('@/lib/db/prisma/client'),
-		import('@/lib/db/supabase/client'),
-	]);
-	// Delete local
-	await prisma.sampleDocument.deleteMany();
-	// Delete remote
-	return await supabase.remoteSampleDocument.deleteMany();
 }

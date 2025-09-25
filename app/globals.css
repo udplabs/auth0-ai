@@ -83,7 +83,7 @@
 	text-wrap: balance;
 }
 
-@layer utilities {
+/* @layer utilities {
 	:root {
 		--foreground-rgb: 0, 0, 0;
 		--background-start-rgb: 214, 219, 220;
@@ -97,7 +97,7 @@
 			--background-end-rgb: 0, 0, 0;
 		}
 	}
-}
+} */
 
 @layer base {
 	:root {
@@ -185,6 +185,9 @@
 
 	body {
 		@apply bg-background text-foreground;
+	}
+	p > code {
+		@apply dark:!text-foreground dark:!bg-muted-foreground text-foreground;
 	}
 }
 

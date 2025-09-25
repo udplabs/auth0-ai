@@ -70,13 +70,13 @@ export const AuthenticatorCard = ({
 					</div>
 					<div className='flex-8'>
 						<div className='flex items-center gap-2'>
-							<CardTitle {...{ skeleton, ...CardTitleProps }}>
+							<CardTitle {...{ loading, ...CardTitleProps }}>
 								{primary}
 							</CardTitle>
 						</div>
 						<CardDescription
 							{...{
-								skeleton,
+								loading,
 								...CardDescriptionProps,
 								className: cn(
 									'italic dark:text-gray-300 mt-1',

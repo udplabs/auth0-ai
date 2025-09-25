@@ -32,11 +32,11 @@ const TransferReducer: React.Reducer<
 		case 'CLOSE':
 			return {
 				...state,
+				...newState,
 				open: false,
 				transferAmount: 0,
 				fromAccountId: undefined,
 				toAccountId: undefined,
-				...newState,
 			};
 		case 'OPEN':
 			return merge(
@@ -46,7 +46,8 @@ const TransferReducer: React.Reducer<
 			);
 		case 'UPDATE':
 		default:
-			console.log(
+			console.debug('==== UPDATE ====');
+			console.debug(
 				{ ...state },
 				{ open: true, transferAmount: 0 },
 				{ ...newState }
@@ -79,10 +80,11 @@ export const TransferProvider = ({ children }: TransferProviderOptions) => {
 				fromAccountId,
 				toAccountId,
 				transferAmount,
+				transferAmountRaw: transferAmount?.toString() || '0',
 				type: open ? 'OPEN' : 'CLOSE',
 			} as Transfers.TransferAction);
 		},
-		[state?.open]
+		[]
 	);
 
 	const selectAccount: Transfers.TransferContext['selectAccount'] = useCallback(
@@ -100,11 +102,20 @@ export const TransferProvider = ({ children }: TransferProviderOptions) => {
 
 	const onChange: Transfers.TransferContext['onChange'] = useCallback(
 		({ target }) => {
-			const amount = parseInt(target?.value);
+			const raw = String(target?.value ?? '');
+
+			// Allow: empty, digits, optional single dot, up to 2 decimals
+			if (!/^\d*\.?\d{0,2}$/.test(raw)) return;
+
+			let numeric = 0;
+			if (raw !== '' && raw !== '.' && raw !== '-') {
+				numeric = parseFloat(raw);
+			}
 
 			return dispatch({
 				type: 'UPDATE',
-				transferAmount: isNaN(amount) ? 0 : amount,
+				transferAmountRaw: raw,
+				transferAmount: isNaN(numeric) ? 0 : numeric,
 			} as Transfers.TransferAction);
 		},
 		[]
@@ -112,15 +123,22 @@ export const TransferProvider = ({ children }: TransferProviderOptions) => {
 
 	const transferFunds: Transfers.TransferContext['transferFunds'] = useCallback(
 		(options) => {
+			function getFriendlyAccountNumber(accountId: string) {
+				return accounts.find((a) => a.id === accountId)?.number || '';
+			}
+
 			const {
 				fromAccountId = state?.fromAccountId,
 				fromAccountNumber = state?.fromAccountNumber ||
 					getFriendlyAccountNumber(state?.fromAccountId || ''),
+				fromAccountDisplayName = state?.fromAccountDisplayName,
 				toAccountId = state?.toAccountId,
 				toAccountNumber = state?.toAccountNumber ||
 					getFriendlyAccountNumber(state?.toAccountId || ''),
+				toAccountDisplayName = state?.toAccountDisplayName,
 				amount = state?.transferAmount,
 				memo = state?.memo,
+				description = state?.description,
 			} = options || {};
 
 			toast.promise(
@@ -130,10 +148,13 @@ export const TransferProvider = ({ children }: TransferProviderOptions) => {
 						body: JSON.stringify({
 							fromAccountId,
 							fromAccountNumber,
+							fromAccountDisplayName,
 							toAccountId,
 							toAccountNumber,
+							toAccountDisplayName,
 							amount,
 							memo,
+							description,
 						}),
 					});
 				},
@@ -149,12 +170,8 @@ export const TransferProvider = ({ children }: TransferProviderOptions) => {
 
 			dispatch({ type: 'CLOSE' } as Transfers.TransferAction);
 		},
-		[state, toast]
+		[state, mutate, accounts]
 	);
-
-	function getFriendlyAccountNumber(accountId: string) {
-		return accounts.find((a) => a.id === accountId)?.number || '';
-	}
 
 	const context = useMemo(
 		() => ({ ...state, onChange, selectAccount, toggleModal, transferFunds }),

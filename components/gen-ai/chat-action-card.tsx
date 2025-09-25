@@ -4,9 +4,9 @@ import { cn } from '@/lib/utils';
 import { ArrowDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-interface ChatActionCardProps extends ButtonProps {
+export interface ChatActionCardProps extends ButtonProps {
 	label: string;
-	cta?: string;
+	cta?: React.ReactNode;
 	icon?: React.ReactElement;
 	animateIcon?: boolean;
 }
@@ -38,7 +38,7 @@ export function ChatActionCard({
 		<div className='flex items-center gap-4 py-6'>
 			<Button {...{ href, target: '_blank', ...rest }}>{label}</Button>
 
-			<div className='flex italic'>
+			<div className='flex items-center gap-2 italic'>
 				{icon}
 				{cta}
 			</div>

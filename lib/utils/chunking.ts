@@ -1,17 +1,19 @@
-export function chunkByWords(text: string) {
-	const words = text.split(/\s+/);
+export function chunkByWords(text: string, max = 40) {
+	const tokens = text.match(/\S+\s+/) || [];
 	const chunks: string[] = [];
 	let buf = '';
-	for (const w of words) {
-		const next = buf ? `${buf} ${w}` : w;
-		if (next.length > 12) {
+
+	for (const w of tokens) {
+		if (buf && buf.length + w.length > max) {
 			chunks.push(buf);
 			buf = w;
 		} else {
-			buf = next;
+			buf += w;
 		}
 	}
+
 	if (buf) chunks.push(buf);
+
 	return chunks;
 }
 

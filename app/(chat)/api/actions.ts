@@ -1,9 +1,10 @@
 'use server';
 
-import { openai } from '@/lib/ai/openai';
+import { openai } from '@/lib/ai/model/openai';
 import { chatKey } from '@/lib/api/chat/get-chat';
 import { saveChat } from '@/lib/db/queries/chat/mutate-chats';
 import { saveMessages } from '@/lib/db/queries/chat/mutate-messages';
+import { ulid } from '@/lib/utils/';
 import { chunk } from '@/lib/utils/chunking';
 import { withStreamingJitter } from '@/lib/utils/with-streaming-jitter';
 import {
@@ -13,7 +14,6 @@ import {
 	TextPart,
 } from 'ai';
 import { revalidateTag } from 'next/cache';
-import { ulid } from 'ulid';
 
 import type { Chat } from '@/types/chat';
 

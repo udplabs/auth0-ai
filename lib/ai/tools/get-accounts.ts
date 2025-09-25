@@ -1,9 +1,10 @@
 // lib/ai/tools/get-accounts.ts
 import { getAccounts as getAccountsApi } from '@/lib/api/accounts/get-accounts';
+import { AccountSchema } from '@/lib/api/schemas/accounts';
+import { ToolResponseSchema } from '@/lib/api/schemas/chat';
 import { getUser } from '@/lib/auth0/client';
 import { tool } from 'ai';
 import { z } from 'zod';
-import { AccountSchema, ToolResponseSchema } from '../schemas';
 /**
  * getAccounts tool
  *
@@ -23,7 +24,7 @@ const inputSchema = z.object();
  * Output schema:
  * - Base response wrapper (status + data) around an array of AccountSchema
  */
-export const outputSchema = ToolResponseSchema(z.array(AccountSchema));
+const outputSchema = ToolResponseSchema(z.array(AccountSchema));
 
 export const getAccounts = tool<
 	z.infer<typeof inputSchema>,
@@ -49,7 +50,7 @@ export const getAccounts = tool<
 	 * - Avoid leaking sensitive stack details to the model.
 	 */
 	execute: async () => {
-		console.log('getAccounts tool called');
+		console.info('getAccounts tool called');
 		try {
 			// Resolve the authenticated user (server-only)
 			// Throws or returns a user with a stable `sub` (subject) identifier
@@ -73,8 +74,8 @@ export const getAccounts = tool<
 				// This tool is a PERFECT use case for RSCs. We should switch to RSCs ASAP. :)
 			};
 		} catch (error: unknown) {
-			console.log('error fetching accounts...');
-			console.log(error);
+			console.info('error fetching accounts...');
+			console.error(error);
 
 			// Normalize to your APIError -> JSON shape, but keep the ToolResponse contract
 			const { APIError } = await import('@/lib/errors');

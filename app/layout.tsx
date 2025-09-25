@@ -90,7 +90,7 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
 	// Read cookie to restore sidebar state (cookie value 'true' => open).
 	const cookieStore = await cookies();
-	const defaultOpen = cookieStore.get('sidebar:state')?.value == 'true';
+	const sidebarOpen = cookieStore.get('sidebar:state')?.value == 'true';
 
 	return (
 		<html
@@ -119,7 +119,7 @@ export default async function RootLayout({
 								position='top-right'
 								richColors
 							/>
-							<SidebarProvider {...{ defaultOpen }}>
+							<SidebarProvider {...{ defaultOpen: sidebarOpen }}>
 								{/* App chrome (navigation) */}
 								<AppSidebar />
 								<SidebarInset className='overflow-none overscroll-none'>
