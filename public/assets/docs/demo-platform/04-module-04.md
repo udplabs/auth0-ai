@@ -102,17 +102,17 @@ database and only sends the authorized documents to the LLM.
 ## Task 1: Create <abbr title="Fine-Grained Authorization">FGA</abbr> Account
 1. Navigate to [https://auth0.com/fine-grained-authorization](https://auth0.com/fine-grained-authorization) and either ⒈ login to an existing account or ⒉ sign up for a new one.
 
-    ![FGA Reg](./assets/images/Module04/images/image1.png)
+    ![FGA Reg](./assets/Module04/images/image1.png)
 
 2. If you see this screen after successfully logging in or registering, click continue. If you’re asked for credentials again, provide the same credentials you used in the initial registration or login process.
 
-    ![FGA Continue](./assets/images/Module04/images/image2.png)
+    ![FGA Continue](./assets/Module04/images/image2.png)
 
 
 ## Task 2: Create an authorization model
 1. In the Auth0 FGA admin console, navigate to the Model Explorer
 
-    ![FGA Model Explorer](./assets/images/Module04/images/image3.png)
+    ![FGA Model Explorer](./assets/Module04/images/image3.png)
 
 2. Copy the following model and paste it into the explorer text area.
 
@@ -192,11 +192,11 @@ database and only sends the authorized documents to the LLM.
 ## Task 3: Create an Authorized Client
 1. From the <abbr title="Fine-Grained Authorization">FGA</abbr> console, navigate to **Settings**.
 
-    ![FGA Settings](./assets/images/Module04/images/fga-settings.png)
+    ![FGA Settings](./assets/Module04/images/fga-settings.png)
 
 2. In the **Authorized Clients** section, click **+ Create Client**.
 
-    ![FGA Create Client](./assets/images/fga-create-client.png)
+    ![FGA Create Client](./assets/Module04/images/fga-create-client.png)
 
 3. Give your client a name. It can be whatever you want but maybe something like:
 
@@ -206,7 +206,7 @@ database and only sends the authorized documents to the LLM.
 
 4. Select Write and delete tuples and Read and query permissions.
 
-    ![FGA Create Client Permissions](./assets/images/fga-create-client-permissions.png)
+    ![FGA Create Client Permissions](./assets/Module04/images/fga-create-client-permissions.png)
 
     > [!IMPORTANT]
     > In normal production development we always advise least privilege access -- if your client does not *need* all the permissions, don't grant them!
@@ -215,7 +215,7 @@ database and only sends the authorized documents to the LLM.
 
 6. See the following? Success!
 
-    ![FGA Create Client Success](./assets/images/fga-create-client-success.png)
+    ![FGA Create Client Success](./assets/Module04/images/fga-create-client-success.png)
 
 7. *Before clicking* **Continue** in the dialog, grab the **Store ID**, **Client ID**, and **Client Secret** and update the following section of your <kbd>.env</kbd> file:
 
@@ -241,7 +241,7 @@ database and only sends the authorized documents to the LLM.
     >
     > You *might* want to refer back to this tab in the next module. 😉
     >
-    > ![FGA Implementation Guide](./assets/images/fga-client-config.png)
+    > ![FGA Implementation Guide](./assets/Module04/images/fga-client-config.png)
 
 8. Restart the application (*just to be certain everything sticks*).
 
@@ -264,11 +264,11 @@ http://localhost:3000
 
 If you get something like this:
 
-![Account Tool Result](./assets/images/get-accounts-result.png)
+![Account Tool Result](./assets/Module04/images/get-accounts-result.png)
 
 and when expanded there are no results...
 
-![Account Tool Result](./assets/images/get-accounts-result-none.png)
+![Account Tool Result](./assets/Module04/images/get-accounts-result-none.png)
 
 #### *Then it worked!*
 

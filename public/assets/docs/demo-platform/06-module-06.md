@@ -47,9 +47,9 @@ Because the <abbr title='Client-Initiated Backchannel Authorization'>CIBA</abbr>
 
 <br>
 
-| App Store                                               |     | Google Play                                                    |
-| ------------------------------------------------------- | --- | -------------------------------------------------------------- |
-| ![App Store](./assets/images/Module06/images/apple.png) |     | ![Google Play](./assets/images/Module06/images/googleplay.png) |
+| App Store                                        |     | Google Play                                             |
+| ------------------------------------------------ | --- | ------------------------------------------------------- |
+| ![App Store](./assets/Module06/images/apple.png) |     | ![Google Play](./assets/Module06/images/googleplay.png) |
 
 <br>
 
@@ -102,19 +102,19 @@ Modify your Auth0 tenant configurations to enable CIBA for the bAInk client appl
 
 1. From the Okta Lab Guide Launch Pad, click Launch to access your Auth0 Tenant (*if not already open*).
 
-    ![Launch Pad](./assets/images/Module06/images/launchpad.png)
+    ![Launch Pad](./assets/Module06/images/launchpad.png)
 
 2. In the Auth0 tenant, navigate to **Applications** → **Applications**
 
-    ![Apps](./assets/images/Module06/images/apps.png)
+    ![Apps](./assets/Module06/images/apps.png)
 
 3. Click on **the bAInk** application
 
-    ![the BAInk](./assets/images/Module06/images/baink.png)
+    ![the BAInk](./assets/Module06/images/baink.png)
 
 4. Scroll to the bottom until you see **Advanced Settings**. Click on **Grant Types** and enable **Client Initiated Backchannel Authentication (CIBA)**.
 
-    ![CIBA](./assets/images/Module06/images/enable-ciba.png)
+    ![CIBA](./assets/Module06/images/enable-ciba.png)
 
 5. Click **Save**.
 
@@ -139,7 +139,7 @@ In order to actually *use* push notifications for MFA, we need to ***enable it**
 1. From the **Auth0 Management Dashboard** navigate to **Security** → **Multi-factor Auth** → **Push Notification using Auth0 Guardian**.
 2. Toggle the feature **ON**.
 
-    ![Guardian](./assets/images/Module06/images/guardian.png)
+    ![Guardian](./assets/Module06/images/guardian.png)
 
 <br>
 
@@ -206,11 +206,11 @@ In a real-world application this may not make sense, but we are not in the real-
        - Aiya is fetching an account list behind the scenes to be able to build the request payload (account ids, etc.).
 11. Aiya will ask to confirm the transaction. Go ahead and **confirm** by typing ```Yes``` (*or something similar*).
 
-	![Transfer Confirmation](./assets/images/Module06/images/prelim-init-transfer.png)
+	![Transfer Confirmation](./assets/Module06/images/prelim-init-transfer.png)
 
 12. **Expected it to work?** It's ok! You ***should*** be seeing an <mark>error</mark> (*failure*).
 
-	![Transfer Error](./assets/images/Module06/images/prelim-transfer-err.png)
+	![Transfer Error](./assets/Module06/images/prelim-transfer-err.png)
 
 #### But why? It worked for ***me***! Why not Aiya?
 
@@ -281,13 +281,13 @@ Create and configure an API in Auth0 in order to be able to send an <kbd>audienc
 
   	*You are welcome to change this value, just make sure to update it elsewhere throughout the application*.
 
-	![Auth0 Create API](./assets/images/Module06/images/create-api.png)
+	![Auth0 Create API](./assets/Module06/images/create-api.png)
 
-1. Click **Create**.
+4. Click **Create**.
 
-1. Click on **Permissions**
+5. Click on **Permissions**
 
-1. Under **Add a Permission** and enter:
+6. Under **Add a Permission** and enter:
 
   | Field           | Value                 |
   | --------------- | --------------------- |
@@ -296,19 +296,19 @@ Create and configure an API in Auth0 in order to be able to send an <kbd>audienc
 
 7. Click **+ Add**
 
-	![Auth0 API Settings](./assets/images/Module06/images/create-permission.png)
+	![Auth0 API Settings](./assets/Module06/images/create-permission.png)
 
-1. Now, navigate to the **Machine to Machine Applications** tab.
+8. Now, navigate to the **Machine to Machine Applications** tab.
 
-1. Scroll down to **the bAInk** application and toggle **ON** for Authorization.
+9. Scroll down to **the bAInk** application and toggle **ON** for Authorization.
 
-1. Click on the expand <kbd>⌄</kbd> button.
+10. Click on the expand <kbd>⌄</kbd> button.
 
-1.  Select the newly created permission: <kbd>create:transfer</kbd>.
+11. Select the newly created permission: <kbd>create:transfer</kbd>.
 
-	![Auth0 API Settings](./assets/images/Module06/images/create-transfer-perm.png)
+	![Auth0 API Settings](./assets/Module06/images/create-transfer-perm.png)
 
-1.  Click **Update** and **Continue**.
+12. Click **Update** and **Continue**.
 
 ---
 #### <span style="font-variant: small-caps">Congrats!</span>
@@ -744,11 +744,11 @@ Only one more to go...
    Transfer $25 from checking to savings.
    ```
 
-	![Aiya Init Transfer](./assets/images/Module06/images/init-transfer.png)
+	![Aiya Init Transfer](./assets/Module06/images/init-transfer.png)
 
 4. If you are ***NOT*** already enrolled in push notifications, you will be prompted to enroll.
 
-	![Aiya Poll](./assets/images/Module06/images/enroll-push.png)
+	![Aiya Poll](./assets/Module06/images/enroll-push.png)
 
 	> [!NOTE]
 	>
@@ -763,15 +763,15 @@ Only one more to go...
 
 6. Click **Continue Transfer**.
 
-	![Continue Transfer](./assets/images/Module06/images/continue-transfer.png)
+	![Continue Transfer](./assets/Module06/images/continue-transfer.png)
 
 7. Now look for a push notification in the **Auth0 Guardian app**.
 
-	![Guardian Push](./assets/images/Module06/images/push.jpg)
+	![Guardian Push](./assets/Module06/images/push.jpg)
 
 8. Once you approve the notification, the funds should transfer and you will see a response from Aiya!
 
-	![Funds Transfer Confirm](./assets/images/Module06/images/transfer-complete.png)
+	![Funds Transfer Confirm](./assets/Module06/images/transfer-complete.png)
 
 
 

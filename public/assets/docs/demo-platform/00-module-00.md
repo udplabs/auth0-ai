@@ -8,15 +8,15 @@ To activate your tenant, follow these instructions:
 
 1. From the Launch Pad on the right of the screen, click on the Accept Invitation.
 
-    ![Accept Invite](./assets/images/Module00/images/1.1a.png)
+    ![Accept Invite](./assets/Module00/images/1.1a.png)
 
 2. Follow the instructions to accept the invitation.
 
-    ![Accept](./assets/images/Module00/images/1.2a.png)
+    ![Accept](./assets/Module00/images/1.2a.png)
 
 3. Upon successful acceptance of the invitation, you will land in your newly created Auth0 tenant.
 
-    ![Tenant](./assets/images/Module00/images/1.3a.png)
+    ![Tenant](./assets/Module00/images/1.3a.png)
 
 ## Navigating your Lab Guide
 Before we get started, here is some information about the Labs.Demo.Okta platform you are using today.
@@ -24,16 +24,16 @@ Before we get started, here is some information about the Labs.Demo.Okta platfor
 ### dev{camps} Outline
 On the left of the screen, you will find an outline of today’s lab which also serves as your navigation control panel. This dev{camp} Agentic AI workshop consists of **six (6)** <mark>**modules**</mark>, each containing <mark>**tasks**</mark> with <mark>**steps**</mark>. You also have the ability to collapse the outline at any time by clicking on the arrow icon.
 
-![Collapse](./assets/images/Module00/images/2.1.png)
+![Collapse](./assets/Module00/images/2.1.png)
 
 At the bottom of each section, there's a handy control to navigate forwards and backwards between the sections. You can also simply click on different sections (and subsections) to navigate freely.
 
-![Nav](./assets/images/Module00/images/2.2.png)
+![Nav](./assets/Module00/images/2.2.png)
 
 ### Launch Pad
 On the right of the screen, you will find an easy way to launch your lab resources. Each resource has its own launch button along with the tenant names and credentials (where applicable).
 
-![Launch Pad](./assets/images/Module00/images/2.3.png)
+![Launch Pad](./assets/Module00/images/2.3.png)
 
 ### Dynamic Lab Guide Variables
 In addition to the ability to copy credentials from the Launch Pad, we've also produced this lab guide using *dynamic variables*. Some variables (*not all*) will display values *specific* to your lab environment. For example, your tenant domain: `{{idp.tenantDomain}}`.

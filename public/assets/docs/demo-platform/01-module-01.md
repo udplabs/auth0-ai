@@ -27,13 +27,13 @@ You must have the following:
 
 If you have not already opened your Auth0 tenant (or if you closed it), from the Launch Pad in the Lab Guide, launch into your Auth0 tenant. You will be using this throughout the lab so we advise you keep a tab open.
 
-![Launch Pad](./assets/images/Module01/images/1.png)
+![Launch Pad](./assets/Module01/images/1.png)
 
 > [!NOTE]
 >
 > If there are any issues, please make sure you have accepted the invitation prior:
 >
-> ![Invite](./assets/images/Module01/images/2.png)
+> ![Invite](./assets/Module01/images/2.png)
 >
 > *If any issues continue to persist with accessing the Auth0 tenant, please flag down one of the lab assistants to troubleshoot.*
 
@@ -66,9 +66,9 @@ If any issues persist, please flag down a lab assistant for additional help.
 ## Confirm Auth0 Guardian download
 Make sure to download the Auth0 Guardian app on your mobile device
 
-| App Store                                           | Google Play                                           |
-| --------------------------------------------------- | ----------------------------------------------------- |
-| ![App Store](./assets/images/Module01/images/4.png) | ![Google Play](./assets/images/Module01/images/5.png) |
+| App Store                                    | Google Play                                    |
+| -------------------------------------------- | ---------------------------------------------- |
+| ![App Store](./assets/Module01/images/4.png) | ![Google Play](./assets/Module01/images/5.png) |
 
 #### <span style="font-variant: small-caps">Congrats!</span>
 *You have completed this module.*

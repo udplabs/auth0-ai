@@ -80,7 +80,7 @@ For this lab we have generously provided you with an OpenAI API key. This key is
 
 1. Navigate back to the Launch Pad in the Lab Guide and copy the OpenAI API Key
 
-    ![OpenAI Key](./assets/images/Module03/images/image1.png)
+    ![OpenAI Key](./assets/Module03/images/image1.png)
 
 2. Update your <kbd>.env</kbd> (or <kbd>.env.local</kbd>) file with the API Key
 
@@ -134,13 +134,13 @@ This application utilizes the management API to fetch/update profile information
 1. Return to the Auth0 Admin Dashboard
 2. Navigate to **Applications** → **the bAInk** → **APIs**.
 3. On the **Auth0 Management API** enable **Authorized**.
-   ![Enable Management API](./assets/images/the-bAInk-mgmt-enable.png)
+   ![Enable Management API](./assets/Module03/images/the-bAInk-mgmt-enable.png)
 4. Click the arrow next to the toggle to expand the menu.
 5. Click to select **All**.
 6. Click **Update**
-   ![Select All Management API Scopes](./assets/images/the-bAInk-mgmt-scopes.png)
+   ![Select All Management API Scopes](./assets/Module03/images/the-bAInk-mgmt-scopes.png)
 7. On the warning that appears, click **Continue**
-   ![Select All Management API Scopes](./assets/images/the-bAInk-mgmt-warn.png)
+   ![Select All Management API Scopes](./assets/Module03/images/the-bAInk-mgmt-warn.png)
 
     <br>
 
@@ -183,7 +183,7 @@ This application utilizes the management API to fetch/update profile information
 * From here, accounts + transactions are automatically created for you behind the scenes. 🎉
   * Feel free to click on **Accounts** if you don't believe me!
 
-![First Auth message](./assets/images/the-bAInk-post-auth.gif)
+![First Auth message](./assets/Module03/images/the-bAInk-post-auth.gif)
 
 <br>
 
@@ -201,7 +201,7 @@ This application utilizes the management API to fetch/update profile information
 >
 > From here, click on <kbd>Resend 'authenticated message'</kbd> to kick off the automated flow again.
 >
-> ![Resend Auth Message](./assets/images/devtools-auth-message.png)
+> ![Resend Auth Message](./assets/Module03/images/devtools-auth-message.png)
 
 
 

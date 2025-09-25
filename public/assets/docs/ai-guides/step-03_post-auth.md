@@ -31,19 +31,20 @@ I’m **Aiya**, in case you forgot 🤭, and I just "detected" a successful logi
 ---
 ### What's next?
 
-- [x] <span style="color: green">~~_Step 1: Get Started_~~</span>
+- [x] <span style="color: green">~~_Intro & Before we Begin_~~</span>
 
-- [x] <span style="color: green">~~_Step 2: Get Setup_~~</span>
+- [x] <span style="color: green">~~_Module 1: Review Env Setup_~~</span>
 
-- [x] <span style='color: green;'>~~_Step 3: Get [Auth0] Configured_~~</span>
+- [x] <span style='color: green;'>~~_Module 2: Prepare App_~~</span>
 
-- [ ] <span style='font-weight: 900'>_Step 4: Configure <abbr title="Fine-grained Authorization">FGA</abbr>_</span> _<span style='color: red; font-variant: small-caps'>📍←You are here</span>_
+- [x] <span style="color: green;">~~_Module 3: Configure App_~~</span> _<span style='color: red; font-variant: small-caps'>📍←You are here</span>_
 
-- [ ] <span style='color: gray'>_Step 5: Setup <abbr title="Fine-grained Authorization">FGA</abbr> for <abbr title="Retrieval-Augmented Generation">RAG</abbr>_</span>
 
-- [ ] <span style='color: gray'>_Step 6: Advanced <abbr title="Fine-grained Authorization">FGA</abbr> for <abbr title="Retrieval-Augmented Generation">RAG</abbr>_</span>
+- [ ] <span style='font-weight: 900'>_Module 4: Configure <abbr title="Fine-grained Authorization">FGA</abbr>_</span> _<span style='color: darkorange; font-variant: small-caps'>←Up next!</span>_
 
-- [ ] <span style='color: gray'>~~_Step 7: Async Auth_~~</span> _<span style='color: orange; font-variant: small-caps'>← Coming Soon</span>_
+- [ ] <span style='color: gray'>_Module 5: Implement <abbr title="Fine-grained Authorization">FGA</abbr> for <abbr title="Retrieval-Augmented Generation">RAG</abbr>_</span>
+
+- [ ] <span style='color: gray'>_Module 6: Async Auth_</span>
 
 ---
 

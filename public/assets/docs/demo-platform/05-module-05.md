@@ -61,7 +61,7 @@ You will notice much of the code has *already been written* for you, but there i
           > [!TIP]
           > Remember this screen from the previous section? Now might be a good time to go back and check it out!
           >
-          > ![FGA Implementation Guide](./assets/images/fga-client-config.png)
+          > ![FGA Implementation Guide](./assets/Module04/images/fga-client-config.png)
           >
           > Closed the dialog? Not sure how to get back? 😫
           >
@@ -84,7 +84,7 @@ You *may* need to **refresh the app**.
 >
 > Seeing an error like the following?
 >
-> ![FGA Error](./assets/images/fga-client-error.png)
+> ![FGA Error](./assets/Module05/images/fga-client-error.png)
 >
 > That just means you need to keep moving forward in the lab to finish implementing <abbr title='Fine-Grained Authorization'>FGA</abbr>.
 >

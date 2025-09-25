@@ -64,7 +64,7 @@ You can clone the repo using the UI or via command line. Need a [refresher](http
 
 ***You should see the following files:***
 
-![Project Files](./assets/images/Module02/images/image2.png)
+![Project Files](./assets/Module02/images/image2.png)
 
 
 <details>
@@ -75,9 +75,9 @@ You can clone the repo using the UI or via command line. Need a [refresher](http
 
 1. Navigate to the [repo](https://github.com/udplabs/auth0-ai).
 2. From the main page click on the **<> Code** button.
-   ![GitHub Code Button](./assets/images/gh-code-button.png)
+   ![GitHub Code Button](./assets/Module02/images/gh-code-button.png)
 3. Click on **Open with GithHub Desktop**
-   ![GitHub Code Button](./assets/images/gh-open-with-desktop.png)
+   ![GitHub Code Button](./assets/Module02/images/gh-open-with-desktop.png)
 4. Follow the prompts in GitHub Desktop.
 
     > [!NOTE]
@@ -108,7 +108,7 @@ You can clone the repo using the UI or via command line. Need a [refresher](http
     > [!NOTE]
     > If application started successfully, you should see the following:
     >
-    > ![Running App](./assets/images/Module02/images/image1.png)
+    > ![Running App](./assets/Module02/images/image1.png)
     >
     > *If you’re having trouble, please ask for some assistance from a lab attendant.*
 
@@ -132,7 +132,7 @@ You can clone the repo using the UI or via command line. Need a [refresher](http
 
 If everything is working as expected, Aiya will kick off a conversation with you. Aiya will help guide you through the lab (for the most part) from this point forward.
 
-![First Aiya message](./assets/images/the-bAInk-first-message.gif)
+![First Aiya message](./assets/Module02/images/the-bAInk-first-message.gif)
 
 #### <span style="font-variant: small-caps">Congrats! 🥳</span>
 *You have completed this module.*
