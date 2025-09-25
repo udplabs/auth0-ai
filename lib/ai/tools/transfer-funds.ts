@@ -67,7 +67,7 @@ export const transferFunds =
 		name: 'transferFunds',
 		// ❌ TASK 7 - STEP 3: Update the tool description.
 		description:
-			'Use this tool to transfer funds on behalf of a user. It requires both the to and from internal account identifiers (ULIDs) in addition to the fully qualified account numbers. DO NOT ASK THE USER FOR ACCOUNT NUMBERS OR IDs. Use `getAccountList` to fetch the necessary data and determine which accounts based on `name` and `displayName`. If still unable to determine the specific account, ask for clarification for that account only. The user will receive a push notification to provide confirmation. Always confirm the details of the transfer with the user before continuing.',
+			'Use this tool to transfer funds on behalf of a user. It requires both the to and from internal account identifiers (ULIDs) in addition to the fully qualified account numbers. DO NOT ASK THE USER FOR ACCOUNT NUMBERS OR IDs. Use `getAccountList` to fetch the necessary data and determine which accounts based on `name` and `displayName`. If still unable to determine the specific account, ask for clarification for that account only. Always confirm the details of the transfer with the user before continuing.',
 		inputSchema,
 		outputSchema,
 		execute: async (payload) => {
