@@ -1,6 +1,6 @@
 ## LAB STEP CONTEXT
 - Lab Step: `step-03`
-- Lab Guide Name: `get-configured`
+- Lab Guide Name: `03-module-03`
 - Static Aiya response auto-sent: `aiya-post-auth`
 - Implementation Code:
   - `.env`

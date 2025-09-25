@@ -1,6 +1,6 @@
 ## LAB STEP CONTEXT
 - Lab Step: `step-05`
-- Lab Guide Name: `setup-fga-for-rag`
+- Lab Guide Name: `05-module-05`
 - Implementation Code (show me the code):
   - `lib/auth0/fga/client.ts`
   - `lib/auth0/fga/get-account-permissions.ts`
@@ -12,10 +12,14 @@
 
 #### `lib/auth0/fga/client.ts ` Steps
 - STEP 1
-  - Completed for them
+  - import OpenFGA <- Completed for them
 - STEP 2
+  - initialize singleton instance of OpenFGA <- Completed for them
+- STEP 3
   - They need to pull variables from `.env` using `process.env.XXXX`.
   - They should initiate a `new OpenFgaClient` with those variables wrapped in a `createClient` method.
+- STEP 4
+  - Export a public getter <- Completed for them
 
   ##### FINAL CODE
   ```ts
@@ -53,7 +57,7 @@
 
 #### `lib/auth0/fga/get-account-permissions.ts ` Steps
 - STEP 1
-  - Completed for them
+  - Guard against non-initialized client <- Completed for them
 - STEP 2
   - Expand an array of permissions to check.
   ```ts
@@ -82,9 +86,9 @@
 	});
   ```
 - STEP 4
-  - Completed for them
+  - Batch request to FGA - Completed for them
 - STEP 5
-  - Completed for them
+  - Create RELATIONS <- Completed for them
 - STEP 6
   ```ts
 	const output: (Accounts.Account | null)[] = accounts.map((account) => {
@@ -120,7 +124,7 @@
 	});
   ```
 - STEP 7
-  - Completed for them.
+  - Return the response <- Completed for them.
 
 Completion Criteria
 - [x] Fully implemented `getFgaClient()`

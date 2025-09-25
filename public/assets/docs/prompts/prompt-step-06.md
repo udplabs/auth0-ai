@@ -1,6 +1,6 @@
 ## LAB STEP CONTEXT
 - Lab Step: `step-06`
-- Lab Guide Name: `async auth`
+- Lab Guide Name: `06-module-06`
 - Static Aiya response: none
 - Implementation Code (show me the code):
   - `lib/auth0/ai/client.ts`
@@ -15,175 +15,189 @@
   - `lib/ai/model/interrupts-middleware.ts`
   - `app/(accounts)/api/[id]/route.ts`
 
-#### `lib/auth0/ai/client.ts` Steps
-- STEP 1 (done for them)
-  - Define a mutable module-level singleton
-  ```ts
-  let singleton: Auth0AI | null;
-  ```
-- STEP 2 (done for them)
-  - Create a public getter
-  ```ts
-  export function getAuth0AI() {
-    if (!singleton) {
-      singleton = new Auth0AI();
-    }
-    return singleton;
-  }
-  ```
+### TASKS
 
-#### `lib/auth0/ai/with-async-authorize.ts` Steps
-- STEP 1 (done for them)
-  - Initialize Auth0AI client singleton
-  ```ts
-  const auth0AI = getAuth0AI();
-  ```
-- STEP 2 (done for them)
-  - Guard
-  ```ts
-  if (!auth0AI) {
-		console.warn('Auth0AI client not initialized!');
-		return;
-	}
-  ```
+#### Task 1
+- Enable CIBA grant in Auth0 Management dashboard for `the bAInk` application.
+#### Task 2
+- Enable guardian MFA in Auth0 Management Dashboard
+#### Task 3
+- Test account transfer by asking Aiya to move money.
+- EXPECTED TO FAIL
+#### Task 4
+- Create an API for `http://localhost:3000/api/v1/accounts/transfers` in Auth0 management dashboard
+- Create/enable `create:transfers` permission/scope in Auth0 Management Dashboard
+#### Task 5
+- Init the Auth0AI client <- Completed for them
+- `lib/auth0/ai/client.ts`
+#### Task 6
+- Create `withAsyncAuthorization` wrapper in `lib/auth0/ai/with-async-authorization.ts`
+
+- STEP 1
+  - Init client <- Completed for them
+- STEP 2
+  - Guard against missing client <- Completed for them
 - STEP 3
-  - Return properly configured `withAsyncConfirmation`
-  [3.1] Add custom scope(s) (and add to params)
-  ```tsc
-  const scopes = ['openid', 'profile', 'email', 'create:transfer'];
+- Add custom scopes
+  ```ts
+    ...
+    const scopes = ['openid', 'profile', 'email', 'create:transfer'];
+    return auth0AI.withAsyncUserConfirmation({
+      scopes /* ✅ STEP 3 */,
+		...
   ```
-  [3.2] Add `userID` parameter
-  ```tsc
+- STEP 4
+  - Return a promise for `userID` parameter
+  ```ts
+  ...
   userID: async () => {
     const user = await getUser();
     return user.sub;
-  }
+  } /* ✅ STEP 4 */,
+  ...
   ```
-  [3.3] Add `audience`
-  ```tsc
-  audience: 'http://localhost:3000/api/accounts/transfers`
+- STEP 5
+  - Insert created `audience`
+  ```ts
+  ...
+  } /* ✅ STEP 4 */,
+  audience: 'http://localhost:3000/api/accounts/transfers' /* ✅ STEP 5 */
+  ...
   ```
-  [3.4] Add `handleOnAuthorize`
-  ```tsc
-  onAuthorizationRequest: handleOnAuthorize(writer),
+- STEP 6
+  - Add `handleOnAuthorize` as handler for `onAuthorizationRequest`
+  ```ts
+  ...
+  onAuthorizationRequest: handleOnAuthorize(writer) /* ✅ STEP 6 */,
+  ...
   ```
-  [3.5] Normalize errors
-  ```tsc
+- STEP 7
+  - Normalize errors in `onUnauthorized`
+  ```ts
+  ...
   onUnauthorized: async (e) => {
-    // ...
-      return {
-				status: 'error',
-				dataCount: 0,
-				message: e.message,
-				error: e,
+    if (e instanceof AccessDeniedInterrupt) {
+      // This indicates the user explicitly denied the authorization request.
+      // This is where you could place custom logic if you desired
+      // or even use the `writer` to send a message to the user.
+    }
+
+    if (e instanceof UserDoesNotHavePushNotificationsInterrupt) {
+      // This indicates the user does not have MFA push notifications set up.
+      // This is where you could place custom logic if you desired
+      // or even use the `writer` to send a message to the user.
+    }
+
+    // *IMPORTANT*
+    //
+    // Wrap the error in application's custom API response format and
+    // return an appropriate error message.
+    //
+    // If you do not wrap it in the expected response, the /chat POST
+    // handler will not be able to process it correctly (and explode).
+    return {
+      status: 'error',
+      dataCount: 0,
+      message: e.message,
+      error: e,
     };
-  }
+  } /* ✅ STEP 7 */,
+  ...
   ```
-  [3.6] Ensure pass-thru options are set
-  ```tsc
-  {
-    // ...
-    ...options
-  }
+- STEP 8
+  - Spread `options`
+  ```ts
+  ...
+  		...options /* ✅ STEP 8 */,
+  ...
   ```
-  [3.7] Ensure tool is actually injected
-  ```tsc
-  //...
-  {(
-    //...
-  })(tool);
+- STEP 9
+  - Inject tool
+  ```ts
+  ...
+	})(tool); /* ✅ STEP 9 */
+  ...
   ```
-
-#### `lib/ai/tools/transfer-funds.ts` Steps
+#### Task 7
 - STEP 1
-  - Wrap the existing tool with `withAsyncAuthorization`.
-
-  [1.1] Import `withAsyncAuthorization`.
-    ```ts
-    import { withAsyncAuthorization } from '@/lib/auth0/ai/with-async-authorization'
-    ```
-  [1.2]
-    ```ts
-    export const transferFunds = withAsyncAuthorization({
+  - Wrap the actual `fundsTransfer` tool.
+  ```ts
+  export const transferFunds = /* ✅ TASK 8 */ (writer: UIMessageStreamWriter) =>
+    /* ✅ TASK 7 - STEP 1 */ withAsyncAuthorization({
       bindingMessage: 'Please approve the transfer',
-      tool: tool<z.infer<typeof inputSchema>, z.infer<typeof outputSchema>>(/* ... */),
-    });
-    ```
+      tool: tool<z.infer<typeof inputSchema>, z.infer<typeof outputSchema>>({
+        ...
+  });
+  ```
 - STEP 2
-  - Use `getCIBACredentials` to retrieve an access token.
-  [2.1] import `getCIBACredentials`
-    ```ts
-    import { getCIBACredentials } from '@auth0/ai-vercel`
-    ```
-  [2.2] Call `getCIBACredentials` to retrieve the user's credentials.
-    ```ts
-    ({
-      //...
-      execute: async (payload) => {
-        try {
-          const { accessToken } = getCIBACredentials() || {};
-          //...
-        } ...
-      }
-    })
-    ```
-  [2.3] Add the `accessToken` to the Authorization header as a Bearer token.
-    ```ts
-    const response = await fetch(
-      `${process.env.APP_BASE_URL}/api/accounts/${payload.fromAccountId}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(payload),
-      }
-    );
-    ```
+- Import and Add `getCIBACredentials
+  ```ts
+  ...
+  // ✅ TASK 7 - STEP 2
+  const { accessToken } = (await getCIBACredentials()) || {};
+
+  const response = await fetch(
+    `${process.env.APP_BASE_URL}/api/accounts/${payload.fromAccountId}`,
+    {
+      method: 'POST',
+      headers: {
+        // ✅ TASK 7 - STEP 2
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+  ...
+  ```
 - STEP 3
-  - Transform the wrapper into a higher-order factory that accepts a Vercel datastream `writer`.
-  ```ts
-  export const transferFunds = (writer?: UIMessageStreamWriter) =>
-    withAsyncAuthorization({
-      writer,
-      /* ... */
-    });
+  - Update tool description to provide explicit instructions
+  ```diff
+  -  ask for clarification for that account only. The user will receive a push notification to provide confirmation. DO NOT require confirmation from the user -- they will confirm via push notification.',
+  +  ask for clarification for that account only. Always confirm the details of the transfer with the user before continuing.',
   ```
+#### Task 8
+  - Enhance UX by wrapping `withAsyncAuthorization` to accept a datastream writer.
+  ```ts
+  ...
+  export const transferFunds = /* ✅ TASK 8 */ (writer: UIMessageStreamWriter) =>
+	/* ✅ TASK 7 - STEP 1 */ withAsyncAuthorization({
+		writer,
+		bindingMessage: 'Please approve the transfer',
+  ...
+  });
+  ```
+#### Task 9
+- STEP 1
+  - Open `lib/ai/tool-registry.ts`.
+- STEP 2 - 3
+  - Change `transferFunds` method
+	```diff
+	- transferFunds
+	+ transferFunds()
+	```
 - STEP 4
-  - Modify the tool description/instructions
-  ```diff
-  - `Always confirm the details of the transfer with the user before continuing.`
-  + `DO NOT require confirmation from the user -- they will confirm via push notification.`
-  ```
-
-#### `lib/ai/tool-registry.ts` Steps
-- STEP 1
-  - Change `transferFunds` -> `transferFunds()`
-  ```ts
-  export const toolRegistry = {
-    enrollMfaPush,
-    getAccounts,
-    getAccountList,
-    getStepGuides,
-    getReferenceFile,
-    getStepCode,
-    getTransactions,
-    getUserProfile,
-    getWeather,
-    transferFunds(),
-    userSettings,
-  } satisfies ToolSet;
-  ```
-
-#### `app/(chat)/api/chat/[id]/_handlers/post.ts`
-- STEP 1
-  - Remove line 109 and uncomment the following line.
-  ```diff
-  - transferFunds,
-  - // transferFunds: transferFunds(dataStream),
-  + transferFunds: transferFunds(dataStream),
-  ```
-
+  - Update `app/(chat)/api/chat/[id]/_handlers/post.ts`
+  - line 81
+	```diff
+	- transferFunds,
+	- // transferFunds: transferFunds(dataStream),
+	+ transferFunds: transferFunds(dataStream),
+	```
+- STEP 5
+  - line 110
+	```diff
+	- transferFunds,
+	- // transferFunds: transferFunds(dataStream),
+	+ transferFunds: transferFunds(dataStream),
+	```
+#### Task 10
+  - Test the implementation
+  - transferFunds should fail if user is not enrolled in push
+  - Aiya will immediately call `enrollPush`
+  - User wil enroll
+  - Generative UI will render to 'Continue Transfer'
+  - User hit's continue, hidden message is sent to Aiya
+  - Aiya runs `transferFunds` again
 
 Completion Criteria
 - [x] Able to request Aiya transfer funds.
