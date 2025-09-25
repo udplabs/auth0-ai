@@ -1,24 +1,31 @@
-# Configure App Settings
-
 ## Objective
 
-Copy the correct Auth0 tenant server-side variables into our local environment variable file.  Enable Auth0’s management API through the Auth0 management dashboard. Accomplishing the prior tasks will allow us to successfully verify user authentication. 
-
+- Copy the correct Auth0 tenant server-side variables into our local environment variable file.
+- Enable Auth0’s management API through the Auth0 management dashboard.
+- Accomplishing the prior tasks will allow us to successfully verify user authentication.
 
 ## Description
 
-Now that we have successfully set up the application and it’s running in our local environment, let’s go ahead and start configuring the correct variables to ensure Aiya is able to properly respond to user prompts. We pull these variable values directly from our Auth0 tenant through the dashboard. Subsequently, we also dive into the dashboard to ensure that Aiya has access to the Auth0 management API in order to communicate directly with Auth0 to manage tenant resources. Finally, we will conclude by verifying that our application is set up properly to handle user authentication and registration. 
+Now that we have successfully set up the application and it’s running in our local environment, let’s go ahead and start configuring the correct variables to ensure Aiya is able to properly respond to user prompts.
 
-## Add Auth0 Tenant <kbd>.env</kbd> *server-side variables*
+We can pull these variable values directly from our Auth0 tenant through the dashboard. We also provide some directly in this lab guide.
 
-1. In your IDE, navigate to the <kbd>.env</kbd> file that is located in the **root** of the project folder (<kbd>./auth0-ai</kbd>)
+Next, we dive further into the dashboard to ensure that Aiya has access to the Auth0 management API in order to communicate directly with Auth0 to manage tenant resources.
+
+Finally, we will conclude by verifying that our application is set up properly to handle user authentication and registration.
+
+## Task 1: Update <kbd>.env</kbd> file
+
+1. In your IDE, navigate to the <kbd>.env</kbd> file that is located in the **root** of the project folder (<kbd>./auth0-ai/.env</kbd>)
 
     > [!TIP]
-    > Notice the values are prepopulated. 🎉
+    > Notice the following values *should be* prepopulated. 🎉
     >
     > You can click the clipboard to copy the following as-is and drop it in the <kbd>.env</kbd> file.
 
-2. The following values are already in the <kbd>.env</kbd> file but *commented out*. Update their values and uncomment them.
+2. The following values are already in the <kbd>.env</kbd> file but *commented out*.
+
+   Either **replace** the entire line OR **update** their values and **uncomment** them (*don't forget to uncomment the line!*).
 
     ```env
     AUTH0_DOMAIN={{idp.tenantDomain}}
@@ -29,7 +36,7 @@ Now that we have successfully set up the application and it’s running in our l
     ```env
     AUTH0_CLIENT_SECRET={{TheBAInk.credentials.clientSecret}}
     ```
-    > [!IMPORTANT]
+    > [!WARNING]
     > **My values do not seem to be pre-populated. Where else can I find them?**
     >
     > The values above *should* be prepopulated.
@@ -41,7 +48,7 @@ Now that we have successfully set up the application and it’s running in our l
     > 3. Go to **Applications → Applications → \[the bAInk]**.
     > 4. Copy the **Domain**, **Client ID**, and **Client Secret**.
 
-## Add Auth0/NextJS .env secret
+## Task 2: Generate Auth0/NextJS .env secret
 Next, we need to generate a secret that the Auth0 NextJS SDK uses to encrypt the session and transaction cookies.
 
 > [!CAUTION]
@@ -59,30 +66,33 @@ Next, we need to generate a secret that the Auth0 NextJS SDK uses to encrypt the
     openssl rand -base64 32
     ```
 
-2. Copy the resulting value and add it as the <kbd>AUTH0_SECRET</kbd> variable’s value 
+2. Copy the resulting value and add it as the <kbd>AUTH0_SECRET</kbd> variable’s value
 
     ```env
     AUTH0_SECRET=<randomly-generated-value>
     ```
 
-## Add OpenAI API Key
+## Task 3: Add OpenAI API Key
 
+For this lab we have generously provided you with an OpenAI API key. This key is **not** guaranteed to last! Although it shows an expiration date, be advised that we may need to expire it early (without warning).
 
+*To get your own API key, follow OpenAI's guides/documentation.*
 
-1. Navigate back to the Launch Pad in the Lab Guide and copy the OpenAI API Key 
+1. Navigate back to the Launch Pad in the Lab Guide and copy the OpenAI API Key
 
     ![OpenAI Key](./assets/images/Module03/images/image1.png)
 
-2. Update your <kbd>.env.local</kbd> or <kbd>.env</kbd> file with the API Key
+2. Update your <kbd>.env</kbd> (or <kbd>.env.local</kbd>) file with the API Key
 
     ```env
-    .env.local or .env
-
-    # ... existing variables
-    # You can use any provider of your choice supported by Vercel AI
-
     OPENAI_API_KEY="YOUR_API_KEY"
     ```
+
+    > [!TIP]
+    >
+    > The Vercel AI SDK supports numerous different providers. While we are using OpenAI for this lab you can technically use any provider.
+    >
+    > Just be advised that each provider has slight variations in behavior and/or requirements and may not be 100% compatible with the demo application.
 
 <br>
 
@@ -100,8 +110,12 @@ Next, we need to generate a secret that the Auth0 NextJS SDK uses to encrypt the
 ---
 <br>
 
-## Save & Restart
-Just to be safe, restart your dev server so it picks up the new environment variables:
+### Save & Restart
+NextJS utilizes what is referred to as *hot reloading*, meaning that you generally do not need to stop/start the app when you make changes.
+
+However, when it comes to <kbd>.env</kbd>, it is better to be safe.
+
+Restart your dev server so it picks up the new environment variables:
 1. Terminate the app:
 <br><kbd>^</kbd> + <kbd>C</kbd> (Mac)
 <br> *or*
@@ -112,10 +126,10 @@ Just to be safe, restart your dev server so it picks up the new environment vari
     npm run dev
     ```
 
-## Enable Management API
+## Task 4: Enable Management API
 This application utilizes the management API to fetch/update profile information as well as manage authenticators for MFA.
 
-Before it can be used, it needs to be enabled.
+*Before it can be used, it needs to be enabled.*
 
 1. Return to the Auth0 Admin Dashboard
 2. Navigate to **Applications** → **the bAInk** → **APIs**.
@@ -139,9 +153,9 @@ Before it can be used, it needs to be enabled.
 
 *Great! Now you should be ready to test.* 🥳
 
-## Test authentication
+## Task 5: Try it
 
-1. Return to the open app **or** reopen the app at: 
+1. Return to the open app **or** reopen the app at:
 
     [`http://localhost:3000`](http://localhost:3000).
 
@@ -149,7 +163,7 @@ Before it can be used, it needs to be enabled.
 
     <br>
 
-    > [!NOTE]
+    > [!TIP]
     > If you do not see **Sign up** you can always access sign up from **Log In** as well.
 
     <br>
@@ -191,10 +205,20 @@ Before it can be used, it needs to be enabled.
 
 
 
-#### <span style="font-variant: small-caps">Congrats!</span>
-*You have completed the entire module.*
+#### <span style="font-variant: small-caps">Congrats! 🥳</span>
+*You have completed this module.*
 
-We properly configured the application with the correct environment variables pulled from our Auth0 tenant. We also enabled access to Auth0’s management API through the console. Finally, we were able to successfully test user authentication in the application. 
+You have successfully:
+<ul>
+  <li style="list-style-type:'✅ ';">
+    configured the application with the correct environment variables pulled from your Auth0 tenant;
+  </li>
+  <li style="list-style-type:'✅ '">
+    enabled access to Auth0’s management API through Management Dashboard;
+  </li>
+  <li style="list-style-type:'✅ '">
+    tested user authentication in the application.
+  </li>
+</ul>
 
-
-
+#### <span style="font-variant: small-caps">Let's keep moving.</span>

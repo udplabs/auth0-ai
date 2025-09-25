@@ -1,54 +1,70 @@
-# Configure Auth0 FGA
-
 ## Objective
 
-Register for a FGA account and set up the corresponding FGA store. Configure the FGA store with the appropriate settings. Define a valid authorization model in the FGA model explorer. By setting up the FGA account, we will be able to verify that Aiya is not returning sensitive account data. Gain a general understanding of Retrieval Augmented Generation (RAG).
+- Register for a <abbr title="Fine-Grained Authorization">FGA</abbr> account and set up the corresponding <abbr title="Fine-Grained Authorization">FGA</abbr> store
+- Configure the <abbr title="Fine-Grained Authorization">FGA</abbr> store with the appropriate settings.
+- Define a valid authorization model in the <abbr title="Fine-Grained Authorization">FGA</abbr> model explorer.
 
-## Scenario
+By setting up the <abbr title="Fine-Grained Authorization">FGA</abbr> account, we will be able to verify that Aiya is **not** returning sensitive account data and gain a *general* understanding of Retrieval Augmented Generation (*RAG*).
 
-While the focus for The bAInk is to implement AI functionality to streamline their users’ experience in their existing product lines, reigning in AI access to sensitive data is critical. This notion is crucial for The bAInk developers to understand, in order to ensure that Aiya does not return any sensitive data that it isn’t supposed to! As an end user, if you try to access your account information when you do not have the necessary permissions, Aiya should not return any results.
+## Description
 
-### Important Information and Context
+While the focus for the bAInk is to implement AI functionality to streamline their users’ experience in their existing product lines, reigning in AI access to sensitive data is critical. This notion is crucial for the bAInk developers to understand in order to ensure that Aiya does not return any sensitive data!
 
-What is RAG?
-That’s a great question! The more important question though is, “What isn’t RAG?”
+As an end user, if you try to access your account information when you do not have the necessary permissions, Aiya should not return any results.
 
-What it **IS**:
-Retrieval-Augmented Generation is a framework where a generative model (such as GPT-5) is augmented with an external retrieval mechanism. 
+---
+## Learnings
+#### What <span style="font-variant: small-caps;font-weight: 900"><i>is</i></span> <abbr title="Retrieval-Augmented Generation">RAG</abbr>?
+That’s a great question! The more important question though is, “What is <span style="font-variant: small-caps;font-weight: 900"><i>not</i></span> <abbr title="Retrieval-Augmented Generation">RAG</abbr>?”
 
-The process involves two main steps:
-- **Retrieval**: The system fetches relevant documents or data from an external source (knowledge base, database, file system, etc.) based on the user’s query
-- **Generation**: The generative model uses both the retrieved information and the original query to generate a response.
+What it <span style="font-variant: small-caps;font-weight: 900"><i>IS</i></span>
 
-### Important Takeaways
+Retrieval-Augmented Generation is a framework where a generative model (such as GPT-5) is augmented with an external retrieval mechanism.
 
-- RAG is a pattern, not a product or a single tool
-- Retrieval can use any method to fetch relevant data, not just vector (semantic) search
-- Augmentation means the model’s output is improved by grounding it in external often dynamic, information
-- Generation is performed by an LLM, which uses both the query and retrieved context 
+The process involves two main (*slightly obvious*) steps:
+1. **Retrieval**: The system fetches relevant documents or data from an external source (*knowledge base, database, file system, etc.*) based on the user’s query
+2. **Generation**: The generative model uses both the retrieved information *and* the original query to generate a response.
 
-### The Challenge: Securing data in RAG pipelines
+#### Takeaways
 
-While RAG is a powerful technique that enhanced LLMs, without proper access control, a RAG pipeline could retrieve information containing sensitive data and use them to generate a response for a user who should not have access to that data. 
+- <abbr title="Retrieval-Augmented Generation">RAG</abbr> is a *pattern*, not a product or a single tool.
+- Retrieval can use any method to fetch relevant data, not just vector-based search.
+- Augmentation means the model’s output is improved by grounding it in external, often dynamic, information.
+- Generation is performed by an LLM, which uses both the query *and* retrieved context
 
-Consequently, this could lead to serious data breaches and compliance violations. Simply filtering based on user roles alone is often insufficient for managing the complex, relationship-based permissions found in real-world applications. 
+---
+
+## The Challenge
+### Securing data in <abbr title="Retrieval-Augmented Generation">RAG</abbr> pipelines
+
+<abbr title="Retrieval-Augmented Generation">RAG</abbr> is a powerful *technique* that enhances LLMs. However, without proper access control, a <abbr title="Retrieval-Augmented Generation">RAG</abbr> pipeline could easily retrieve information containing sensitive data and use it to potentially generate a response for a user who should not have access to that data.
+
+While this does not necessarily result in a *direct* exposure of data, it can lead to an *indirect* exposure via hydrated generative responses.
+
+An indirect breach, while seemingly less malignant, *is still a breach*. Such exposure could lead to more serious data breaches and compliance violations. Simply filtering based on user roles alone is often insufficient for managing the complex, relationship-based permissions found in real-world applications and data.
 
 >[!IMPORTANT]
 >For our dev{camp} we are *over simplifying* the authorization model for accounts and transactions for the sake of learning.
 >
 >In a real world situation, you can imagine how complex account access can get -- think of financial advisors, family accounts, even third-party aggregation software (i.e. Mint, Copilot, Lunchmoney, etc. ).
 
-### The Solution: Auth0 Fine-Grained Authorization (FGA)
+## The Solution
+### Auth0 Fine-Grained Authorization (<abbr title="Fine-Grained Authorization">FGA</abbr>)
 
-To solve this challenge, Auth for AI Agents uses Auth0 FGA. This platform is a flexible, high-performance authorization service for applications that require a sophisticated permissions system. It implements relationship-based access control (ReBAC) to manage permissions at large-scale. 
+To solve this challenge, Auth for AI Agents pairs beautifully with Auth0 <abbr title="Fine-Grained Authorization">FGA</abbr>. This platform is a flexible, high-performance authorization service for applications that require a sophisticated permissions system and implements relationship-based access control (ReBAC) to manage permissions at large-scale.
 
-Auth0 FGA allows you to decouple your authorization logic from your application code. Instead of embedding complex permission rules directly into your application, you define an authorization model and store relationship data in Auth0 FGA. Your application can then query Auth0 FGA at runtime to make real-time access decisions. 
+---
+***Auth0*** <abbr title="Fine-Grained Authorization"><b>FGA</b></abbr> ***allows you to decouple your authorization logic from your application code.***
 
-### How it works with RAG
+---
 
-Integrating FGA into your RAG pipeline ensures that every “document” is checked against the user’s permissions before it’s passed to the LLM (or presented to the user). 
+Instead of embedding complex permission rules directly into your application, you define an authorization model and store relationship data in Auth0 <abbr title="Fine-Grained Authorization">FGA</abbr>. Your application can then query Auth0 <abbr title="Fine-Grained Authorization">FGA</abbr> at runtime to make real-time access decisions.
 
-The process works as follows: 
+### How it works with <abbr title="Retrieval-Augmented Generation">RAG</abbr>
+
+Integrating <abbr title="Fine-Grained Authorization">FGA</abbr> into your <abbr title="Retrieval-Augmented Generation">RAG</abbr> pipeline ensures that every “document” is checked against the user’s permissions before it’s passed to the LLM (or presented to the user).
+
+The process works as follows:
 1. <span style='padding-right: 10px; font-variant: small-caps; font-weight: 700'>Authorization Model</span> First, you define your authorization model in Auth0 <abbr title='Fine-Grained Authorization'>FGA</abbr>. This model
 specifies the types of objects (e.g., <kbd>document</kbd>), the possible
 relationships between users and objects (e.g., <kbd>owner</kbd>, <kbd>editor</kbd>, <kbd>viewer</kbd>),
@@ -67,24 +83,24 @@ element, representing a specific relationship in the format of <kbd>(user, relat
     > In the **US** most people say tuples (/ˈtuːpəl/) like [**too•plz**](https://ssl.gstatic.com/dictionary/static/pronunciation/2024-04-19/audio/tu/tuples_en_us_2.mp3).
     >
     > In the **UK**, most people say tuples (/ˈtjuːpəl/) [**tuh•plz**](https://dictionary.cambridge.org/media/english/uk_pron/c/cdo/cdo02/cdo0216tupluk2149.mp3)
+    >
+    > What do ***you*** say? 🧐
 
     <br>
 
-1. <span style='padding-right: 10px; font-variant: small-caps; font-weight: 700'>Fetch & Filter</span> When a user submits a query to your GenAI application, your backend first
+3. <span style='padding-right: 10px; font-variant: small-caps; font-weight: 700'>Fetch & Filter</span> When a user submits a query to your GenAI application, your backend first
 fetches relevant documents from a vector database and then makes a
-permission check call to Auth0 <abbr title='Fine-Grained Authorization'>FGA</abbr>. This call asks, "Is this user allowed to
-view these documents?". Our AI framework SDKs abstract this and make it as
-easy as plugging in a filter in your retriever tool.
+permission check call to Auth0 <abbr title='Fine-Grained Authorization'>FGA</abbr>. This call essentially asks, "*Is this user allowed to
+view these documents?*".
 
-    > [!NOTE]
-    > For our implementation we are determining the account access available to a user/agent.
+    Our AI framework SDKs abstract this and make it as easy as plugging in a filter in your retriever tool.
 
-1. <span style='padding-right: 10px; font-variant: small-caps; font-weight: 700'>Secure Retrieval</span>Auth0 <abbr title='Fine-Grained Authorization'>FGA</abbr> determines if the user is authorized to access the documents. Your
+4. <span style='padding-right: 10px; font-variant: small-caps; font-weight: 700'>Secure Retrieval</span>Auth0 <abbr title='Fine-Grained Authorization'>FGA</abbr> determines if the user is authorized to access the documents. Your
 application backend uses this data to filter the results from the vector
-database and only sends the authorized documents to the LLM. 
+database and only sends the authorized documents to the LLM.
 
-## Sign Up for an FGA Account
-1. Navigate to https://auth0.com/fine-grained-authorization and either login to an existing account or sign up for a new one
+## Task 1: Create <abbr title="Fine-Grained Authorization">FGA</abbr> Account
+1. Navigate to [https://auth0.com/fine-grained-authorization](https://auth0.com/fine-grained-authorization) and either ⒈ login to an existing account or ⒉ sign up for a new one.
 
     ![FGA Reg](./assets/images/Module04/images/image1.png)
 
@@ -93,11 +109,16 @@ database and only sends the authorized documents to the LLM.
     ![FGA Continue](./assets/images/Module04/images/image2.png)
 
 
-## Create an authorization model in the FGA Store
+## Task 2: Create an authorization model
 1. In the Auth0 FGA admin console, navigate to the Model Explorer
+
     ![FGA Model Explorer](./assets/images/Module04/images/image3.png)
 
-2. Copy the following model and paste it into the explorer text area. What we’re doing here is defining the authorization model and creating relationships between the defined entities. Taking a look at the model, you will notice there are multiple types of entities defined that mirror our use case: a <kbd>user</kbd>, <kbd>agent</kbd>, <kbd>account</kbd>, and how they all relate to one another.
+2. Copy the following model and paste it into the explorer text area.
+
+   What we’re doing here is defining the authorization model and creating relationships between the defined entities.
+
+   Taking a look at the model, you will notice there are multiple types of entities defined that mirror our use case: a <kbd>user</kbd>, <kbd>agent</kbd>, <kbd>account</kbd>, and how they all relate to one another.
 
 ```bash
     model
@@ -165,18 +186,19 @@ database and only sends the authorized documents to the LLM.
     }
 ```
 
-3. Click **save**.
+3. Click **Save**.
 
 
-## Create an Authorized Client for Access to the FGA SDK
-1. From the FGA console, navigate to **Settings**. 
+## Task 3: Create an Authorized Client
+1. From the <abbr title="Fine-Grained Authorization">FGA</abbr> console, navigate to **Settings**.
+
     ![FGA Settings](./assets/images/Module04/images/fga-settings.png)
 
 2. In the **Authorized Clients** section, click **+ Create Client**.
 
     ![FGA Create Client](./assets/images/fga-create-client.png)
 
-3. Give your client a name. It can be whatever you want but maybe something like: 
+3. Give your client a name. It can be whatever you want but maybe something like:
 
     ```
     the-bAInk
@@ -185,22 +207,23 @@ database and only sends the authorized documents to the LLM.
 4. Select Write and delete tuples and Read and query permissions.
 
     ![FGA Create Client Permissions](./assets/images/fga-create-client-permissions.png)
-    
-    > [!IMPORTANT] 
+
+    > [!IMPORTANT]
     > In normal production development we always advise least privilege access -- if your client does not *need* all the permissions, don't grant them!
 
-5. Click Create. 
+5. Click **Create**.
 
 6. See the following? Success!
 
     ![FGA Create Client Success](./assets/images/fga-create-client-success.png)
 
-7. Before clicking on the dialog, grab the Store ID, Client ID, and Client Secret and update the following section of your .env file:
+7. *Before clicking* **Continue** in the dialog, grab the **Store ID**, **Client ID**, and **Client Secret** and update the following section of your <kbd>.env</kbd> file:
 
     ```env
     # ==================== OpenFGA ====================
     # Store ID from fga.dev
     FGA_STORE_ID=
+
     # Client ID from fga.dev
     FGA_CLIENT_ID=
 
@@ -209,7 +232,7 @@ database and only sends the authorized documents to the LLM.
     # Client Secret from fga.dev
     FGA_CLIENT_SECRET=
     # =================================================
-    ``` 
+    ```
 
     > [!TIP]
     > ***After*** clicking continue in the dialog, you will see guidance on using your new credentials.
@@ -228,9 +251,9 @@ database and only sends the authorized documents to the LLM.
     > It is generally a *better* practice to restart the application.
 
 
-## Test your application
+## Task 4: Try it
 
-1. Return to the application in the browser 
+1. Return to the application in the browser
 http://localhost:3000
 
 2. Send a message to Aiya
@@ -247,15 +270,23 @@ and when expanded there are no results...
 
 ![Account Tool Result](./assets/images/get-accounts-result-none.png)
 
-#### *Then it worked!* Congrats!
+#### *Then it worked!*
 
-I know, you were expecting actual results, but this is a good thing. It means you are not seeing account data you do not have permission to view!
+*I know*, you were expecting actual results, but this is a good thing. It means you are not seeing account data you do not have permission to view!
 
-Head to the next step so we can work on wiring up <abbr title='Fine-Grained Authorization'>FGA</abbr> to manage our account and transaction permissions.
+Head to the next step so we can work on wiring up <abbr title='Fine-Grained Authorization'>FGA</abbr> to manage your account and transaction permissions.
 
-#### <span style="font-variant: small-caps">Congrats!</span>
-*You have completed the entire module.*
+#### <span style="font-variant: small-caps">Congrats! 🥳</span>
+*You have completed this module.*
 
-We got a glimpse of what RAG is and how Auth0’s FGA product can help bridge the gap of securing data passed through RAG pipelines. Additionally, we successfully set up an FGA store and created an authorized client to be able to communicate securely with FGA from our application’s backend. Finally, we were able to successfully test that Aiya was not returning sensitive account data. 
-
-
+<ul>
+  <li style="list-style-type:'✅ ';">
+    We got a glimpse of what <abbr title="Retrieval-Augmented Generation">RAG</abbr> is and how Auth0’s <abbr title="Fine-Grained Authorization">FGA</abbr> product can help bridge the gap of securing data passed through <abbr title="Retrieval-Augmented Generation">RAG</abbr> pipelines.
+  </li>
+  <li style="list-style-type:'✅ '">
+    Additionally, we successfully set up an <abbr title="Fine-Grained Authorization">FGA</abbr> store and created an authorized client to be able to communicate securely with <abbr title="Fine-Grained Authorization">FGA</abbr> from our application’s backend.
+  </li>
+  <li style="list-style-type:'✅ '">
+    Finally, we were able to successfully test that Aiya was not returning sensitive account data.
+  </li>
+</ul>
