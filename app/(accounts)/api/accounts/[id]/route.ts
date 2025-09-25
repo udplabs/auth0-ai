@@ -11,12 +11,11 @@ import type { Transfers } from '@/types/transfers';
  * Creates (initiates) an internal funds transfer between two customer accounts.
  *
  * High‑level flow:
- * 1. Authenticate current user via Auth0 (server helper getUser()).
- * 2. Parse & validate incoming JSON body (expected shape: Transfers.CreateTransactionInput).
- * 3. Augment payload with derived customerId (user.sub).
- * 4. Persist the transfer (createTransfer) to db.
- * 5. Revalidate cache tag 'accounts' so any account balance UI using fetch/cache is refreshed.
- * 6. Return the new transfer (or transaction) id as JSON.
+ * 1. Parse & validate incoming JSON body (expected shape: Transfers.CreateTransactionInput).
+ * 2. Augment payload with derived customerId (user.sub).
+ * 3. Persist the transfer (createTransfer) to db.
+ * 4. Revalidate cache tag 'accounts' so any account balance UI using fetch/cache is refreshed.
+ * 5. Return the new transfer (or transaction) id as JSON.
  *
  * Error handling:
  * - Throws APIError with a consistent JSON shape for known issues (bad body, domain errors).
