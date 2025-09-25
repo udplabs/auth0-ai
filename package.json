@@ -7,7 +7,7 @@
 		"lab-init": "npm run db:generate && npm run dev",
 		"debug": "NODE_OPTIONS='--inspect' next dev --turbopack",
 		"build": "npm run db:generate && next build",
-		"start": "next start",
+		"start": "npm run lab-init",
 		"lint": "next lint",
 		"analyze": "ANALYZE=true npm build",
 		"type-check": "tsc --noEmit",
