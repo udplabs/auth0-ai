@@ -1,4 +1,4 @@
-# Async Authorization with CIBA
+# Async Auth
 
 
 ## Objective
@@ -549,14 +549,14 @@ This one is an easy one, promise! In order for Aiya to know that a tool exists, 
 
 We attempted a transfer with Aiya earlier so the tool is *clearly in the registry*. However, we have ***changed*** the tool.
 
-In the previous task we transformed ```transfer-funds``` into a higher-order factory function. ***Now we need to call it***.
+In the previous task we transformed <kbd>transfer-funds</kbd> into a higher-order factory function. ***Now we need to call it***.
 
 *Let’s make sure it is entered into the registry correctly.*
 
 <span style="font-variant: small-caps; font-weight: 700">Steps</span>
 
 1. Open `lib/ai/tool-registry.ts`.
-2. Simply change ```transferFunds``` → ```transferFunds()```
+2. Simply change <kbd>transferFunds</kbd> → <kbd>transferFunds()</kbd>
 	```diff
 	- transferFunds
 	+ transferFunds()

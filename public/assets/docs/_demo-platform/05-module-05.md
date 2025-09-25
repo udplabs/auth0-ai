@@ -1,19 +1,19 @@
-# Implement Auth0 FGA for RAG
+# Implement FGA for RAG
 
 **Module 5 Objective**
 
-Integrate a functioning FGA client into the demo application. This will enable you to verify that Aiya can correctly return sensitive account information with valid results. 
+Integrate a functioning FGA client into the demo application. This will enable you to verify that Aiya can correctly return sensitive account information with valid results.
 
 
 **Scenario**
 
-As a customer of The bAInk, it is expected that you should be able to see your own account information, assuming you have already been successfully authenticated into the application. After logging into The bAInk web portal and asking Aiya for your account information, you should be able to see the relevant and valid information being returned. 
+As a customer of The bAInk, it is expected that you should be able to see your own account information, assuming you have already been successfully authenticated into the application. After logging into The bAInk web portal and asking Aiya for your account information, you should be able to see the relevant and valid information being returned.
 
 **Description**
 
-At this point we are moving into actual code. This module is designed to encourage you to write your own code rather than copy/paste. 
+At this point we are moving into actual code. This module is designed to encourage you to write your own code rather than copy/paste.
 
-However, if you would prefer a copy/paste approach, you can click the suggestion above the chat input box `Show me the code` and Aiya will provide the final code for you to reference. 
+However, if you would prefer a copy/paste approach, you can click the suggestion above the chat input box `Show me the code` and Aiya will provide the final code for you to reference.
 
 You can simply type <kbd>Show me the code for step XX</kbd>.
 
@@ -54,7 +54,7 @@ You will notice some of the code has *already been written* for you, but there i
         ```
 
         <br>
-        
+
           > [!TIP]
           > Remember this screen from the previous section? Now might be a good time to go back and check it out!
           >
@@ -63,7 +63,7 @@ You will notice some of the code has *already been written* for you, but there i
           > Closed the dialog? Not sure how to get back? 😫
           >
           > ***Check out the [FGA Docs](https://docs.fga.dev/integration/setup-sdk-client) for guidance** (or ask Aiya!)*.
-        
+
           <br>
 3. [x] ~~*Export a public getter*~~. _<span style='color: green; font-variant: small-caps'>← Done for you</span>_
 
@@ -214,12 +214,4 @@ But don't worry, to save time, we've created a shortcut for you.
 > ***We encourage you to try on your own first.***
 
 ## Conclusion of Module 5
-We successfully installed and initialized Auth0 FGA client, implemented permission retrieval, seeded relationship tuples via Dev Tools into FGA, verified behavior when specific permissions are missing and confirmed that no data is returned until valid tuples exist. 
-
-
-
-
-
-
-
-
+We successfully installed and initialized Auth0 FGA client, implemented permission retrieval, seeded relationship tuples via Dev Tools into FGA, verified behavior when specific permissions are missing and confirmed that no data is returned until valid tuples exist.

@@ -32,7 +32,7 @@ THEN:
 
 ## 4. Multi-Step & Step‑Up (e.g. Transfers, MFA)
 - If a transfer or sensitive action exceeds a policy limit and the tool returns a pending approval status, stop responding (Section 3).
-- If MFA enrollment required: use `enrollMfaPush` before reattempting the original action (unless the tool auto-triggers it).
+- If MFA enrollment is required (eg `CIBA_USER_DOES_NOT_HAVE_PUSH_NOTIFICATIONS`): immediately follow with `enrollMfaPush` before reattempting the original action (unless the tool auto-triggers it).
 
 ## 5. Parameter Gathering
 Ask only for missing required fields.
