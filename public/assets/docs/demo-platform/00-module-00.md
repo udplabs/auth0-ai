@@ -39,7 +39,7 @@ On the right of the screen, you will find an easy way to launch your lab resourc
 In addition to the ability to copy credentials from the Launch Pad, we've also produced this lab guide using *dynamic variables*. Some variables (*not all*) will display values *specific* to your lab environment. For example, your tenant domain: `{{idp.tenantDomain}}`.
 
 > [!NOTE]
-> If you see what appears as though it *should* be a dynamic variable, you'll be able to tell by the curly braces: `{{...}}`.
+> If you see what appears as though it *should* be a dynamic variable, you'll be able to tell by the curly braces: <kbd>{{...}}</kbd>.
 >
 > Technology isn't perfect! Chances are something went awry and the variable did not populate.
 

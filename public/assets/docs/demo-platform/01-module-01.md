@@ -60,7 +60,7 @@ If any issues persist, please flag down a lab assistant for additional help.
 >
 > You will need to restart terminal or powershell after installing node.js.
 >
-> *(or reloading your config)*
+> (*or reload your config*)
 
 
 ## Confirm Auth0 Guardian download
