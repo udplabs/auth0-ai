@@ -61,15 +61,22 @@ let singleton: OpenFgaClient | null = null;
 // ---------------------------------------------------------------------------
 export async function createClient() {
 	try {
+		// const options: UserClientConfigurationParams = {
+		// 	retryParams: {
+		// 		maxRetry: 2,
+		// 		minWaitInMs: 300,
+		// 	},
+		// 	// apiUrl: process.env.FGA_API_URL,
+		// 	// ...
+		// };
+
 		const options: UserClientConfigurationParams = {
 			retryParams: {
 				maxRetry: 2,
 				minWaitInMs: 300,
 			},
 			// apiUrl: process.env.FGA_API_URL,
-			// ...
 		};
-
 		// ---------------------------------------------------------------------------
 		// ❌ STEP 3: Return FGA client. Keep separate from public getter so you
 		// can add retries / backoff later if desired.

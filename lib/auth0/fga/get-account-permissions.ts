@@ -75,7 +75,6 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 	const RELATIONS: Accounts.AccountPermissions[] = [
 		'can_view',
 		// ...👈 add other relations here
-
 		// Note: we are NOT asking `can_transfer_funds`
 		// That is a permission we check for at the time
 		// of an actual transfer request.
@@ -93,7 +92,6 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 					// Not sure what goes here?
 					// Check the types for ClientBatchCheckItem
 					// OR... ask Aiya for a hint
-
 					user: ``, //..., 👈 who?
 					relation, // 👈 can do what?
 					object: ``, // 👈 to or with what?
@@ -154,10 +152,9 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 		}
 
 		// ❌ 4. Transactions are nested in account.transactions but...
-		// if (copy?.transactions?.length /*&&...*/) {
 		if (
 			copy?.transactions?.length
-			/* && ... */
+			/* && !permissions... */
 		) {
 			// 👈 Are there permissions that control when they should be?
 			// Should they always be returned? 🤔
