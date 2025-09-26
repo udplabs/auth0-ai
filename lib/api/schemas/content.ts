@@ -38,6 +38,10 @@ export const ContentSchema = z.object({
 		.describe(
 			'The lab step the content relates to. Steps are formatted as `step-00` where `00` is a zero-padded number. i.e. `step-01` `step-02`, etc.'
 		),
+	labModule: z
+		.number()
+		.optional()
+		.describe('The lab module the content relates to.'),
 	contentPlacement: z
 		.enum(['aiya', 'labs', 'secret'])
 		.optional()

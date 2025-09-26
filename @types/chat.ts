@@ -42,7 +42,7 @@ export namespace Chat {
 		isDownVoted?: boolean;
 		chatId: string;
 		userId?: string;
-		labStep?: string;
+		labModule?: number;
 		isFirstMessage?: string;
 		isHidden?: boolean;
 		interrupt?: Interrupt;

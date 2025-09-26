@@ -14,9 +14,32 @@ export const systemPromptMiddleware: LanguageModelV2Middleware = {
 			) || {};
 
 		if (incomingMessage && modelMessages && chatId) {
-			const currentLabStep =
-				incomingMessage?.metadata?.labStep ??
-				(await StepGuru.generate({ messages: modelMessages }))?.text;
+			let currentModule: number | undefined;
+
+			const metaModule = incomingMessage?.metadata?.labModule;
+
+			if (
+				metaModule &&
+				typeof metaModule === 'number' &&
+				Number.isFinite(metaModule)
+			) {
+				currentModule = metaModule;
+			} else {
+				const generatedModule = (
+					await StepGuru.generate({ messages: modelMessages })
+				)?.text;
+				if (
+					typeof generatedModule === 'number' &&
+					Number.isFinite(generatedModule)
+				) {
+					currentModule = generatedModule;
+				} else if (typeof generatedModule === 'string') {
+					const parsed = parseInt(generatedModule.trim(), 10);
+					if (Number.isFinite(parsed)) {
+						currentModule = parsed;
+					}
+				}
+			}
 
 			const systemPrompt = await getSystemPrompts({
 				requestHints: {
@@ -24,7 +47,7 @@ export const systemPromptMiddleware: LanguageModelV2Middleware = {
 					...requestHints,
 					settings: {
 						...requestHints?.settings,
-						currentLabStep,
+						currentModule,
 					},
 				},
 			});

@@ -5,6 +5,7 @@ model RemoteContent {
     name             String
     // i.e. step-01 step-02
     labStep          String?
+    labModule        Int?
     contentPlacement ContentPlacement?
     contentType      ContentType       @default(PROMPT_UNKNOWN)
     mimeType         MimeType          @default(TEXT_PLAIN)

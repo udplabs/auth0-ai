@@ -4,6 +4,11 @@
 model Settings {
   // auth0 user_id
   id             String   @id
+  // Adding to keep backward compatible
+  currentModule  Int?
+  currentStep    Int?
+  currentTask    Int?
+  // TODO deprecate
   currentLabStep String?
   nextLabStep    String?
   // Random AI generated notes/information on a user's lab progress

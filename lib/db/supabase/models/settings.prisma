@@ -1,5 +1,10 @@
 model RemoteSettings {
   id             String   @id
+  // Adding to keep backward compatible
+  currentModule  Int?
+  currentStep    Int?
+  currentTask    Int?
+  // TODO deprecate
   currentLabStep String?
   labMeta        String?
   preferences    String?

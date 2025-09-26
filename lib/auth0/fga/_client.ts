@@ -110,5 +110,9 @@ export async function getFgaClient(): Promise<OpenFgaClient | null> {
 		singleton = await createClient();
 	}
 
+	if (singleton == null) {
+		console.warn('FGA Client not initialized!');
+	}
+
 	return singleton;
 }

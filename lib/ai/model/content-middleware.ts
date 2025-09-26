@@ -42,8 +42,7 @@ export const contentMiddleware: LanguageModelV2Middleware = {
 							await upsertSettings({
 								...settings,
 								id: userId,
-								currentLabStep: 'step-02',
-								nextLabStep: 'step-03',
+								currentModule: 2,
 							});
 						}
 					};
@@ -57,8 +56,7 @@ export const contentMiddleware: LanguageModelV2Middleware = {
 						await upsertSettings({
 							...settings,
 							id: userId,
-							currentLabStep: 'step-03',
-							nextLabStep: 'step-04',
+							currentModule: 3,
 						});
 					};
 				}

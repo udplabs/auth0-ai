@@ -37,7 +37,7 @@ export const UIMessageMetadataSchema = z.object({
 	isDownVoted: z.boolean().optional(),
 	chatId: z.string(),
 	userId: z.string().optional(),
-	labStep: z.string().optional(),
+	labModule: z.number().optional(),
 	isFirstMessage: z.string().optional(),
 	isHidden: z.boolean().optional(),
 	interrupt: TransferInterruptSchema.optional(),

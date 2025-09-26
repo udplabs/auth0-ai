@@ -8,39 +8,39 @@ import { z } from 'zod';
 
 const inputSchema = z
 	.object({
-		labStep: z
-			.string()
+		labModule: z
+			.number()
 			.optional()
 			.describe(
-				'The current lab step. If not provided, the current step will be looked up. Lab steps should be provided in `step-01` format.'
+				'The current lab module. If not provided, the current module will be looked up.'
 			),
 	})
 	.describe(
-		'The current lab step. If not provided, the current step will be looked up. Lab steps should be provided in `step-01` format.'
+		'The current lab module. If not provided, the current module will be looked up.'
 	);
 const outputSchema = ToolResponseSchema(z.array(ContentSchema));
 
-export const getStepGuides = tool<
+export const getModuleGuides = tool<
 	z.infer<typeof inputSchema>,
 	z.infer<typeof outputSchema>
 >({
-	name: 'getStepGuides',
+	name: 'getModuleGuides',
 	description: `
-	This is not a semantic search tool. It is a document retrieval tool. Use this tool to fetch guide content for specific lab steps.
+	This is not a semantic search tool. It is a document retrieval tool. Use this tool to fetch guide content for specific lab modules.
 
-	For example, the user has moved to a new step but then queries about the prior step. Your current prompt would not contain the context of the last step -- inputs for the tool would be key: 'step-01' to retrieve all relevant lab guide content for step 1.
+	For example, the user has moved to a new module but then queries about the prior module. Your current prompt would not contain the context of the last module -- inputs for the tool would be key: '01' to retrieve all relevant lab guide content for module 1.
 
-	Step *code* should be retrieved using \`getStepCode\`.
+	Module *code* should be retrieved using \`getModuleCode\`.
 
-	When possible guides should be presented to the user as-is as markdown or can be used to formulate a more appropriate response based on the situation.
+	When possible, guides should be presented to the user as-is as markdown or can be used to formulate a more appropriate response based on the situation.
 
 	Content should be sorted alphanumerically based on \`name\`. This is important as some content is sequential!
 	`.trim(),
 	inputSchema,
 	outputSchema,
-	execute: async ({ labStep }) => {
+	execute: async ({ labModule }) => {
 		try {
-			if (!labStep) {
+			if (!labModule) {
 				// Don't throw
 				// Content can be retrieved without a user
 				const user = await getUser(false);
@@ -49,13 +49,13 @@ export const getStepGuides = tool<
 					const { custom_metadata } =
 						(await getUserProfile({ userId: user.sub })) || {};
 
-					labStep = custom_metadata?.currentLabStep ?? undefined;
+					labModule = custom_metadata?.currentModule ?? undefined;
 				}
 			}
-			if (labStep) {
+			if (labModule) {
 				const content = await getStepGuidesQuery({
-					query: labStep,
-					contentType: 'guide/step',
+					query: labModule.toString(),
+					contentType: 'guide/module',
 				});
 
 				return {

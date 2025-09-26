@@ -7,8 +7,7 @@ import { z } from 'zod';
 
 const outputSchema = ToolResponseSchema(SettingsSchema);
 const inputSchema = z.object({
-	currentLabStep: z.string().optional(),
-	nextLabStep: z.string().optional(),
+	currentModule: z.number().min(1).optional(),
 	labMeta: z.string().optional(),
 	userId: z.string().optional(),
 });
@@ -22,19 +21,13 @@ export const userSettings = tool<
 		'This tool is to upsert user settings for a specific user. When a user initially begins the lab they will not have any details and will not have sent a message. This tool requires authentication. As you learn what step of the lab a user is currently on, or any other relevant information, use this tool to update the database. The `labMeta` field is for any content/values you determine to be of interest in order to better assist the user in the lab. Use it at your own discretion as a "memory" of sorts.',
 	inputSchema,
 	outputSchema,
-	execute: async ({
-		currentLabStep = 'step-0',
-		nextLabStep,
-		labMeta,
-		userId: user_id,
-	}) => {
+	execute: async ({ currentModule, labMeta, userId: user_id }) => {
 		try {
 			const userId = !user_id ? (await getUser()).sub : user_id;
 
 			const settings = await upsertSettings({
 				id: userId,
-				currentLabStep,
-				nextLabStep,
+				currentModule,
 				labMeta,
 			});
 

@@ -151,8 +151,7 @@ export async function fileExistsAtRoot(filepath: string) {
 function UISettings(settings: SettingsModel): UISettings {
 	return {
 		...settings,
-		currentLabStep: settings?.currentLabStep ?? undefined,
-		nextLabStep: settings?.nextLabStep ?? undefined,
+		currentModule: settings?.currentModule ?? undefined,
 		labMeta: settings?.labMeta ?? undefined,
 		preferences: settings?.preferences ?? undefined,
 		createdAt: settings.createdAt.toISOString(),

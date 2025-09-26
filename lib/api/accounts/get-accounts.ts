@@ -29,26 +29,26 @@ async function fetchAccounts(userId: string, includeTransactions = false) {
 		const hasFgaClientId = !!process.env?.FGA_CLIENT_ID;
 		const settings = await getSettings(userId);
 
-		let labStep = settings?.currentLabStep;
-		if (error instanceof FgaValidationError && labStep === 'step-04') {
-			// We know user is past step 4
-			// Force update to step-5
-			labStep = 'step-05';
+		let labModule = settings?.currentModule;
+		if (error instanceof FgaValidationError && labModule === 4) {
+			// We know user is past module 4
+			// Force update to module-5
+			labModule = 5;
 		} else if (
 			error instanceof Error &&
 			error.message === 'fga_not_initialized' &&
 			hasFgaClientId &&
-			labStep === 'step-03'
+			labModule === 3
 		) {
-			// User should be on step-4 but this means it's not updated yet.
-			// Adding FGA Client ID means Step 4 is now complete.
-			// Force update to step-5
-			labStep = 'step-05';
+			// User should be on module-4 but this means it's not updated yet.
+			// Adding FGA Client ID means Module 4 is now complete.
+			// Force update to module-5
+			labModule = 5;
 		}
 
 		await upsertSettings({
 			...settings,
-			currentLabStep: labStep,
+			currentModule: labModule,
 		});
 	}
 

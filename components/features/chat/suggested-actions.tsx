@@ -41,14 +41,14 @@ export function SuggestedActions({
 }: SuggestedActionsProps) {
 	const {
 		open = _open,
-		labStep,
+		labModule,
 		suggestedActions,
 		toggleSuggestions,
 	} = useSuggestions();
 
 	suggestedActions.push(
 		...[
-			...(labStep <= 4
+			...(labModule && labModule <= 4
 				? [
 						{
 							label: (
@@ -61,7 +61,7 @@ export function SuggestedActions({
 						},
 					]
 				: []),
-			...(labStep > 4
+			...(labModule && labModule > 4
 				? [
 						{ suggestion: 'Show me my accounts' },
 						{ suggestion: 'Show me my transactions' },

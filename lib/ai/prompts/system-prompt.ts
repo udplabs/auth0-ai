@@ -55,23 +55,24 @@ async function getPrompts(settings?: Partial<UISettings>) {
 
 	// Defaulting to Step 2 as it is the first step
 	// User will not be authenticated and will not have settings
-	const { currentLabStep, nextLabStep } = settings || {};
+	const { currentModule = 2 } = settings || {};
 
-	const labStep =
-		nextLabStep && currentLabStep != nextLabStep ? nextLabStep : currentLabStep;
+	const stepPrompts = sortBy(
+		await getStepPrompts(currentModule.toString()),
+		'name'
+	);
 
-	if (labStep) {
-		const stepPrompts = sortBy(await getStepPrompts(labStep), 'name');
+	systemPrompts.push(...stepPrompts);
 
-		systemPrompts.push(...stepPrompts);
+	const guidePrompts = sortBy(
+		await getStepGuides({
+			query: currentModule.toString(),
+			contentPlacement: 'labs',
+		}),
+		'name'
+	);
 
-		const guidePrompts = sortBy(
-			await getStepGuides({ query: labStep, contentPlacement: 'labs' }),
-			'name'
-		);
-
-		systemPrompts.push(...guidePrompts);
-	}
+	systemPrompts.push(...guidePrompts);
 
 	const prompts = [];
 
@@ -79,7 +80,7 @@ async function getPrompts(settings?: Partial<UISettings>) {
 		for (const prompt of systemPrompts) {
 			const { textData, name, contentType, mimeType } = prompt;
 			if (mimeType?.toUpperCase().startsWith('TEXT')) {
-				if (contentType === 'guide/step') {
+				if (contentType === 'guide/module') {
 					// Wrap guide so Aiya knows it's the guide
 					prompts.push(
 						`\n\n===== LAB GUIDE: ${name} =====\n\n${textData}\n\n====================`

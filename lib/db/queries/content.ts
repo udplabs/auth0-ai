@@ -29,7 +29,7 @@ namespace Content {
 		embedding?: number[];
 		mimeType?: UIMimeType;
 		textData?: string;
-		labStep?: string;
+		labModule?: number;
 		applicationData?: Record<string, any>;
 	}
 
@@ -42,9 +42,9 @@ namespace Content {
 	 *
 	 */
 	export type UIType =
-		| 'guide/step'
+		| 'guide/module'
 		| 'guide/lab'
-		| 'prompt/step'
+		| 'prompt/module'
 		| 'prompt/system'
 		| 'prompt/lab'
 		| 'prompt/unknown'
@@ -67,7 +67,7 @@ namespace Content {
 		contentType?: UIType;
 	}
 
-	type QueryKeys = 'name' | 'filename' | 'labStep';
+	type QueryKeys = 'name' | 'filename' | 'labModule';
 }
 
 function getContentType(contentType: Content.UIType) {
@@ -121,9 +121,9 @@ function buildQuery({
 		} else if (key === 'filename') {
 			AND.push({ name: { equals: query } });
 			AND.push({ mimeType: { equals: getMimeType(query) } });
-		} else if (key === 'labStep') {
+		} else if (key === 'labModule') {
 			AND.push({
-				labStep: { equals: query.replace('_', '-').toLowerCase() },
+				labModule: { equals: parseInt(query.replace('_', '-')) },
 			});
 		}
 	}
@@ -231,15 +231,15 @@ export async function getStepPrompts(
 	query: string
 ): Promise<Content.UIContent[]> {
 	return await findAllContent({
-		key: 'labStep',
+		key: 'labModule',
 		query,
-		contentType: 'prompt/step',
+		contentType: 'prompt/module',
 	});
 }
 
 export async function getAllStepPrompts() {
 	return await findAllContent({
-		contentType: 'prompt/step',
+		contentType: 'prompt/module',
 	});
 }
 
@@ -251,21 +251,21 @@ interface GetStepGuidesParams {
 
 export async function getStepGuides({
 	query,
-	contentType = 'guide/step',
+	contentType = 'guide/module',
 	contentPlacement,
 }: GetStepGuidesParams): Promise<Content.UIContent[]> {
 	return await findAllContent({
-		key: 'labStep',
+		key: 'labModule',
 		query,
 		contentType,
 		contentPlacement,
 	});
 }
 
-export async function getStepCode(step: string) {
+export async function getModuleCode(module: string) {
 	return await findAllContent({
-		key: 'labStep',
-		query: step,
+		key: 'labModule',
+		query: module,
 		contentType: 'reference/code',
 	});
 }
@@ -333,7 +333,7 @@ function UIContent(
 		const ui: Content.UIContent = {
 			...c,
 			applicationData: c.applicationData as Record<string, any>,
-			labStep: c?.labStep != null ? c.labStep : undefined,
+			labModule: c?.labModule != null ? c.labModule : undefined,
 			textData:
 				c?.textData != null
 					? c.textData?.replaceAll('./assets', '/assets')

@@ -160,7 +160,7 @@ export function ChatProvider({
 					text: 'Hi Aiya! This is my first message.',
 					metadata: {
 						chatId,
-						labStep: 'step-03',
+						labModule: 3,
 						isFirstMessage: 'true',
 					},
 				});
@@ -184,14 +184,13 @@ export function ChatProvider({
 					text: 'Hi Aiya! I have successfully authenticated. What\s next?',
 					metadata: {
 						chatId,
-						labStep: 'step-04',
+						labModule: 4,
 					},
 				});
 
 				updateUserSettings({
 					id: user.id,
-					currentLabStep: 'step-04',
-					nextLabStep: 'step-05',
+					currentModule: 4,
 				});
 			}
 		}

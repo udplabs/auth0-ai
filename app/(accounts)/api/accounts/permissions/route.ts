@@ -15,12 +15,12 @@ export async function DELETE() {
 
 		const settings = await getSettings(user.sub);
 
-		if (settings?.currentLabStep === 'step-05') {
+		if (settings?.currentModule === 5) {
 			// User has finished step 5.
 			// Force update step
 			await upsertSettings({
 				...settings,
-				currentLabStep: 'step-06',
+				currentModule: 6,
 			});
 		}
 
