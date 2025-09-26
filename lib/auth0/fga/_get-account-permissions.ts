@@ -67,7 +67,7 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 	// ---------------------------------------------------------------------------
 	if (!fga) {
 		console.warn('FGA client not initialized!');
-		return [];
+		throw new Error('fga_not_initialized');
 	}
 
 	// ---------------------------------------------------------------------------

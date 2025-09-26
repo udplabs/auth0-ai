@@ -66,7 +66,7 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 	// ---------------------------------------------------------------------------
 	if (!fga) {
 		console.warn('FGA client not initialized!');
-		return [];
+		throw new Error('fga_not_initialized');
 	}
 
 	// ---------------------------------------------------------------------------
@@ -154,7 +154,11 @@ export async function getAccountPermissions(accounts: Accounts.Account[]) {
 		}
 
 		// ❌ 4. Transactions are nested in account.transactions but...
-		if (copy?.transactions?.length /*&&...*/) {
+		// if (copy?.transactions?.length /*&&...*/) {
+		if (
+			copy?.transactions?.length
+			/* && ... */
+		) {
 			// 👈 Are there permissions that control when they should be?
 			// Should they always be returned? 🤔
 			// Should we do something with them?
