@@ -48,16 +48,20 @@ export function SuggestedActions({
 
 	suggestedActions.push(
 		...[
-			{
-				label: (
-					<span>
-						What is <abbr title='Fine-grained Authorization'>FGA</abbr> for{' '}
-						<abbr title='Retrieval-Augmented Generation'>RAG</abbr>?
-					</span>
-				),
-				suggestion: 'What is FGA for RAG?',
-			},
-			...(labStep >= 3
+			...(labStep <= 4
+				? [
+						{
+							label: (
+								<span>
+									What is <abbr title='Fine-grained Authorization'>FGA</abbr>{' '}
+									for <abbr title='Retrieval-Augmented Generation'>RAG</abbr>?
+								</span>
+							),
+							suggestion: 'What is FGA for RAG?',
+						},
+					]
+				: []),
+			...(labStep > 4
 				? [
 						{ suggestion: 'Show me my accounts' },
 						{ suggestion: 'Show me my transactions' },

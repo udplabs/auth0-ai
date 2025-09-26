@@ -2,6 +2,7 @@ import { resetAccountPermissions } from '@/lib/api/accounts/reset-account-permis
 import { revalidateTag } from 'next/cache';
 
 import { getUser } from '@/lib/auth0/client';
+import { getSettings, upsertSettings } from '@/lib/db/queries/settings';
 
 // Handles resetting account permissions
 export async function DELETE() {
@@ -11,6 +12,17 @@ export async function DELETE() {
 		console.info('=== RESETTING ACCOUNT PERMISSIONS ===');
 
 		await resetAccountPermissions(user.sub);
+
+		const settings = await getSettings(user.sub);
+
+		if (settings?.currentLabStep === 'step-05') {
+			// User has finished step 5.
+			// Force update step
+			await upsertSettings({
+				...settings,
+				currentLabStep: 'step-06',
+			});
+		}
 
 		revalidateTag('accounts');
 		return new Response(null, { status: 204 });

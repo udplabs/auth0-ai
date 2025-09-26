@@ -69,7 +69,7 @@ export async function upsertSettings(
 }
 
 // Call upsertSettings
-async function getSettings(id: string): Promise<UISettings> {
+export async function getSettings(id: string): Promise<UISettings> {
 	const settings = await prisma.settings.findUnique({ where: { id } });
 
 	if (settings?.createdAt && settings?.updatedAt) {

@@ -9,7 +9,7 @@ interface UseSuggestionsResponse {
 	labStep: number;
 	shouldShow?: boolean;
 }
-
+//TODO: Add a "let's go" suggestion for after auth message
 export const useSuggestions = (): UseSuggestionsResponse => {
 	const [open, toggleSuggestions] = useState(true);
 
@@ -32,6 +32,16 @@ export const useSuggestions = (): UseSuggestionsResponse => {
 			suggestion: 'Show me the `.env` settings',
 			variant: 'info',
 			shouldShow: labStep === 3,
+		},
+		{
+			suggestion: 'Show me the FGA model',
+			variant: 'info',
+			shouldShow: labStep === 4,
+		},
+		{
+			suggestion: 'Show me my accounts',
+			variant: 'info',
+			shouldShow: labStep === 4,
 		},
 		{
 			suggestion: 'Show me the `createClient()` code',
@@ -98,12 +108,6 @@ export const useSuggestions = (): UseSuggestionsResponse => {
 				'Show me the code for `lib/auth0/ai/handle-on-authorize.ts` and explain it.',
 			variant: 'default',
 			shouldShow: labStep === 6,
-		},
-		{
-			label: 'Show me the final code',
-			suggestion: `Show me the code for ${labStepString}`,
-			variant: 'info',
-			shouldShow: labStep >= 3,
 		},
 	];
 
