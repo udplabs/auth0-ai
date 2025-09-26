@@ -67,7 +67,7 @@ export async function createClient() {
 				minWaitInMs: 300,
 			},
 			// apiUrl: process.env.FGA_API_URL,
-			//...
+			// ...
 		};
 
 		// ---------------------------------------------------------------------------

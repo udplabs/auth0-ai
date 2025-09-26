@@ -95,9 +95,6 @@ export function ChatProvider({
 
 	const chatRef = useRef<AIChat<ChatType.UIMessage>>(null);
 
-	console.log('authMessageSent:', authMessageSent.value);
-	console.log('firstMessageSent:', firstMessageSent.value);
-
 	if (!chatRef.current || chatRef.current.id !== chatId) {
 		chatRef.current = new AIChat<ChatType.UIMessage>({
 			generateId: ulid,
