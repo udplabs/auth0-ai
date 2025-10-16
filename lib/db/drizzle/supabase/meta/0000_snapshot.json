@@ -1,0 +1,1209 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public._prisma_migrations": {
+      "name": "_prisma_migrations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(36)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "checksum": {
+          "name": "checksum",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "finished_at": {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "migration_name": {
+          "name": "migration_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "logs": {
+          "name": "logs",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rolled_back_at": {
+          "name": "rolled_back_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "applied_steps_count": {
+          "name": "applied_steps_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.RemoteSampleDocument": {
+      "name": "RemoteSampleDocument",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pageContent": {
+          "name": "pageContent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "embedding": {
+          "name": "embedding",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.RemoteContent": {
+      "name": "RemoteContent",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "textData": {
+          "name": "textData",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicationData": {
+          "name": "applicationData",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "labStep": {
+          "name": "labStep",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contentPlacement": {
+          "name": "contentPlacement",
+          "type": "ContentPlacement",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contentType": {
+          "name": "contentType",
+          "type": "ContentType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'prompt/unknown'"
+        },
+        "mimeType": {
+          "name": "mimeType",
+          "type": "MimeType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'text/plain'"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "labModule": {
+          "name": "labModule",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "RemoteContent_contentPlacement_idx": {
+          "name": "RemoteContent_contentPlacement_idx",
+          "columns": [
+            {
+              "expression": "contentPlacement",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "enum_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "RemoteContent_contentType_idx": {
+          "name": "RemoteContent_contentType_idx",
+          "columns": [
+            {
+              "expression": "contentType",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "enum_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "RemoteContent_labStep_idx": {
+          "name": "RemoteContent_labStep_idx",
+          "columns": [
+            {
+              "expression": "labStep",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "RemoteContent_mimeType_idx": {
+          "name": "RemoteContent_mimeType_idx",
+          "columns": [
+            {
+              "expression": "mimeType",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "enum_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "RemoteContent_name_idx": {
+          "name": "RemoteContent_name_idx",
+          "columns": [
+            {
+              "expression": "name",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {
+        "Local app read content": {
+          "name": "Local app read content",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "prisma"
+          ],
+          "using": "true"
+        }
+      },
+      "isRLSEnabled": true
+    },
+    "public.AppInstance": {
+      "name": "AppInstance",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "auth0ClientId": {
+          "name": "auth0ClientId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "auth0Domain": {
+          "name": "auth0Domain",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hashedInstanceId": {
+          "name": "hashedInstanceId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "AppInstance_auth0ClientId_idx": {
+          "name": "AppInstance_auth0ClientId_idx",
+          "columns": [
+            {
+              "expression": "auth0ClientId",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "AppInstance_auth0Domain_idx": {
+          "name": "AppInstance_auth0Domain_idx",
+          "columns": [
+            {
+              "expression": "auth0Domain",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "AppInstance_hashedInstanceId_idx": {
+          "name": "AppInstance_hashedInstanceId_idx",
+          "columns": [
+            {
+              "expression": "hashedInstanceId",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.RemoteSettings": {
+      "name": "RemoteSettings",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "currentLabStep": {
+          "name": "currentLabStep",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "labMeta": {
+          "name": "labMeta",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "preferences": {
+          "name": "preferences",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "appInstanceId": {
+          "name": "appInstanceId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nextLabStep": {
+          "name": "nextLabStep",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentModule": {
+          "name": "currentModule",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentStep": {
+          "name": "currentStep",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentTask": {
+          "name": "currentTask",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "RemoteSettings_appInstanceId_idx": {
+          "name": "RemoteSettings_appInstanceId_idx",
+          "columns": [
+            {
+              "expression": "appInstanceId",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.RemoteChat": {
+      "name": "RemoteChat",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "appInstanceId": {
+          "name": "appInstanceId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "RemoteChat_appInstanceId_idx": {
+          "name": "RemoteChat_appInstanceId_idx",
+          "columns": [
+            {
+              "expression": "appInstanceId",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "RemoteChat_userId_idx": {
+          "name": "RemoteChat_userId_idx",
+          "columns": [
+            {
+              "expression": "userId",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.RemoteMessage": {
+      "name": "RemoteMessage",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "chatId": {
+          "name": "chatId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parts": {
+          "name": "parts",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "attachments": {
+          "name": "attachments",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vote": {
+          "name": "vote",
+          "type": "VoteType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "RemoteMessage_chatId_idx": {
+          "name": "RemoteMessage_chatId_idx",
+          "columns": [
+            {
+              "expression": "chatId",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "RemoteMessage_userId_idx": {
+          "name": "RemoteMessage_userId_idx",
+          "columns": [
+            {
+              "expression": "userId",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "RemoteMessage_chatId_fkey": {
+          "name": "RemoteMessage_chatId_fkey",
+          "tableFrom": "RemoteMessage",
+          "tableTo": "RemoteChat",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "chatId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.RemoteSampleAccount": {
+      "name": "RemoteSampleAccount",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "customerId": {
+          "name": "customerId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "balance": {
+          "name": "balance",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currencyCode": {
+          "name": "currencyCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'USD'"
+        },
+        "currencyName": {
+          "name": "currencyName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'US Dollar'"
+        },
+        "currencySymbol": {
+          "name": "currencySymbol",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'$'"
+        },
+        "currencyNumericCode": {
+          "name": "currencyNumericCode",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 840
+        },
+        "displayName": {
+          "name": "displayName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "number": {
+          "name": "number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "openedDate": {
+          "name": "openedDate",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "closedDate": {
+          "name": "closedDate",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "routingNumber": {
+          "name": "routingNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subType": {
+          "name": "subType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'active'"
+        },
+        "balanceDue": {
+          "name": "balanceDue",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentPrincipal": {
+          "name": "currentPrincipal",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dueDate": {
+          "name": "dueDate",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interestRate": {
+          "name": "interestRate",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lastPaymentDate": {
+          "name": "lastPaymentDate",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nextPaymentDate": {
+          "name": "nextPaymentDate",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "originalPrincipal": {
+          "name": "originalPrincipal",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paymentAmount": {
+          "name": "paymentAmount",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paymentDate": {
+          "name": "paymentDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "term": {
+          "name": "term",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cardNumber": {
+          "name": "cardNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "creditLimit": {
+          "name": "creditLimit",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "minimumPaymentAmount": {
+          "name": "minimumPaymentAmount",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "statementBalance": {
+          "name": "statementBalance",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "availableBalance": {
+          "name": "availableBalance",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dividendRate": {
+          "name": "dividendRate",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interestYTD": {
+          "name": "interestYTD",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cashBalance": {
+          "name": "cashBalance",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "RemoteSampleAccount_customerId_idx": {
+          "name": "RemoteSampleAccount_customerId_idx",
+          "columns": [
+            {
+              "expression": "customerId",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.RemoteSampleTransaction": {
+      "name": "RemoteSampleTransaction",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "accountId": {
+          "name": "accountId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customerId": {
+          "name": "customerId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payee": {
+          "name": "payee",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rawPayee": {
+          "name": "rawPayee",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "memo": {
+          "name": "memo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "TransactionType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "categoryId": {
+          "name": "categoryId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "categoryName": {
+          "name": "categoryName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "budgetCategoryId": {
+          "name": "budgetCategoryId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "budgetCategory": {
+          "name": "budgetCategory",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "budgetSubcategory": {
+          "name": "budgetSubcategory",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tags": {
+          "name": "tags",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencyCode": {
+          "name": "currencyCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'USD'"
+        },
+        "currencyName": {
+          "name": "currencyName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'United States Dollar'"
+        },
+        "currencySymbol": {
+          "name": "currencySymbol",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'$'"
+        },
+        "currencyNumericCode": {
+          "name": "currencyNumericCode",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 840
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "RemoteSampleTransaction_accountId_idx": {
+          "name": "RemoteSampleTransaction_accountId_idx",
+          "columns": [
+            {
+              "expression": "accountId",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "RemoteSampleTransaction_customerId_idx": {
+          "name": "RemoteSampleTransaction_customerId_idx",
+          "columns": [
+            {
+              "expression": "customerId",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "RemoteSampleTransaction_accountId_fkey": {
+          "name": "RemoteSampleTransaction_accountId_fkey",
+          "tableFrom": "RemoteSampleTransaction",
+          "tableTo": "RemoteSampleAccount",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "accountId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.ContentPlacement": {
+      "name": "ContentPlacement",
+      "values": [
+        "aiya",
+        "labs",
+        "secret"
+      ],
+      "schema": "public"
+    },
+    "public.ContentType": {
+      "name": "ContentType",
+      "values": [
+        "guide/step",
+        "guide/lab",
+        "prompt/step",
+        "prompt/system",
+        "prompt/lab",
+        "prompt/unknown",
+        "reference/code"
+      ],
+      "schema": "public"
+    },
+    "public.MimeType": {
+      "name": "MimeType",
+      "values": [
+        "text/markdown",
+        "text/plain",
+        "text/html",
+        "text/csv",
+        "application/json",
+        "application/xml",
+        "text/typescript"
+      ],
+      "schema": "public"
+    },
+    "public.TransactionType": {
+      "name": "TransactionType",
+      "values": [
+        "credit",
+        "debit"
+      ],
+      "schema": "public"
+    },
+    "public.VoteType": {
+      "name": "VoteType",
+      "values": [
+        "up",
+        "down"
+      ],
+      "schema": "public"
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "tables": {}
+  }
+}

@@ -55,8 +55,9 @@ export const DebugCard = ({
 				<Collapsible
 					open={showAccessToken}
 					onOpenChange={toggleAccessToken}
+					{...CollapsibleProps}
 				>
-					<CollapsibleTrigger>
+					<CollapsibleTrigger {...CollapsibleTriggerProps}>
 						<div className='flex items-center gap-2'>
 							Access Token
 							<CollapseIcon
@@ -67,7 +68,10 @@ export const DebugCard = ({
 							/>
 						</div>
 					</CollapsibleTrigger>
-					<CollapsibleContent className='flex flex-col gap-4 pt-4'>
+					<CollapsibleContent
+						className='flex flex-col gap-4 pt-4'
+						{...CollapsibleContentProps}
+					>
 						<div className='grid grid-cols-2 gap-4'>
 							<TextField
 								readOnly

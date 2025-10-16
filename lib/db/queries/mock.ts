@@ -1,10 +1,5 @@
 'use server';
 
-import type {
-	SampleTransactionCreateInput,
-	SampleTransactionUpdateInput,
-} from '@/lib/db/generated/prisma/models';
-
 import type { Accounts } from '@/types/accounts';
 import type { Transactions } from '@/types/transactions';
 
@@ -24,76 +19,99 @@ export async function getSampleData(userId: string): Promise<{
 	accounts: SampleAccount[];
 	transactions: SampleTransaction[];
 }> {
-	const [{ prisma }, { supabase }, { convertToUI }] = await Promise.all([
-		import('@/lib/db/prisma/client'),
-		import('@/lib/db/supabase/client'),
+	const [
+		{ convertToUI },
+		{ getRemoteSampleAccounts, getRemoteSampleTransactions },
+		{ sql },
+		{ sampleAccount: dSampleAccount, sampleTransaction: dSampleTransaction },
+		{ and, eq, gt },
+	] = await Promise.all([
 		import('@/lib/utils/db-converter'),
+		import('@/lib/db/drizzle/supabase/db'),
+		import('@/lib/db/drizzle/sql/db'),
+		import('@/lib/db/drizzle/sql/schema'),
+		import('drizzle-orm'),
 	]);
 
 	const lastSyncedAt = new Date();
 	const expiresAt = new Date(lastSyncedAt.getTime() + 1000 * 60 * 30); // 30 minutes
 
-	let localSampleAccounts = await prisma.sampleAccount.findMany({
-		where: { AND: [{ customerId: userId }, { expiresAt: { gt: new Date() } }] },
+	let localSampleAccounts = await sql.query.sampleAccount.findMany({
+		where: and(
+			eq(dSampleAccount.customerId, userId),
+			gt(dSampleAccount.expiresAt, new Date())
+		),
 	});
 
 	if (localSampleAccounts.length === 0) {
-		const remoteAccounts = await supabase.remoteSampleAccount.findMany({
-			where: { customerId: userId },
-		});
+		const remoteAccounts = await getRemoteSampleAccounts(userId);
 
-		await prisma.$transaction([
-			...remoteAccounts.map(({ updatedAt: _, ...a }) => {
-				return prisma.sampleAccount.upsert({
-					where: { id: a.id },
-					update: {
+		localSampleAccounts = await sql.transaction(async (tx) => {
+			await Promise.all(
+				remoteAccounts.map((a) => {
+					const account = {
 						...a,
 						lastSyncedAt,
 						expiresAt,
-					},
-					create: {
-						...a,
-						lastSyncedAt,
-						expiresAt,
-					},
-				});
-			}),
-		]);
+						createdAt: new Date(a?.createdAt),
+						updatedAt: new Date(a?.updatedAt),
+						dueDate: a?.dueDate ? new Date(a.dueDate) : undefined,
+						openedDate: a?.openedDate ? new Date(a.openedDate) : new Date(),
+						closedDate: a?.closedDate ? new Date(a.closedDate) : undefined,
+						lastPaymentDate: a?.lastPaymentDate
+							? new Date(a.lastPaymentDate)
+							: undefined,
+						nextPaymentDate: a?.nextPaymentDate
+							? new Date(a.nextPaymentDate)
+							: undefined,
+					};
+					return tx.insert(dSampleAccount).values(account).onConflictDoUpdate({
+						target: dSampleAccount.id,
+						set: account,
+					});
+				})
+			);
 
-		localSampleAccounts = await prisma.sampleAccount.findMany({
-			where: { customerId: userId },
+			return await tx.query.sampleAccount.findMany({
+				where: eq(dSampleAccount.customerId, userId),
+			});
 		});
 	}
 
-	let localSampleTransactions = await prisma.sampleTransaction.findMany({
-		where: { AND: [{ customerId: userId }, { expiresAt: { gt: new Date() } }] },
+	let localSampleTransactions = await sql.query.sampleTransaction.findMany({
+		where: and(
+			eq(dSampleAccount.customerId, userId),
+			gt(dSampleAccount.expiresAt, new Date())
+		),
 	});
 
 	if (localSampleTransactions.length === 0) {
-		const remoteTransactions = await supabase.remoteSampleTransaction.findMany({
-			where: { customerId: userId },
-		});
+		const remoteTransactions = await getRemoteSampleTransactions(userId);
 
-		await prisma.$transaction([
-			...remoteTransactions.map(({ updated_at: _, ...t }) => {
-				return prisma.sampleTransaction.upsert({
-					where: { id: t.id },
-					update: {
+		localSampleTransactions = await sql.transaction(async (tx) => {
+			await Promise.all(
+				remoteTransactions.map((t) => {
+					const transaction = {
 						...t,
 						lastSyncedAt,
 						expiresAt,
-					} as SampleTransactionUpdateInput,
-					create: {
-						...t,
-						lastSyncedAt,
-						expiresAt,
-					} as SampleTransactionCreateInput,
-				});
-			}),
-		]);
+						createdAt: new Date(t?.createdAt),
+						updatedAt: new Date(t?.updatedAt),
+						date: new Date(t?.date ?? new Date()),
+					};
+					return tx
+						.insert(dSampleTransaction)
+						.values(transaction)
+						.onConflictDoUpdate({
+							target: dSampleTransaction.id,
+							set: transaction,
+						});
+				})
+			);
 
-		localSampleTransactions = await prisma.sampleTransaction.findMany({
-			where: { customerId: userId },
+			return await tx.query.sampleTransaction.findMany({
+				where: eq(dSampleTransaction.customerId, userId),
+			});
 		});
 	}
 

@@ -9,7 +9,7 @@ async function getSystemPrompt() {
 
 	const deriveStepPrompt = `\
 		- You are an internal agent whose goal is to derive the user's current lab module before messages are processed by the primary agent (named Aiya).
-		- Utilize LAB CONTEXT to narrow down the user's current lab module.
+		- Utilize LAB MODULE CONTEXT to narrow down the user's current lab module.
 		- Use all provided content to concisely determine the user's current lab module.
 		- Make your best effort to output only the lab module: i.e. \`1\`, \`2\`, etc.
 		- If you are unable to determine the exact module, narrow the user's intent down to a singular task in less than 10 words.

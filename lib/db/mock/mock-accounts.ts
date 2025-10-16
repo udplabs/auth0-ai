@@ -18,7 +18,7 @@ export async function createMockAccounts(userId: string) {
 		{ getSampleData },
 		{ ulid },
 		{ createOwnerPermissions },
-		{ saveAccountsAndReturnSeparate },
+		{ saveAccountsAndTransactions },
 	] = await Promise.all([
 		import('@/lib/db/queries/mock'),
 		import('ulid'),
@@ -31,7 +31,7 @@ export async function createMockAccounts(userId: string) {
 		transactions: sampleTransactions = [],
 	} = await getSampleData(sampleUserId);
 
-	const accounts: Accounts.Account[] = [];
+	const accounts: Accounts.AccountWithoutTransactions[] = [];
 	const transactions: Transactions.Transaction[] = [];
 
 	// Generate new IDs for accounts, transactions, and embeddings
@@ -78,7 +78,7 @@ export async function createMockAccounts(userId: string) {
 	// Save the mock accounts and transactions
 	// This is duplicative since createAccounts does this but we need to keep logic separate.
 	const { accounts: createdAccounts, transactions: createdTransactions } =
-		await saveAccountsAndReturnSeparate(accounts, transactions);
+		await saveAccountsAndTransactions(accounts, transactions);
 
 	// Set permissions for the created accounts
 	await createOwnerPermissions(

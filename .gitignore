@@ -53,3 +53,4 @@ yarn-error.log*
 
 # generated code
 /lib/db/generated
+/**/_*.ts

@@ -4,11 +4,7 @@
 import type { Accounts } from '@/@types/accounts';
 import { getFgaClient } from './client';
 
-import {
-	type ClientBatchCheckItem,
-	type TupleKey,
-	FgaApiValidationError,
-} from '@openfga/sdk';
+import { type TupleKey, FgaApiValidationError } from '@openfga/sdk';
 
 const fga = await getFgaClient();
 

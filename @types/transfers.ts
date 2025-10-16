@@ -1,4 +1,4 @@
-import type { TransferCreateInput } from '@/lib/db/generated/prisma/models';
+import type { TransferModelCreate } from '@/lib/db/drizzle/sql/schema';
 import type { Accounts } from './accounts';
 
 export namespace Transfers {
@@ -38,7 +38,7 @@ export namespace Transfers {
 	// }
 
 	export interface CreateTransferInput
-		extends Omit<TransferCreateInput, 'customerId' | 'memo' | 'description'> {
+		extends Omit<TransferModelCreate, 'customerId' | 'memo' | 'description'> {
 		customerId?: string;
 		fromAccountNumber: string;
 		fromAccountDisplayName: string;
