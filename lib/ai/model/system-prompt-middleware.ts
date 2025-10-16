@@ -39,6 +39,11 @@ export const systemPromptMiddleware: LanguageModelV2Middleware = {
 						currentModule = parsed;
 					}
 				}
+				console.log(
+					'\n\nThe Guru thinks you are working on module',
+					currentModule
+				);
+				console.log('🤔 Is that accurate? If not, please let Aiya know!\n\n');
 			}
 
 			const systemPrompt = await getSystemPrompts({
