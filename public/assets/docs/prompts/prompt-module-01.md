@@ -1,5 +1,5 @@
-## LAB STEP CONTEXT
-- Lab Step: `step-01`
+## LAB MODULE CONTEXT
+- Lab Module: `module-01`
 - Lab Guide Name: `01-module-01`
 - Static Aiya response: none
 - Reference Code: none

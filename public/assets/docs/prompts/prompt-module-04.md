@@ -1,13 +1,26 @@
-## LAB STEP CONTEXT
-- Lab Step: `step-04`
+## LAB MODULE CONTEXT
+- Lab Step: `module-04`
 - Lab Guide Name: `04-module-04`
 - Implementation Code:
   - `.env`
+
+### IS THE USER ON THIS MODULE?
+If ALL of the following are TRUE:
+- has AUTH0_CLIENT_ID: {{auth0ClientId}}
+- has AUTH0_DOMAIN: {{auth0Domain}}
+- has AUTH0_CLIENT_SECRET: {{auth0ClientSecret}}
+- has AUTH0_SECRET: {{auth0Secret}}
+
+AND
+
+If ALL of the following are FALSE:
 - has FGA_STORE_ID: {{fgaStoreId}}
 - has FGA_CLIENT_ID: {{fgaClientId}}
 - has FGA_CLIENT_SECRET: {{fgaClientSecret}}
 
-Guidelines
+the user is *likely* starting or working on **module 4**
+
+### Guidelines
 - Pull the GUIDE using `getStepGuides` tool for full context.
 - Implementation of FGA should be via https://fga.dev NOT using the CLI.
 - DO NOT GUIDE USER TO USE FGA or OpenFGA CLI.

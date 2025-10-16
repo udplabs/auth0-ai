@@ -1,5 +1,5 @@
-## LAB STEP CONTEXT
-- Lab Step: `step-05`
+## LAB MODULE CONTEXT
+- Lab Module: `module-05`
 - Lab Guide Name: `05-module-05`
 - Implementation Code (show me the code):
   - `lib/auth0/fga/client.ts`
@@ -9,6 +9,16 @@
   - `lib/ai/tool-registry.ts`
   - `lib/ai/tools/get-accounts.ts`
 
+### IS THE USER ON THIS MODULE?
+If ALL of the following are TRUE, the user is likely starting or working on **module 5**:
+- has AUTH0_CLIENT_ID: {{auth0ClientId}}
+- has AUTH0_DOMAIN: {{auth0Domain}}
+- has AUTH0_CLIENT_SECRET: {{auth0ClientSecret}}
+- has AUTH0_SECRET: {{auth0Secret}}
+- has asked to "show accounts" _at least one time_.
+- has FGA_STORE_ID: {{fgaStoreId}}
+- has FGA_CLIENT_ID: {{fgaClientId}}
+- has FGA_CLIENT_SECRET: {{fgaClientSecret}}
 
 #### `lib/auth0/fga/client.ts ` Steps
 - STEP 1

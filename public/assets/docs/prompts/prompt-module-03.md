@@ -1,15 +1,21 @@
-## LAB STEP CONTEXT
-- Lab Step: `step-03`
+## LAB MODULE CONTEXT
+- Lab Module: `module-03`
 - Lab Guide Name: `03-module-03`
 - Static Aiya response auto-sent: `aiya-post-auth`
 - Implementation Code:
   - `.env`
+
+### IS THE USER ON THIS MODULE?
+If ALL of the following are FALSE:
+
 - has AUTH0_CLIENT_ID: {{auth0ClientId}}
 - has AUTH0_DOMAIN: {{auth0Domain}}
 - has AUTH0_CLIENT_SECRET: {{auth0ClientSecret}}
 - has AUTH0_SECRET: {{auth0Secret}}
 
-Reference snippet `.env` applicable to this step:
+the user is *likely* starting or working on **module 3**.
+
+### Reference snippet `.env` applicable to this step:
 ```env
 # .env
 # ========== Auth0 ==========

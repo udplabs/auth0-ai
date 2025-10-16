@@ -1,5 +1,5 @@
-## LAB STEP CONTEXT
-- Lab Step: `step-06`
+## LAB MODULE CONTEXT
+- Lab Module: `module-06`
 - Lab Guide Name: `06-module-06`
 - Static Aiya response: none
 - Implementation Code (show me the code):
@@ -15,8 +15,8 @@
   - `lib/ai/model/interrupts-middleware.ts`
   - `app/(accounts)/api/[id]/route.ts`
 
-### TASKS
 
+### TASKS
 #### Task 1
 - Enable CIBA grant in Auth0 Management dashboard for `the bAInk` application.
 #### Task 2
