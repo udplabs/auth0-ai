@@ -1,4 +1,4 @@
-export function chunkByWords(text: string, max = 40) {
+function chunkByWords(text: string, max = 40) {
 	const tokens = text.match(/\S+\s+/) || [];
 	const chunks: string[] = [];
 	let buf = '';
@@ -17,7 +17,7 @@ export function chunkByWords(text: string, max = 40) {
 	return chunks;
 }
 
-export function chunkByParagraph(text: string) {
+function chunkByParagraph(text: string) {
 	const paras = text.split(/\r?\n\s*\r?\n/);
 	return paras.map((p, i) => (i < paras.length - 1 ? p + '\n\n' : p));
 }

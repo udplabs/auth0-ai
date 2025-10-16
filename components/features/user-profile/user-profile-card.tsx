@@ -28,7 +28,6 @@ import { VerifiedBadge } from './verified-badge';
 
 export const UserProfileCard = ({
 	AvatarProps,
-	AvatarFallbackProps,
 	AvatarImageProps,
 	CardContentProps,
 	CardDescriptionProps,
@@ -122,7 +121,6 @@ export const UserProfileCard = ({
 
 export interface UserProfileCardProps extends CardProps {
 	AvatarProps?: AvatarProps;
-	AvatarFallbackProps?: AvatarFallbackProps;
 	AvatarImageProps?: AvatarImageProps;
 	CardContentProps?: CardContentProps;
 	CardDescriptionProps?: CardDescriptionProps;
