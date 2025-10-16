@@ -42,7 +42,7 @@ export const contentMiddleware: LanguageModelV2Middleware = {
 							await upsertSettings({
 								...settings,
 								id: userId,
-								currentModule: 2,
+								currentModule: 3,
 							});
 						}
 					};
@@ -56,7 +56,7 @@ export const contentMiddleware: LanguageModelV2Middleware = {
 						await upsertSettings({
 							...settings,
 							id: userId,
-							currentModule: 3,
+							currentModule: 4,
 						});
 					};
 				}
