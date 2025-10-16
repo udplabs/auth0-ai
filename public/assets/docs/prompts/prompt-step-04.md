@@ -3,6 +3,9 @@
 - Lab Guide Name: `04-module-04`
 - Implementation Code:
   - `.env`
+- has FGA_STORE_ID: {{fgaStoreId}}
+- has FGA_CLIENT_ID: {{fgaClientId}}
+- has FGA_CLIENT_SECRET: {{fgaClientSecret}}
 
 Guidelines
 - Pull the GUIDE using `getStepGuides` tool for full context.

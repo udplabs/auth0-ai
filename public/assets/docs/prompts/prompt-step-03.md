@@ -4,6 +4,10 @@
 - Static Aiya response auto-sent: `aiya-post-auth`
 - Implementation Code:
   - `.env`
+- has AUTH0_CLIENT_ID: {{auth0ClientId}}
+- has AUTH0_DOMAIN: {{auth0Domain}}
+- has AUTH0_CLIENT_SECRET: {{auth0ClientSecret}}
+- has AUTH0_SECRET: {{auth0Secret}}
 
 Reference snippet `.env` applicable to this step:
 ```env
