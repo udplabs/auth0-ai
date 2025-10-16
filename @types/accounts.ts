@@ -105,6 +105,8 @@ export namespace Accounts {
 			| 'delinquent';
 		transactions?: Transactions.Transaction[];
 		permissions?: AccountPermissions[];
+		createdAt: string;
+		updatedAt: string;
 	}
 
 	export type AccountPermissions =
@@ -244,16 +246,23 @@ export namespace Accounts {
 	export type AccountWithoutTransactions<
 		T extends Type = Type,
 		S extends SubTypeOf<T> = SubTypeOf<T & Type>,
-	> = Omit<Account<T, S>, 'transactions'>;
+	> = Omit<Root<T, ConstrainSubType<T, S>>, 'transactions'> & FieldsByType<T>;
 
 	export interface CreateAccountInput
-		extends Omit<Account, 'id' | 'openedDate'> {
+		extends Omit<Account, 'id' | 'openedDate' | 'transactions'> {
 		openedDate?: Account['openedDate'];
 		name: Account['name'];
 		number: Account['number'];
 		type: Type;
 		subType: Accounts.SubTypeOf<Type>;
+		id?: string;
+		transactions?: Transactions.CreateTransactionInputNoAccount[];
 	}
+
+	export type CreateAccountInputWithoutTransactions = Omit<
+		CreateAccountInput,
+		'transactions'
+	>;
 
 	export type AccountList = Pick<
 		Account,

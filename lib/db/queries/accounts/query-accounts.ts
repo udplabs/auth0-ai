@@ -1,18 +1,20 @@
 'use server';
 
-import { convertToUI } from '@/lib/utils/db-converter';
-import { AccountModel, AccountWhereInput } from '../../generated/prisma/models';
-import { prisma } from '../../prisma/client';
-
+import { sql } from '@/lib/db/drizzle/sql/db';
+import { account as dAccount } from '@/lib/db/drizzle/sql/schema';
+import { UIAccounts } from '@/lib/db/models';
 import type { Accounts } from '@/types/accounts';
+import { and, eq, inArray } from 'drizzle-orm';
 
 export async function getExternalAccountsByUserId(userId: string) {
-	const dbAccounts = await prisma.account.findMany({
-		where: { customerId: userId, isExternal: true },
-		include: { transactions: true },
+	const dbAccounts = await sql.query.account.findMany({
+		where: and(eq(dAccount.customerId, userId), eq(dAccount.isExternal, true)),
+		with: {
+			transactions: true,
+		},
 	});
 
-	return convertToUI<AccountModel[], Accounts.Account[]>(dbAccounts);
+	return UIAccounts(dbAccounts);
 }
 
 export async function getAccountsByUserId(
@@ -31,31 +33,21 @@ export async function getAccountsByUserId(
 	userId: string,
 	includeTransactions?: boolean
 ): Promise<Accounts.Account[] | Accounts.AccountWithoutTransactions[]> {
-	const dbAccounts = await prisma.account.findMany({
-		where: { customerId: userId },
-		include: includeTransactions ? { transactions: true } : undefined,
+	const dbAccounts = await sql.query.account.findMany({
+		where: eq(dAccount.customerId, userId),
+		with: { transactions: includeTransactions ? true : undefined },
 	});
-	return convertToUI<AccountModel[], Accounts.Account[]>(dbAccounts);
+
+	return UIAccounts(dbAccounts);
 }
 
 export async function getAccountsByAccountId(
 	accountIds: string[],
 	includeTransactions = false
 ): Promise<Accounts.Account[]> {
-	const dbAccounts = await prisma.account.findMany({
-		where: { id: { in: accountIds } },
-		include: { transactions: includeTransactions },
+	const dbAccounts = await sql.query.account.findMany({
+		where: inArray(dAccount.id, accountIds),
+		with: { transactions: includeTransactions ? true : undefined },
 	});
-	return convertToUI<AccountModel[], Accounts.Account[]>(dbAccounts);
-}
-
-// THIS IS AN INTERNAL FUNCTION USED ONLY TO GENERATE THE VECTOR DB
-// DO NOT USE THIS IN ANY API ROUTES
-export async function getAllAccounts(
-	where?: AccountWhereInput
-): Promise<Accounts.Account[]> {
-	const dbAccounts = await prisma.account.findMany(
-		where ? { where } : undefined
-	);
-	return convertToUI<AccountModel[], Accounts.Account[]>(dbAccounts);
+	return UIAccounts(dbAccounts);
 }

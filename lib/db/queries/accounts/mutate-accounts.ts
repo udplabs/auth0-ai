@@ -1,45 +1,99 @@
 'use server';
 
-import type {
-	AccountCreateManyInput,
-	AccountModel,
-	TransactionCreateManyInput,
-	TransactionModel,
-	TransferModel,
-} from '../../generated/prisma/models';
-import { prisma } from '../../prisma/client';
+import { decrement, increment, sql } from '@/lib/db/drizzle/sql/db';
+import {
+	account as dAccount,
+	transaction as dTransaction,
+	type AccountModelCreate,
+	type TransferModel,
+} from '@/lib/db/drizzle/sql/schema';
+import { DBAccount, UIAccount } from '@/lib/db/models';
+import { saveTransactions } from '@/lib/db/queries/accounts/mutate-transactions';
+import { eq } from 'drizzle-orm';
 
 import type { Accounts } from '@/types/accounts';
 import type { Transactions } from '@/types/transactions';
 
-export async function saveAccounts(
-	accounts: Accounts.CreateAccountInput[],
-	transactions: Transactions.CreateTransactionInput[]
-): Promise<void> {
-	await saveAccountsAndTransactions(accounts, transactions);
-}
+// TODO: Rewrite to be more testable! Current id generation is crap.
+export async function saveAccount(
+	account: Accounts.CreateAccountInputWithoutTransactions
+): Promise<Accounts.AccountWithoutTransactions>;
+export async function saveAccount(
+	account: Accounts.CreateAccountInput
+): Promise<Accounts.Account>;
+export async function saveAccount(
+	account:
+		| Accounts.CreateAccountInput
+		| Accounts.CreateAccountInputWithoutTransactions
+): Promise<Accounts.Account | Accounts.AccountWithoutTransactions> {
+	const transactions: Transactions.CreateTransactionInputNoAccount[] = [];
 
-export async function saveAccountsAndReturnCombined(
-	accounts: Accounts.CreateAccountInput[],
-	transactions?: Transactions.CreateTransactionInput[]
-): Promise<Accounts.Account[]> {
-	const { accounts: uiAccounts, transactions: uiTransactions } =
-		await saveAccountsAndTransactions(accounts, transactions);
+	let dbAccount: AccountModelCreate;
 
-	const combinedAccounts: Accounts.Account[] = [];
-
-	if (uiTransactions.length > 0) {
-		uiAccounts.forEach((account) => {
-			combinedAccounts.push({
-				...account,
-				transactions: uiTransactions.filter(
-					(tx) => tx.accountId === account.id
-				),
-			} as Accounts.Account);
-		});
+	if ('transactions' in account && account?.transactions?.length) {
+		const { transactions: txs, ...rest } = account;
+		dbAccount = DBAccount(rest);
+		transactions.push(...txs);
+	} else {
+		dbAccount = DBAccount(account);
 	}
 
-	return combinedAccounts;
+	// Create account first
+	const [createdDbAccount] = await sql
+		.insert(dAccount)
+		.values(dbAccount)
+		.returning();
+
+	// Then create transactions if they exist
+	if (transactions.length > 0) {
+		const createdDbTransactions = await saveTransactions(
+			transactions,
+			createdDbAccount.id
+		);
+
+		return {
+			...UIAccount(createdDbAccount),
+			transactions: createdDbTransactions,
+		} as Accounts.Account;
+	}
+
+	return UIAccount(createdDbAccount) as Accounts.AccountWithoutTransactions;
+}
+
+export async function saveAccounts(
+	accounts: Accounts.CreateAccountInput[]
+): Promise<Accounts.Account[]>;
+export async function saveAccounts(
+	accounts: Accounts.CreateAccountInputWithoutTransactions[]
+): Promise<Accounts.AccountWithoutTransactions[]>;
+export async function saveAccounts(
+	accounts: (
+		| Accounts.CreateAccountInput
+		| Accounts.CreateAccountInputWithoutTransactions
+	)[]
+): Promise<(Accounts.Account | Accounts.AccountWithoutTransactions)[]> {
+	const withTransactions: Accounts.Account[] = [];
+	const withoutTransactions: Accounts.AccountWithoutTransactions[] = [];
+
+	for (const account of accounts) {
+		if ('transactions' in account && account?.transactions?.length) {
+			withTransactions.push(
+				await saveAccount(account as Accounts.CreateAccountInput)
+			);
+		} else {
+			withoutTransactions.push(
+				await saveAccount(
+					account as Accounts.CreateAccountInputWithoutTransactions
+				)
+			);
+		}
+	}
+
+	if (withTransactions.length > 0) {
+		return withTransactions;
+	}
+
+	return withoutTransactions;
 }
 
 interface AccountsSeparatedResponse {
@@ -47,118 +101,59 @@ interface AccountsSeparatedResponse {
 	transactions: Transactions.Transaction[];
 }
 
-export async function saveAccountsAndReturnSeparate(
-	accounts: Accounts.CreateAccountInput[],
-	transactions?: Transactions.CreateTransactionInput[]
-): Promise<AccountsSeparatedResponse> {
-	return await saveAccountsAndTransactions(accounts, transactions);
-}
-
-async function saveAccountsAndTransactions(
-	accounts: Accounts.CreateAccountInput[],
+/**
+ * This function assumes that accounts do NOT have transactions and transactions DO have an `accountId`.
+ * It's basically a convenience batcher.
+ */
+export async function saveAccountsAndTransactions(
+	accounts: Accounts.CreateAccountInputWithoutTransactions[],
 	transactions: Transactions.CreateTransactionInput[] = []
 ): Promise<AccountsSeparatedResponse> {
-	const _accounts: Accounts.CreateAccountInput[] = [];
+	const createdAccounts = await saveAccounts(accounts);
+	const createdTransactions = await saveTransactions(transactions);
 
-	// 1) Check for nested transactions and separate them if present
-	// These need to be created separately as createMany does not support nested createMany
-	for (const account of accounts) {
-		const { transactions: tx = [], ...rest } = account;
-		_accounts.push(rest);
-		if (tx.length > 0) {
-			transactions.push(...tx);
-		}
-	}
-
-	const [{ uniqBy }, { convertToDB, convertToUI }] = await Promise.all([
-		import('lodash-es'),
-		import('@/lib/utils/db-converter'),
-	]);
-
-	// 2) Convert to DB format
-	// This is necessary to ensure the data is in the correct format for Prisma
-	const dbAccounts = convertToDB<
-		Accounts.CreateAccountInput[],
-		AccountCreateManyInput[]
-	>(accounts);
-
-	const dbTransactions = convertToDB<
-		Transactions.CreateTransactionInput[],
-		TransactionCreateManyInput[]
-	>(uniqBy(transactions, 'id'));
-
-	const createdAccounts = await prisma.account.createManyAndReturn({
-		data: dbAccounts,
-	});
-
-	const uiAccounts = convertToUI<AccountModel[], Accounts.Account[]>(
-		createdAccounts
-	);
-
-	if (dbTransactions.length > 0) {
-		// 2) Save transactions
-		const createdTransactions = await prisma.transaction.createManyAndReturn({
-			data: dbTransactions,
-		});
-
-		// 3) Convert transactions to UI format
-		const uiTransactions = convertToUI<
-			TransactionModel[],
-			Transactions.Transaction[]
-		>(createdTransactions);
-
-		return { accounts: uiAccounts, transactions: uiTransactions };
-	}
-
-	return { accounts: uiAccounts, transactions: [] };
+	return { accounts: createdAccounts, transactions: createdTransactions };
 }
 
 export async function updateBalances(transfer: TransferModel) {
 	const { fromAccountId, toAccountId, amount } = transfer;
 
-	const fromAccount = await prisma.account.findUnique({
-		where: { id: fromAccountId },
+	const fromAccount = await sql.query.account.findFirst({
+		where: eq(dAccount.id, fromAccountId),
 	});
-	const toAccount = await prisma.account.findUnique({
-		where: { id: toAccountId },
+	const toAccount = await sql.query.account.findFirst({
+		where: eq(dAccount.id, toAccountId),
 	});
 
-	await prisma.$transaction([
-		prisma.account.update({
-			where: { id: fromAccountId },
-			data: {
-				balance: { decrement: amount },
+	await sql.transaction(async (tx) => {
+		await tx
+			.update(dAccount)
+			.set({
+				balance: decrement(dAccount.balance, amount),
 				...(fromAccount?.type === 'deposit' && {
-					availableBalance: { decrement: amount },
+					availableBalance: decrement(dAccount.availableBalance, amount),
 				}),
-			},
-		}),
-		prisma.account.update({
-			where: { id: toAccountId },
-			data: {
-				balance: { increment: amount },
+			})
+			.where(eq(dAccount.id, fromAccountId));
+
+		await tx
+			.update(dAccount)
+			.set({
+				balance: increment(dAccount.balance, amount),
 				...(toAccount?.type === 'deposit' && {
-					availableBalance: { increment: amount },
+					availableBalance: increment(dAccount.availableBalance, amount),
 				}),
 				...(toAccount?.type === 'loan' && {
 					balanceDue: Math.max(0, (toAccount?.balanceDue || 0) - amount),
 				}),
-			},
-		}),
-	]);
+			})
+			.where(eq(dAccount.id, toAccountId));
+	});
 }
 
 export async function deleteAccountData(userId: string) {
-	// Delete Documents
-	await prisma.document.deleteMany({
-		where: { userId },
-	});
 	// Delete Transactions
-	await prisma.transaction.deleteMany({
-		where: { customerId: userId },
-	});
+	await sql.delete(dTransaction).where(eq(dTransaction.customerId, userId));
 	// Delete Accounts
-	await prisma.account.deleteMany({
-		where: { customerId: userId },
-	});
+	await sql.delete(dAccount).where(eq(dAccount.customerId, userId));
 }

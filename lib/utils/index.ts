@@ -62,3 +62,26 @@ export function currencyFormatter(
 		return formatter(parsed);
 	}
 }
+
+export function getDateTime(value: string | Date | undefined | null): string;
+export function getDateTime(
+	value: string | Date | undefined | null,
+	output: 'date'
+): Date;
+
+export function getDateTime(
+	value: string | Date | undefined | null,
+	output: 'date' | 'string' = 'string'
+): Date | string {
+	const date = !value
+		? new Date()
+		: typeof value === 'string'
+			? new Date(value)
+			: value;
+
+	if (output === 'string') {
+		return date.toISOString();
+	}
+
+	return date;
+}

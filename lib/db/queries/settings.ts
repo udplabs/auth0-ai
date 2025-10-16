@@ -1,12 +1,20 @@
 'use server';
-import { ulid } from '@/lib/utils';
+import { isDev } from '@/lib/constants';
+import { sql } from '@/lib/db/drizzle/sql/db';
+import {
+	settings as dSettings,
+	type SettingsModel,
+} from '@/lib/db/drizzle/sql/schema';
+import { db as drizzle } from '@/lib/db/drizzle/supabase/db';
+import {
+	appInstance as dAppInstance,
+	remoteSettings,
+} from '@/lib/db/drizzle/supabase/schema';
+import { getDateTime, ulid } from '@/lib/utils';
 import { createHash } from 'crypto';
+import { eq } from 'drizzle-orm';
 import { promises } from 'fs';
 import path from 'path';
-import { SettingsCreateInput, SettingsModel } from '../generated/prisma/models';
-import { RemoteSettingsCreateInput } from '../generated/supabase/models';
-import { prisma } from '../prisma/client';
-import { supabase } from '../supabase/client';
 
 import type { UICreateSettingsInput, UISettings } from '@/types/settings';
 
@@ -30,47 +38,51 @@ export async function upsertSettings(
 
 	const { id, createdAt, updatedAt, ...rest } = data;
 
-	// Build base data object
-	// - coerce ISO strings to Date for createdAt/updatedAt
 	const payload = {
-		...data,
-		createdAt:
-			typeof createdAt === 'string'
-				? new Date(createdAt)
-				: (createdAt ?? undefined),
-		updatedAt:
-			typeof updatedAt === 'string'
-				? new Date(updatedAt)
-				: ((rest as any).updatedAt ?? undefined),
+		createdAt: getDateTime(createdAt, 'date'),
+		updatedAt: getDateTime(updatedAt, 'date'),
+		...rest,
 	};
-
-	const result = await prisma.settings.upsert({
-		where: { id },
-		update: payload,
-		create: payload as SettingsCreateInput,
-	});
+	const [localSettings] = await sql
+		.insert(dSettings)
+		.values({ id, ...payload })
+		.onConflictDoUpdate({
+			target: dSettings.id,
+			set: payload,
+		})
+		.returning();
 
 	const appInstance = await saveAppInstance();
 
 	// Update remote DB
 	// TODO: make this a throw-away call 🤔
-	await supabase.remoteSettings.upsert({
-		where: { id },
-		update: {
-			...payload,
-			appInstanceId: appInstance.id,
-		},
-		create: {
-			...payload,
-		} as RemoteSettingsCreateInput,
-	});
+	if (!isDev) {
+		await drizzle
+			.insert(remoteSettings)
+			.values({
+				...localSettings,
+				createdAt: getDateTime(localSettings.createdAt),
+				updatedAt: getDateTime(localSettings.updatedAt),
+				appInstanceId: appInstance.id,
+			})
+			.onConflictDoUpdate({
+				target: remoteSettings.id,
+				set: {
+					...localSettings,
+					createdAt: getDateTime(localSettings.createdAt),
+					updatedAt: getDateTime(localSettings.updatedAt),
+				},
+			});
+	}
 
-	return UISettings(result);
+	return UISettings(localSettings);
 }
 
 // Call upsertSettings
 export async function getSettings(id: string): Promise<UISettings> {
-	const settings = await prisma.settings.findUnique({ where: { id } });
+	const settings = await sql.query.settings.findFirst({
+		where: eq(dSettings.id, id),
+	});
 
 	if (settings?.createdAt && settings?.updatedAt) {
 		return UISettings(settings);
@@ -79,8 +91,8 @@ export async function getSettings(id: string): Promise<UISettings> {
 	// Create placeholder
 	return await upsertSettings({
 		id,
-		createdAt: new Date(),
-		updatedAt: new Date(),
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
 	});
 }
 export async function saveAppInstance() {
@@ -121,20 +133,30 @@ export async function saveAppInstance() {
 		}
 	}
 
-	return await supabase.appInstance.upsert({
-		where: { id },
-		update: {
-			auth0ClientId,
-			auth0Domain,
-			hashedInstanceId,
-		},
-		create: {
-			id,
-			auth0ClientId,
-			auth0Domain,
-			hashedInstanceId,
-		},
-	});
+	const [result] = await drizzle
+		.insert(dAppInstance)
+		.values({ auth0ClientId, auth0Domain, hashedInstanceId, id })
+		.onConflictDoUpdate({
+			target: dAppInstance.id,
+			set: { auth0ClientId, auth0Domain, hashedInstanceId },
+		})
+		.returning();
+
+	return result;
+	// return await supabase.appInstance.upsert({
+	// 	where: { id },
+	// 	update: {
+	// 		auth0ClientId,
+	// 		auth0Domain,
+	// 		hashedInstanceId,
+	// 	},
+	// 	create: {
+	// 		id,
+	// 		auth0ClientId,
+	// 		auth0Domain,
+	// 		hashedInstanceId,
+	// 	},
+	// });
 }
 
 export async function fileExistsAtRoot(filepath: string) {
@@ -151,10 +173,10 @@ export async function fileExistsAtRoot(filepath: string) {
 function UISettings(settings: SettingsModel): UISettings {
 	return {
 		...settings,
+		createdAt: getDateTime(settings?.createdAt),
+		updatedAt: getDateTime(settings?.updatedAt),
 		currentModule: settings?.currentModule ?? undefined,
 		labMeta: settings?.labMeta ?? undefined,
 		preferences: settings?.preferences ?? undefined,
-		createdAt: settings.createdAt.toISOString(),
-		updatedAt: settings.updatedAt.toISOString(),
 	} as UISettings;
 }

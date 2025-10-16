@@ -67,7 +67,7 @@ export const TransactionSchema = z.object({
 		.describe('A human readable memo or note about the transaction.'),
 
 	amount: z.number(),
-	date: z.string().datetime().describe('The date the transaction occurred.'),
+	date: z.iso.datetime().describe('The date the transaction occurred.'),
 	type: z.enum(['credit', 'debit']),
 
 	/**
@@ -152,4 +152,6 @@ export const TransactionSchema = z.object({
 		.describe(
 			'The ISO 4217 numeric code for the currency (e.g. 840 for USD, 978 for EUR).'
 		),
+	createdAt: z.iso.datetime(),
+	updatedAt: z.iso.datetime(),
 });

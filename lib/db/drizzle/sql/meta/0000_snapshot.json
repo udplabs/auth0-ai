@@ -1,0 +1,1808 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "version": "6",
+  "dialect": "sqlite",
+  "tables": {
+    "_prisma_migrations": {
+      "name": "_prisma_migrations",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "checksum": {
+          "autoincrement": false,
+          "name": "checksum",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "finished_at": {
+          "autoincrement": false,
+          "name": "finished_at",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "migration_name": {
+          "autoincrement": false,
+          "name": "migration_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "logs": {
+          "autoincrement": false,
+          "name": "logs",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rolled_back_at": {
+          "autoincrement": false,
+          "name": "rolled_back_at",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "started_at": {
+          "default": "(current_timestamp)",
+          "autoincrement": false,
+          "name": "started_at",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "applied_steps_count": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "applied_steps_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "Account": {
+      "name": "Account",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "customerId": {
+          "autoincrement": false,
+          "name": "customerId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isExternal": {
+          "default": false,
+          "autoincrement": false,
+          "name": "isExternal",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "externalConnectionId": {
+          "autoincrement": false,
+          "name": "externalConnectionId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "externalConnectionName": {
+          "autoincrement": false,
+          "name": "externalConnectionName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "balance": {
+          "autoincrement": false,
+          "name": "balance",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currencyCode": {
+          "default": "'USD'",
+          "autoincrement": false,
+          "name": "currencyCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencyName": {
+          "default": "'US Dollar'",
+          "autoincrement": false,
+          "name": "currencyName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencySymbol": {
+          "default": "'$'",
+          "autoincrement": false,
+          "name": "currencySymbol",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencyNumericCode": {
+          "default": 840,
+          "autoincrement": false,
+          "name": "currencyNumericCode",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "displayName": {
+          "autoincrement": false,
+          "name": "displayName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "number": {
+          "autoincrement": false,
+          "name": "number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "openedDate": {
+          "autoincrement": false,
+          "name": "openedDate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "closedDate": {
+          "autoincrement": false,
+          "name": "closedDate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "routingNumber": {
+          "autoincrement": false,
+          "name": "routingNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "autoincrement": false,
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subType": {
+          "autoincrement": false,
+          "name": "subType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "default": "'active'",
+          "autoincrement": false,
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "balanceDue": {
+          "autoincrement": false,
+          "name": "balanceDue",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentPrincipal": {
+          "autoincrement": false,
+          "name": "currentPrincipal",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dueDate": {
+          "autoincrement": false,
+          "name": "dueDate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interestRate": {
+          "autoincrement": false,
+          "name": "interestRate",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lastPaymentDate": {
+          "autoincrement": false,
+          "name": "lastPaymentDate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nextPaymentDate": {
+          "autoincrement": false,
+          "name": "nextPaymentDate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "originalPrincipal": {
+          "autoincrement": false,
+          "name": "originalPrincipal",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paymentAmount": {
+          "autoincrement": false,
+          "name": "paymentAmount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paymentDate": {
+          "autoincrement": false,
+          "name": "paymentDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "term": {
+          "autoincrement": false,
+          "name": "term",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cardNumber": {
+          "autoincrement": false,
+          "name": "cardNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "creditLimit": {
+          "autoincrement": false,
+          "name": "creditLimit",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "minimumPaymentAmount": {
+          "autoincrement": false,
+          "name": "minimumPaymentAmount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "statementBalance": {
+          "autoincrement": false,
+          "name": "statementBalance",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "availableBalance": {
+          "autoincrement": false,
+          "name": "availableBalance",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dividendRate": {
+          "autoincrement": false,
+          "name": "dividendRate",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interestYTD": {
+          "autoincrement": false,
+          "name": "interestYTD",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cashBalance": {
+          "autoincrement": false,
+          "name": "cashBalance",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "Account_externalConnectionId_idx": {
+          "name": "Account_externalConnectionId_idx",
+          "columns": [
+            "externalConnectionId"
+          ],
+          "isUnique": false
+        },
+        "Account_customerId_idx": {
+          "name": "Account_customerId_idx",
+          "columns": [
+            "customerId"
+          ],
+          "isUnique": false
+        },
+        "Account_number_idx": {
+          "name": "Account_number_idx",
+          "columns": [
+            "number"
+          ],
+          "isUnique": false
+        },
+        "Account_status_idx": {
+          "name": "Account_status_idx",
+          "columns": [
+            "status"
+          ],
+          "isUnique": false
+        },
+        "Account_type_idx": {
+          "name": "Account_type_idx",
+          "columns": [
+            "type"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "Message": {
+      "name": "Message",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "chatId": {
+          "autoincrement": false,
+          "name": "chatId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "autoincrement": false,
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "autoincrement": false,
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parts": {
+          "autoincrement": false,
+          "name": "parts",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metadata": {
+          "autoincrement": false,
+          "name": "metadata",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "attachments": {
+          "autoincrement": false,
+          "name": "attachments",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vote": {
+          "autoincrement": false,
+          "name": "vote",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "Message_userId_idx": {
+          "name": "Message_userId_idx",
+          "columns": [
+            "userId"
+          ],
+          "isUnique": false
+        },
+        "Message_chatId_idx": {
+          "name": "Message_chatId_idx",
+          "columns": [
+            "chatId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "Message_chatId_Chat_id_fk": {
+          "name": "Message_chatId_Chat_id_fk",
+          "tableFrom": "Message",
+          "tableTo": "Chat",
+          "columnsFrom": [
+            "chatId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "Chat": {
+      "name": "Chat",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "autoincrement": false,
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "autoincrement": false,
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "Chat_userId_idx": {
+          "name": "Chat_userId_idx",
+          "columns": [
+            "userId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "Transfer": {
+      "name": "Transfer",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "customerId": {
+          "autoincrement": false,
+          "name": "customerId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fromAccountId": {
+          "autoincrement": false,
+          "name": "fromAccountId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "toAccountId": {
+          "autoincrement": false,
+          "name": "toAccountId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "autoincrement": false,
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "memo": {
+          "autoincrement": false,
+          "name": "memo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amount": {
+          "autoincrement": false,
+          "name": "amount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currencyCode": {
+          "default": "'USD'",
+          "autoincrement": false,
+          "name": "currencyCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencyName": {
+          "default": "'US Dollar'",
+          "autoincrement": false,
+          "name": "currencyName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencyNumericCode": {
+          "default": 840,
+          "autoincrement": false,
+          "name": "currencyNumericCode",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencySymbol": {
+          "default": "'$'",
+          "autoincrement": false,
+          "name": "currencySymbol",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "Transfer_toAccountId_idx": {
+          "name": "Transfer_toAccountId_idx",
+          "columns": [
+            "toAccountId"
+          ],
+          "isUnique": false
+        },
+        "Transfer_fromAccountId_idx": {
+          "name": "Transfer_fromAccountId_idx",
+          "columns": [
+            "fromAccountId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "Transaction": {
+      "name": "Transaction",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "accountId": {
+          "autoincrement": false,
+          "name": "accountId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customerId": {
+          "autoincrement": false,
+          "name": "customerId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isExternal": {
+          "default": false,
+          "autoincrement": false,
+          "name": "isExternal",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "externalConnectionId": {
+          "autoincrement": false,
+          "name": "externalConnectionId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "externalConnectionName": {
+          "autoincrement": false,
+          "name": "externalConnectionName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "payee": {
+          "autoincrement": false,
+          "name": "payee",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rawPayee": {
+          "autoincrement": false,
+          "name": "rawPayee",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "autoincrement": false,
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "memo": {
+          "autoincrement": false,
+          "name": "memo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amount": {
+          "autoincrement": false,
+          "name": "amount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "date",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "autoincrement": false,
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "categoryId": {
+          "autoincrement": false,
+          "name": "categoryId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "categoryName": {
+          "autoincrement": false,
+          "name": "categoryName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "budgetCategoryId": {
+          "autoincrement": false,
+          "name": "budgetCategoryId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "budgetCategory": {
+          "autoincrement": false,
+          "name": "budgetCategory",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "budgetSubcategory": {
+          "autoincrement": false,
+          "name": "budgetSubcategory",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tags": {
+          "autoincrement": false,
+          "name": "tags",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencyCode": {
+          "default": "'USD'",
+          "autoincrement": false,
+          "name": "currencyCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencyName": {
+          "default": "'United States Dollar'",
+          "autoincrement": false,
+          "name": "currencyName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencySymbol": {
+          "default": "'$'",
+          "autoincrement": false,
+          "name": "currencySymbol",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencyNumericCode": {
+          "default": 840,
+          "autoincrement": false,
+          "name": "currencyNumericCode",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "Transaction_externalConnectionId_idx": {
+          "name": "Transaction_externalConnectionId_idx",
+          "columns": [
+            "externalConnectionId"
+          ],
+          "isUnique": false
+        },
+        "Transaction_budgetSubcategory_idx": {
+          "name": "Transaction_budgetSubcategory_idx",
+          "columns": [
+            "budgetSubcategory"
+          ],
+          "isUnique": false
+        },
+        "Transaction_budgetCategory_idx": {
+          "name": "Transaction_budgetCategory_idx",
+          "columns": [
+            "budgetCategory"
+          ],
+          "isUnique": false
+        },
+        "Transaction_categoryName_idx": {
+          "name": "Transaction_categoryName_idx",
+          "columns": [
+            "categoryName"
+          ],
+          "isUnique": false
+        },
+        "Transaction_type_idx": {
+          "name": "Transaction_type_idx",
+          "columns": [
+            "type"
+          ],
+          "isUnique": false
+        },
+        "Transaction_date_idx": {
+          "name": "Transaction_date_idx",
+          "columns": [
+            "date"
+          ],
+          "isUnique": false
+        },
+        "Transaction_customerId_idx": {
+          "name": "Transaction_customerId_idx",
+          "columns": [
+            "customerId"
+          ],
+          "isUnique": false
+        },
+        "Transaction_accountId_idx": {
+          "name": "Transaction_accountId_idx",
+          "columns": [
+            "accountId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "Transaction_accountId_Account_id_fk": {
+          "name": "Transaction_accountId_Account_id_fk",
+          "tableFrom": "Transaction",
+          "tableTo": "Account",
+          "columnsFrom": [
+            "accountId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "Document": {
+      "name": "Document",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "autoincrement": false,
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pageContent": {
+          "autoincrement": false,
+          "name": "pageContent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "embedding": {
+          "autoincrement": false,
+          "name": "embedding",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metadata": {
+          "autoincrement": false,
+          "name": "metadata",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {
+        "Document_id_Transaction_id_fk": {
+          "name": "Document_id_Transaction_id_fk",
+          "tableFrom": "Document",
+          "tableTo": "Transaction",
+          "columnsFrom": [
+            "id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "SampleAccount": {
+      "name": "SampleAccount",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "customerId": {
+          "autoincrement": false,
+          "name": "customerId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "balance": {
+          "autoincrement": false,
+          "name": "balance",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currencyCode": {
+          "default": "'USD'",
+          "autoincrement": false,
+          "name": "currencyCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencyName": {
+          "default": "'US Dollar'",
+          "autoincrement": false,
+          "name": "currencyName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencySymbol": {
+          "default": "'$'",
+          "autoincrement": false,
+          "name": "currencySymbol",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencyNumericCode": {
+          "default": 840,
+          "autoincrement": false,
+          "name": "currencyNumericCode",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "displayName": {
+          "autoincrement": false,
+          "name": "displayName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "number": {
+          "autoincrement": false,
+          "name": "number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "openedDate": {
+          "autoincrement": false,
+          "name": "openedDate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "closedDate": {
+          "autoincrement": false,
+          "name": "closedDate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "routingNumber": {
+          "autoincrement": false,
+          "name": "routingNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "autoincrement": false,
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subType": {
+          "autoincrement": false,
+          "name": "subType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "default": "'active'",
+          "autoincrement": false,
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "balanceDue": {
+          "autoincrement": false,
+          "name": "balanceDue",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentPrincipal": {
+          "autoincrement": false,
+          "name": "currentPrincipal",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dueDate": {
+          "autoincrement": false,
+          "name": "dueDate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interestRate": {
+          "autoincrement": false,
+          "name": "interestRate",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lastPaymentDate": {
+          "autoincrement": false,
+          "name": "lastPaymentDate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nextPaymentDate": {
+          "autoincrement": false,
+          "name": "nextPaymentDate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "originalPrincipal": {
+          "autoincrement": false,
+          "name": "originalPrincipal",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paymentAmount": {
+          "autoincrement": false,
+          "name": "paymentAmount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paymentDate": {
+          "autoincrement": false,
+          "name": "paymentDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "term": {
+          "autoincrement": false,
+          "name": "term",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cardNumber": {
+          "autoincrement": false,
+          "name": "cardNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "creditLimit": {
+          "autoincrement": false,
+          "name": "creditLimit",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "minimumPaymentAmount": {
+          "autoincrement": false,
+          "name": "minimumPaymentAmount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "statementBalance": {
+          "autoincrement": false,
+          "name": "statementBalance",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "availableBalance": {
+          "autoincrement": false,
+          "name": "availableBalance",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dividendRate": {
+          "autoincrement": false,
+          "name": "dividendRate",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interestYTD": {
+          "autoincrement": false,
+          "name": "interestYTD",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cashBalance": {
+          "autoincrement": false,
+          "name": "cashBalance",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lastSyncedAt": {
+          "autoincrement": false,
+          "name": "lastSyncedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expiresAt": {
+          "autoincrement": false,
+          "name": "expiresAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "SampleAccount_customerId_idx": {
+          "name": "SampleAccount_customerId_idx",
+          "columns": [
+            "customerId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "SampleDocument": {
+      "name": "SampleDocument",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "autoincrement": false,
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pageContent": {
+          "autoincrement": false,
+          "name": "pageContent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lastSyncedAt": {
+          "autoincrement": false,
+          "name": "lastSyncedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expiresAt": {
+          "autoincrement": false,
+          "name": "expiresAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "embedding": {
+          "autoincrement": false,
+          "name": "embedding",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metadata": {
+          "autoincrement": false,
+          "name": "metadata",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "SampleTransaction": {
+      "name": "SampleTransaction",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "accountId": {
+          "autoincrement": false,
+          "name": "accountId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customerId": {
+          "autoincrement": false,
+          "name": "customerId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payee": {
+          "autoincrement": false,
+          "name": "payee",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rawPayee": {
+          "autoincrement": false,
+          "name": "rawPayee",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "autoincrement": false,
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "memo": {
+          "autoincrement": false,
+          "name": "memo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amount": {
+          "autoincrement": false,
+          "name": "amount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "autoincrement": false,
+          "name": "date",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "autoincrement": false,
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "categoryId": {
+          "autoincrement": false,
+          "name": "categoryId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "categoryName": {
+          "autoincrement": false,
+          "name": "categoryName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "budgetCategoryId": {
+          "autoincrement": false,
+          "name": "budgetCategoryId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "budgetCategory": {
+          "autoincrement": false,
+          "name": "budgetCategory",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "budgetSubcategory": {
+          "autoincrement": false,
+          "name": "budgetSubcategory",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tags": {
+          "autoincrement": false,
+          "name": "tags",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencyCode": {
+          "default": "'USD'",
+          "autoincrement": false,
+          "name": "currencyCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencyName": {
+          "default": "'United States Dollar'",
+          "autoincrement": false,
+          "name": "currencyName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencySymbol": {
+          "default": "'$'",
+          "autoincrement": false,
+          "name": "currencySymbol",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currencyNumericCode": {
+          "default": 840,
+          "autoincrement": false,
+          "name": "currencyNumericCode",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lastSyncedAt": {
+          "autoincrement": false,
+          "name": "lastSyncedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expiresAt": {
+          "autoincrement": false,
+          "name": "expiresAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "SampleTransaction_customerId_idx": {
+          "name": "SampleTransaction_customerId_idx",
+          "columns": [
+            "customerId"
+          ],
+          "isUnique": false
+        },
+        "SampleTransaction_accountId_idx": {
+          "name": "SampleTransaction_accountId_idx",
+          "columns": [
+            "accountId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "SampleTransaction_accountId_SampleAccount_id_fk": {
+          "name": "SampleTransaction_accountId_SampleAccount_id_fk",
+          "tableFrom": "SampleTransaction",
+          "tableTo": "SampleAccount",
+          "columnsFrom": [
+            "accountId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "Settings": {
+      "name": "Settings",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "currentModule": {
+          "autoincrement": false,
+          "name": "currentModule",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentStep": {
+          "autoincrement": false,
+          "name": "currentStep",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentTask": {
+          "autoincrement": false,
+          "name": "currentTask",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentLabStep": {
+          "autoincrement": false,
+          "name": "currentLabStep",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nextLabStep": {
+          "autoincrement": false,
+          "name": "nextLabStep",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "labMeta": {
+          "autoincrement": false,
+          "name": "labMeta",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "preferences": {
+          "autoincrement": false,
+          "name": "preferences",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "LocalContent": {
+      "name": "LocalContent",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "textData": {
+          "autoincrement": false,
+          "name": "textData",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicationData": {
+          "autoincrement": false,
+          "name": "applicationData",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "labStep": {
+          "autoincrement": false,
+          "name": "labStep",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "labModule": {
+          "autoincrement": false,
+          "name": "labModule",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contentPlacement": {
+          "autoincrement": false,
+          "name": "contentPlacement",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contentType": {
+          "default": "'prompt/unknown'",
+          "autoincrement": false,
+          "name": "contentType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mimeType": {
+          "default": "'text/plain'",
+          "autoincrement": false,
+          "name": "mimeType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lastSyncedAt": {
+          "autoincrement": false,
+          "name": "lastSyncedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expiresAt": {
+          "autoincrement": false,
+          "name": "expiresAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "LocalContent_mimeType_idx": {
+          "name": "LocalContent_mimeType_idx",
+          "columns": [
+            "mimeType"
+          ],
+          "isUnique": false
+        },
+        "LocalContent_contentType_idx": {
+          "name": "LocalContent_contentType_idx",
+          "columns": [
+            "contentType"
+          ],
+          "isUnique": false
+        },
+        "LocalContent_labStep_idx": {
+          "name": "LocalContent_labStep_idx",
+          "columns": [
+            "labStep"
+          ],
+          "isUnique": false
+        },
+        "LocalContent_name_idx": {
+          "name": "LocalContent_name_idx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
+        },
+        "LocalContent_contentPlacement_idx": {
+          "name": "LocalContent_contentPlacement_idx",
+          "columns": [
+            "contentPlacement"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  }
+}

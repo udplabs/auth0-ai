@@ -1,8 +1,5 @@
 import { toolRegistry } from '@/lib/ai/tool-registry';
-import type {
-	ChatCreateInput,
-	ChatModel,
-} from '@/lib/db/generated/prisma/models';
+import type { ChatModel, ChatModelCreate } from '@/lib/db/drizzle/sql/schema';
 
 import type { SharedV2ProviderOptions } from '@ai-sdk/provider';
 import type {
@@ -81,8 +78,15 @@ export namespace Chat {
 		geolocation?: UIGeolocation;
 		settings?: Partial<UISettings>;
 		prompt?: string;
+		auth0Domain?: boolean;
+		auth0ClientId?: boolean;
+		auth0ClientSecret?: boolean;
+		auth0Secret?: boolean;
+		fgaStoreId?: boolean;
+		fgaClientId?: boolean;
+		fgaClientSecret?: boolean;
 	}
-	export interface CreateChatInput extends Pick<ChatCreateInput, 'id'> {
+	export interface CreateChatInput extends Pick<ChatModelCreate, 'id'> {
 		userId?: string;
 		createdAt?: string;
 		updatedAt?: string;

@@ -138,12 +138,10 @@ export const AccountRootSchema = z.object({
 		.string()
 		.describe('Institution assigned unique identifier for the account.'),
 
-	openedDate: z
-		.string()
+	openedDate: z.iso
 		.datetime()
 		.describe('The date (ISO 8601) the account was opened.'),
-	closedDate: z
-		.string()
+	closedDate: z.iso
 		.datetime()
 		.optional()
 		.describe('The date (ISO 8601) the account was closed.'),
@@ -165,8 +163,8 @@ export const AccountRootSchema = z.object({
 		)
 		.optional()
 		.describe('The permissions the user has for this account.'),
-	createdAt: z.string(),
-	updatedAt: z.string(),
+	createdAt: z.iso.datetime(),
+	updatedAt: z.iso.datetime(),
 });
 
 export const LoanSubTypeSchema = z.enum([
@@ -195,8 +193,7 @@ export const LoanAccountSchema = AccountRootSchema.extend({
 		.number()
 		.optional()
 		.describe('The current principal balance of the loan.'),
-	dueDate: z
-		.string()
+	dueDate: z.iso
 		.datetime()
 		.describe('The date (ISO 8601) the balance due is due.'),
 
@@ -212,16 +209,14 @@ export const LoanAccountSchema = AccountRootSchema.extend({
 	/**
 	 * The date of the last payment made on the loan.
 	 */
-	lastPaymentDate: z
-		.string()
+	lastPaymentDate: z.iso
 		.datetime()
 		.describe('The date of the last payment made on the loan (ISO 8601).'),
 
 	/**
 	 * The date of the next scheduled payment on the loan.
 	 */
-	nextPaymentDate: z
-		.string()
+	nextPaymentDate: z.iso
 		.datetime()
 		.describe('The date of the next scheduled payment on the loan (ISO 8601).'),
 

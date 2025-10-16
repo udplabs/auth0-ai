@@ -1,12 +1,13 @@
 'use server';
 
-import type { ChatModel } from '@/lib/db/generated/prisma/models';
 import { APIError } from '@/lib/errors';
 import { convertToUI } from '@/lib/utils/db-converter';
 import { groupItemsByDate } from '@/lib/utils/group-items-by-date';
-import { prisma } from '../../prisma/client';
 
+import { sql } from '@/lib/db/drizzle/sql/db';
+import { chat as dChat, type ChatModel } from '@/lib/db/drizzle/sql/schema';
 import type { Chat } from '@/types/chat';
+import { and, desc, eq } from 'drizzle-orm';
 
 interface GetChatByIdOptions {
 	userId?: string;
@@ -18,13 +19,16 @@ export async function getChatById(
 	options: GetChatByIdOptions = {}
 ): Promise<Chat.UIChat | undefined> {
 	const { userId, includeMessages = false } = options;
-
-	const chat = await prisma.chat.findUnique({
-		where: { id },
-		include: { messages: includeMessages },
+	const chat = await sql.query.chat.findFirst({
+		where: eq(dChat.id, id),
+		with: { messages: includeMessages ? true : undefined },
 	});
+	// const chat = await prisma.chat.findUnique({
+	// 	where: { id },
+	// 	include: { messages: includeMessages },
+	// });
 
-	if (chat !== null) {
+	if (chat) {
 		if (userId && chat.userId && chat.userId !== userId) {
 			throw new APIError(
 				'unauthorized:api',
@@ -37,9 +41,13 @@ export async function getChatById(
 }
 
 export async function getChatByMessageId(messageId: string, userId?: string) {
-	const message = await prisma.message.findUnique({
-		where: userId ? { id: messageId, userId } : { id: messageId },
-		include: { chat: true },
+	const message = await sql.query.message.findFirst({
+		where: userId
+			? and(eq(dChat.id, messageId), eq(dChat.userId, userId))
+			: eq(dChat.id, messageId),
+		with: {
+			chat: true,
+		},
 	});
 
 	if (!message) {
@@ -75,24 +83,18 @@ export async function listChatsByUserId(
 	userId: string,
 	options?: ListChatsParams | ListGroupedChatsParams
 ): Promise<ListChatsByUserIdResult | Chat.GroupedItems<Chat.UIChat>> {
-	const { page = 1, pageSize = 20, grouped = false } = options || {};
+	const { page = 1, pageSize: limit = 20, grouped = false } = options || {};
 
-	const skip = (page - 1) * pageSize;
+	const offset = (page - 1) * limit;
 
 	const [chats, total] = await Promise.all([
-		prisma.chat.findMany({
-			where: {
-				userId,
-			},
-			orderBy: { updatedAt: 'desc' },
-			skip,
-			take: pageSize,
+		sql.query.chat.findMany({
+			where: eq(dChat.userId, userId),
+			orderBy: [desc(dChat.updatedAt)],
+			limit,
+			offset,
 		}),
-		prisma.chat.count({
-			where: {
-				userId,
-			},
-		}),
+		sql.$count(dChat, eq(dChat.userId, userId)),
 	]);
 
 	const uiChats = chats.map(convertToUI<ChatModel, Chat.UIChat>);
@@ -105,7 +107,7 @@ export async function listChatsByUserId(
 		chats: uiChats,
 		total,
 		page,
-		pageSize,
-		totalPages: Math.ceil(total / pageSize),
+		pageSize: limit,
+		totalPages: Math.ceil(total / limit),
 	};
 }
