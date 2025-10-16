@@ -104,10 +104,9 @@ export function convertToUI<DB = any, UI = any>(dbItem: DB): UI {
 					continue;
 				}
 
-				// Prisma has a bug and cannot take strings.
 				// The UI prefers strings.
 				if (value instanceof Date) {
-					const newValue = value.toISOString();
+					const newValue = new Date(value).toISOString();
 
 					// If a message, always place createdAt/updatedAt under metadata, and ensure it exists
 					if (isMessage && (key === 'createdAt' || key === 'updatedAt')) {
