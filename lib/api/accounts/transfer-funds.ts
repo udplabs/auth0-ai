@@ -6,6 +6,7 @@ import {
 import { getAccountsByAccountId } from '@/lib/db/queries/accounts/query-accounts';
 
 import { APIError } from '@/lib/errors';
+import { ulid } from '@/lib/utils';
 import type { Accounts } from '@/types/accounts';
 import type { Transfers } from '@/types/transfers';
 
@@ -37,6 +38,7 @@ export async function transferFunds({
 		description,
 		fromAccountId,
 		toAccountId,
+		id: ulid(),
 		...transfer,
 	});
 	const {

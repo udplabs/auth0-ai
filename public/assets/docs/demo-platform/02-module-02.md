@@ -1,5 +1,3 @@
-# Prepare App Environment
-
 ## Objective
 
 1. Verify that a bootstrapped <mark>Regular Web Application</mark> has been created in your Auth0 tenant with the correct configuration details.
@@ -86,27 +84,60 @@ You can clone the repo using the UI or via command line. Need a [refresher](http
 <br>
 </details>
 
+## Task 3: Add OpenAI API Key
+
+For this lab we have generously provided you with an OpenAI API key. This key is **not** guaranteed to last! Although it shows an expiration date, be advised that we may need to expire it early (without warning).
+
+*To get your own API key, follow OpenAI's guides/documentation.*
+
+1. Navigate back to the Launch Pad in the Lab Guide and copy the OpenAI API Key
+
+    ![OpenAI Key](./assets/Module03/images/image1.png)
+
+2. In your IDE, navigate to the <kbd>.env</kbd> file that is located in the **root** of the project folder (<kbd>./auth0-ai/.env</kbd>) and update it with the API key:
+
+    <kbd>OPENAI_API_KEY="YOUR_API_KEY"</kbd>
+
+    > [!TIP]
+    >
+    > The Vercel AI SDK supports numerous different providers. While we are using OpenAI for this lab you can technically use any provider.
+    >
+    > Just be advised that each provider has slight variations in behavior and/or requirements and may not be 100% compatible with the demo application.
+
+3. ***Save the changes!***
+
+<br>
+
+---
+> [!NOTE]
+> For ease and simplicity the lab utilizes only one <kbd>.env</kbd> file.
+>
+> ***We do not recommend this in a production environment.***
+>
+> Best practice is to keep 'secrets' or sensitive information in <kbd>.env.local</kbd>.
+>
+> *Rule of thumb* -- **Follow best practice for your organization.**
+>
+> *Refer to [NextJS documentation](https://nextjs.org/docs/app/guides/environment-variables) for additional information on how variables are handled in NextJS specifically.*
+---
+<br>
+
 ## Task 3: Start the app
 1. In your terminal or powershell, install the project dependencies using NPM
 
     ```bash
     npm install
     ```
-2. Once complete, run the following to generate the database:
+2. After package install is completed, start up the application:
 
     ```bash
-    npm run db:generate
-    ```
-3. After the database is generated, start up the application in *development mode*:
-
-    ```bash
-    npm run dev
+    npm start
     ```
 
     <br>
 
     > [!NOTE]
-    > If application started successfully, you should see the following:
+    > If the application started successfully, you should see something similar to the following:
     >
     > ![Running App](./assets/Module02/images/image1.png)
     >

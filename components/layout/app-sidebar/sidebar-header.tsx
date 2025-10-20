@@ -1,5 +1,5 @@
 'use client';
-import { DarkLogo, LightLogo } from '@/components/logo';
+import { Logo } from '@/components/logo';
 import {
 	SidebarMenu,
 	type SidebarMenuProps,
@@ -18,8 +18,6 @@ export function SidebarHeader({
 	SidebarMenuProps,
 	...props
 }: SidebarHeaderProps) {
-	const theme = useTheme();
-
 	const { setOpenMobile } = useSidebar();
 
 	return (
@@ -32,11 +30,7 @@ export function SidebarHeader({
 					}}
 					className='flex flex-row items-center gap-3'
 				>
-					{theme.resolvedTheme === 'light' ? (
-						<LightLogo />
-					) : (
-						<DarkLogo className='w-full pe-5' />
-					)}
+					<Logo />
 				</Link>
 			</SidebarMenu>
 		</UISidebarHeader>

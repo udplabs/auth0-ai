@@ -6,7 +6,7 @@
 
 ## Description
 
-Now that we have successfully set up the application and it’s running in our local environment, let’s go ahead and start configuring the correct variables to ensure Aiya is able to properly respond to user prompts.
+Now that we have successfully set up the application and it’s running in our local environment, let’s go ahead and start configuring the correct variables to get started.
 
 We can pull these variable values directly from our Auth0 tenant through the dashboard. We also provide some directly in this lab guide.
 
@@ -72,28 +72,6 @@ Next, we need to generate a secret that the Auth0 NextJS SDK uses to encrypt the
     AUTH0_SECRET=<randomly-generated-value>
     ```
 
-## Task 3: Add OpenAI API Key
-
-For this lab we have generously provided you with an OpenAI API key. This key is **not** guaranteed to last! Although it shows an expiration date, be advised that we may need to expire it early (without warning).
-
-*To get your own API key, follow OpenAI's guides/documentation.*
-
-1. Navigate back to the Launch Pad in the Lab Guide and copy the OpenAI API Key
-
-    ![OpenAI Key](./assets/Module03/images/image1.png)
-
-2. Update your <kbd>.env</kbd> (or <kbd>.env.local</kbd>) file with the API Key
-
-    ```env
-    OPENAI_API_KEY="YOUR_API_KEY"
-    ```
-
-    > [!TIP]
-    >
-    > The Vercel AI SDK supports numerous different providers. While we are using OpenAI for this lab you can technically use any provider.
-    >
-    > Just be advised that each provider has slight variations in behavior and/or requirements and may not be 100% compatible with the demo application.
-
 <br>
 
 ---
@@ -123,10 +101,10 @@ Restart your dev server so it picks up the new environment variables:
 
 2. Start the app again. *<mark>If the app does not auto-refresh, make sure to manually refresh it.</mark>*
     ```bash
-    npm run dev
+    npm start
     ```
 
-## Task 4: Enable Management API
+## Task 3: Enable Management API
 This application utilizes the management API to fetch/update profile information as well as manage authenticators for MFA.
 
 *Before it can be used, it needs to be enabled.*
@@ -153,7 +131,7 @@ This application utilizes the management API to fetch/update profile information
 
 *Great! Now you should be ready to test.* 🥳
 
-## Task 5: Try it
+## Task 4: Try it
 
 1. Return to the open app **or** reopen the app at:
 
