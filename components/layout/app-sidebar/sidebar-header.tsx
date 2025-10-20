@@ -7,7 +7,6 @@ import {
 	type SidebarHeaderProps as UISidebarHeaderProps,
 	useSidebar,
 } from '@/components/ui/sidebar';
-import { useTheme } from 'next-themes';
 import Link from 'next/link';
 
 export interface SidebarHeaderProps extends UISidebarHeaderProps {
