@@ -151,5 +151,16 @@ namespace NodeJS {
 		 * @readonly
 		 */
 		readonly OPENAI_API_KEY?: string;
+		/**
+		 * For this application, `local` is in fact 'production'.
+		 *
+		 * `production` is the mode used for the deployed version.
+		 * `development` is used by Auth0 developers when modifying the app.
+		 * `test` is used for testing certain changes during development, not for running tests.
+		 *
+		 * @default local;
+		 * @readonly
+		 */
+		readonly MODE: 'development' | 'local' | 'production' | 'test';
 	}
 }

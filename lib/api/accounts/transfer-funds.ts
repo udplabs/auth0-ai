@@ -1,7 +1,7 @@
 import { updateBalances } from '@/lib/db/queries/accounts/mutate-accounts';
 import {
-	createTransactions,
 	createTransfer,
+	saveTransactions,
 } from '@/lib/db/queries/accounts/mutate-transactions';
 import { getAccountsByAccountId } from '@/lib/db/queries/accounts/query-accounts';
 
@@ -41,13 +41,7 @@ export async function transferFunds({
 		id: ulid(),
 		...transfer,
 	});
-	const {
-		amount,
-		createdAt: created_at,
-		customerId,
-		memo,
-		updatedAt: updated_at,
-	} = createdTransfer;
+	const { amount, createdAt, customerId, memo, updatedAt } = createdTransfer;
 
 	const rootTransaction = {
 		amount,
@@ -55,19 +49,19 @@ export async function transferFunds({
 		budgetCategoryId: 'payments_transfers',
 		categoryId: '6012',
 		categoryName: 'Transfers',
-		created_at,
+		createdAt: createdAt.toISOString(),
 		customerId,
 		description,
-		memo,
+		memo: memo ?? undefined,
 		tags: ['transfer', 'online', 'aiya'],
-		updated_at,
+		updatedAt: updatedAt.toISOString(),
+		date: createdAt.toISOString(),
 	};
 	// Create the transactions in the DB
-	await createTransactions([
+	await saveTransactions([
 		{
 			...rootTransaction,
 			accountId: fromAccountId,
-			date: created_at,
 			payee: toAccountNumber,
 			rawPayee: toAccountNumber,
 			type: 'debit',
@@ -75,7 +69,6 @@ export async function transferFunds({
 		{
 			...rootTransaction,
 			accountId: toAccountId,
-			date: created_at,
 			payee: fromAccountNumber,
 			rawPayee: fromAccountNumber,
 			type: 'credit',

@@ -28,6 +28,8 @@ export const ContentSchema = z.object({
 			'prompt/lab',
 			'prompt/unknown',
 			'reference/code',
+			'prompt/module',
+			'guide/module',
 		])
 		.describe(
 			'The type and subtype of content. Similar to mimetype but more specific to the application domain.'

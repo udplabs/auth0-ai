@@ -1,4 +1,4 @@
-import type { SettingsModel } from '@/lib/db/generated/prisma/models';
+import type { SettingsModel } from '@/lib/db/drizzle/sql/schema';
 
 export interface UISettings extends Pick<SettingsModel, 'id'> {
 	createdAt: string;
@@ -20,6 +20,6 @@ export interface UISettings extends Pick<SettingsModel, 'id'> {
 export interface UICreateSettingsInput
 	extends Partial<Omit<UISettings, 'createdAt' | 'updatedAt'>> {
 	id: string;
-	createdAt?: string | Date;
-	updatedAt?: string | Date;
+	createdAt?: string;
+	updatedAt?: string;
 }

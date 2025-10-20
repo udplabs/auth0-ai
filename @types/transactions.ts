@@ -96,26 +96,35 @@ export namespace Transactions {
 		 *
 		 * @example "USD"
 		 */
-		currencyCode: string;
+		currencyCode?: string;
 		/**
 		 * The ISO 4217 currency name (e.g. "United States Dollar" for USD, "Euro" for EUR).
 		 *
 		 * @example "United States Dollar"
 		 */
-		currencyName: string;
+		currencyName?: string;
 		/**
 		 * The symbol used to represent the currency (e.g. "$" for USD, "€" for EUR).
 		 *
 		 * @example "$"
 		 */
-		currencySymbol: string;
+		currencySymbol?: string;
 		/**
 		 * The ISO 4217 numeric code for the currency (e.g. 840 for USD, 978 for EUR).
 		 *
 		 * @example 840
 		 */
-		currencyNumericCode: number;
+		currencyNumericCode?: number;
+		createdAt: string;
+		updatedAt: string;
 	}
 
-	export type CreateTransactionInput = Omit<Transaction, 'id'>;
+	export interface CreateTransactionInput extends Omit<Transaction, 'id'> {
+		id?: string;
+	}
+
+	export type CreateTransactionInputNoAccount = Omit<
+		CreateTransactionInput,
+		'accountId'
+	> & { accountId?: string };
 }

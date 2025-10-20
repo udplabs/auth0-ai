@@ -1,24 +1,20 @@
 'use server';
 
+import { ASSET_URL } from '@/lib/constants';
+import { sql } from '@/lib/db/drizzle/sql/db';
+import { localContent as dLocalContent } from '@/lib/db/drizzle/sql/schema';
+import { db as drizzle } from '@/lib/db/drizzle/supabase/db';
 import {
-	ContentPlacement,
-	ContentType,
-	MimeType,
-} from '../generated/prisma/enums';
-import { JsonObject } from '../generated/prisma/internal/prismaNamespace';
-import {
-	LocalContentCreateInput,
-	LocalContentModel,
-	LocalContentWhereInput,
-} from '../generated/prisma/models';
-import {
-	RemoteContentModel,
-	RemoteContentWhereInput,
-} from '../generated/supabase/models';
-import { prisma } from '../prisma/client';
-import { supabase } from '../supabase/client';
-
+	ContentType as dContentType,
+	remoteContent,
+	type ContentPlacement as dContentPlacement,
+	type MimeType as dMimeType,
+} from '@/lib/db/drizzle/supabase/schema';
+import { getDateTime } from '@/lib/utils';
+import { and, eq, gt, type SQL } from 'drizzle-orm';
 namespace Content {
+	export type LocalContentModel = typeof dLocalContent.$inferSelect;
+	export type RemoteContentModel = typeof remoteContent.$inferSelect;
 	export interface UIContent
 		extends Pick<RemoteContentModel, 'id' | 'name'>,
 			Pick<LocalContentModel, 'id' | 'name'> {
@@ -56,87 +52,56 @@ namespace Content {
 		| 'text/plan'
 		| 'text/html'
 		| 'text/csv'
+		| 'text/typescript'
 		| 'application/json'
-		| 'application/xml'
-		| 'application/typescript';
+		| 'application/xml';
 
 	export interface GetParams {
 		key?: QueryKeys;
 		query?: string;
 		contentPlacement?: UIContentPlacement;
 		contentType?: UIType;
+		mimeType?: UIMimeType;
 	}
 
 	type QueryKeys = 'name' | 'filename' | 'labModule';
 }
 
-function getContentType(contentType: Content.UIType) {
-	const dbContentType = contentType
-		.replace('/', '_')
-		.toUpperCase() as ContentType;
-	return ContentType[dbContentType];
-}
-
-function getMimeType(mimeType: string) {
-	const dbMimeType = mimeType.replace('/', '_').toUpperCase() as MimeType;
-	return MimeType[dbMimeType];
-}
-
-function getContentPlacement(contentPlacement: string) {
-	const dbContentPlacement = contentPlacement
-		.replace('/', '_')
-		.toUpperCase() as ContentPlacement;
-	return ContentPlacement[dbContentPlacement];
-}
-
-function getUIMimeType(mimeType: MimeType | null) {
-	if (mimeType !== null) {
-		return mimeType.replace('_', '/').toLowerCase() as Content.UIMimeType;
-	}
-}
-
-function getUIContentType(contentType: ContentType | null) {
-	if (contentType !== null) {
-		return contentType.replace('_', '/').toLowerCase() as Content.UIType;
-	}
-	return 'unknown';
-}
-function getUIContentPlacement(contentPlacement: ContentPlacement | null) {
-	if (contentPlacement !== null) {
-		return contentPlacement.toLowerCase() as Content.UIContentPlacement;
-	}
-}
-
-function buildQuery({
+function buildDrizzleQuery({
 	key,
 	query,
 	contentType,
 	contentPlacement,
+	mimeType,
 }: Content.GetParams) {
-	const AND: LocalContentWhereInput[] | RemoteContentWhereInput[] = [];
+	const AND: SQL[] = [];
 
 	if (key && query) {
 		if (key === 'name') {
-			AND.push({ name: { contains: query } });
+			AND.push(eq(remoteContent.name, query));
 		} else if (key === 'filename') {
-			AND.push({ name: { equals: query } });
-			AND.push({ mimeType: { equals: getMimeType(query) } });
+			AND.push(eq(remoteContent.name, query));
 		} else if (key === 'labModule') {
-			AND.push({
-				labModule: { equals: parseInt(query.replace('_', '-')) },
-			});
+			AND.push(eq(remoteContent.labModule, Number(query)));
 		}
+	}
+
+	if (mimeType) {
+		AND.push(eq(remoteContent.mimeType, mimeType as dMimeType));
 	}
 
 	if (key !== 'filename') {
 		if (contentType) {
-			AND.push({ contentType: { equals: getContentType(contentType) } });
+			AND.push(eq(remoteContent.contentType, contentType as dContentType));
 		}
 
 		if (contentPlacement) {
-			AND.push({
-				contentPlacement: { equals: getContentPlacement(contentPlacement) },
-			});
+			AND.push(
+				eq(
+					remoteContent.contentPlacement,
+					contentPlacement as dContentPlacement
+				)
+			);
 		}
 	}
 
@@ -147,17 +112,12 @@ function buildQuery({
 export async function findFirstContent(
 	params: Content.GetParams
 ): Promise<Content.UIContent | undefined> {
-	const AND = buildQuery(params);
+	const dAND = buildDrizzleQuery(params);
 
-	if (!AND.length) throw new Error('Must provide valid search parameters!');
+	if (!dAND.length) throw new Error('Must provide valid search parameters!');
 
-	const localContent = await prisma.localContent.findFirst({
-		where: {
-			AND: [
-				...AND,
-				{ expiresAt: { gt: new Date() } },
-			] as LocalContentWhereInput[],
-		},
+	const localContent = await sql.query.localContent.findFirst({
+		where: and(...[...dAND, gt(dLocalContent.expiresAt, new Date())]),
 	});
 
 	if (localContent != null) {
@@ -165,11 +125,11 @@ export async function findFirstContent(
 	}
 
 	// Fetch remote content
-	const content = await supabase.remoteContent.findFirst({
-		where: { AND: [...AND] as RemoteContentWhereInput[] },
+	const content = await drizzle.query.remoteContent.findFirst({
+		where: and(...dAND),
 	});
 
-	if (content != null) {
+	if (content) {
 		// Update local copy
 		return await updateLocalContent(content);
 	}
@@ -178,20 +138,15 @@ export async function findFirstContent(
 export async function findAllContent(
 	params: Content.GetParams
 ): Promise<Content.UIContent[]> {
-	const AND = buildQuery(params);
+	const dAND = buildDrizzleQuery(params);
 
-	const localContent = await prisma.localContent.findMany({
-		where: {
-			AND: [
-				...AND,
-				{ expiresAt: { gt: new Date() } },
-			] as LocalContentWhereInput[],
-		},
+	const localContent = await sql.query.localContent.findMany({
+		where: and(...[...dAND, gt(dLocalContent.expiresAt, new Date())]),
 	});
 
 	if (!localContent.length) {
-		const content = await supabase.remoteContent.findMany({
-			where: { AND: [...AND] as RemoteContentWhereInput[] },
+		const content = await drizzle.query.remoteContent.findMany({
+			where: and(...dAND),
 		});
 
 		return updateLocalContent(content);
@@ -201,20 +156,20 @@ export async function findAllContent(
 }
 
 export async function getContentById(id: string) {
-	const localContent = await prisma.localContent.findUnique({
-		where: { id },
+	const localContent = await sql.query.localContent.findFirst({
+		where: eq(dLocalContent.id, id),
 	});
 
 	if (localContent != null) return UIContent(localContent);
 
 	// Check remote
-	const remoteContent = await supabase.remoteContent.findUnique({
-		where: { id },
+	const remote = await drizzle.query.remoteContent.findFirst({
+		where: eq(remoteContent.id, id),
 	});
 
-	if (remoteContent != null) {
+	if (remote != null) {
 		// Update local copy
-		return await updateLocalContent(remoteContent);
+		return await updateLocalContent(remote);
 	}
 
 	// If no local or remote content found, return undefined
@@ -273,46 +228,45 @@ export async function getModuleCode(module: string) {
 // Wrapper to make initial app a bit faster
 export async function syncContent(): Promise<void> {
 	// Sync local content with remote content
-	const remoteContent = await supabase.remoteContent.findMany();
+	const remote = await drizzle.query.remoteContent.findMany();
 
-	await updateLocalContent(remoteContent);
+	await updateLocalContent(remote);
 }
 // =====================================================
 
 export async function updateLocalContent(
-	data: RemoteContentModel
+	data: Content.RemoteContentModel
 ): Promise<Content.UIContent>;
 export async function updateLocalContent(
-	data: RemoteContentModel[]
+	data: Content.RemoteContentModel[]
 ): Promise<Content.UIContent[]>;
 export async function updateLocalContent(
-	data: RemoteContentModel | RemoteContentModel[]
+	data: Content.RemoteContentModel | Content.RemoteContentModel[]
 ): Promise<Content.UIContent | Content.UIContent[]> {
 	const lastSyncedAt = new Date();
 	const expiresAt = new Date(lastSyncedAt.getTime() + 1000 * 60 * 24); // 30 minutes
 
 	const isArray = Array.isArray(data);
 	const _data = isArray ? data : [data];
-
-	const localContent = await prisma.$transaction([
-		..._data.map((c) => {
-			return prisma.localContent.upsert({
-				where: { id: c.id },
-				update: {
+	const localContent = await sql.transaction(async (tx) => {
+		await Promise.all(
+			_data.map((c) => {
+				const content: Content.LocalContentModel = {
 					...c,
-					applicationData: (c?.applicationData || null) as JsonObject,
+					createdAt: getDateTime(c.createdAt, 'date'),
+					updatedAt: getDateTime(c.updatedAt, 'date'),
 					lastSyncedAt,
 					expiresAt,
-				},
-				create: {
-					...c,
-					applicationData: (c?.applicationData || null) as JsonObject,
-					lastSyncedAt,
-					expiresAt,
-				} as LocalContentCreateInput,
-			});
-		}),
-	]);
+					applicationData: c?.applicationData as string,
+				};
+				return tx.insert(dLocalContent).values(content).onConflictDoUpdate({
+					target: dLocalContent.id,
+					set: content,
+				});
+			})
+		);
+		return await tx.query.localContent.findMany();
+	});
 
 	if (isArray) {
 		return UIContent(localContent);
@@ -321,10 +275,10 @@ export async function updateLocalContent(
 	return UIContent(localContent[0]);
 }
 
-function UIContent(content: LocalContentModel): Content.UIContent;
-function UIContent(content: LocalContentModel[]): Content.UIContent[];
+function UIContent(content: Content.LocalContentModel): Content.UIContent;
+function UIContent(content: Content.LocalContentModel[]): Content.UIContent[];
 function UIContent(
-	content: LocalContentModel | LocalContentModel[]
+	content: Content.LocalContentModel | Content.LocalContentModel[]
 ): Content.UIContent | Content.UIContent[] {
 	const isArray = Array.isArray(content);
 	const _content = isArray ? content : [content];
@@ -336,13 +290,14 @@ function UIContent(
 			labModule: c?.labModule != null ? c.labModule : undefined,
 			textData:
 				c?.textData != null
-					? c.textData?.replaceAll('./assets', '/assets')
+					? c.textData?.replaceAll('./assets', `${ASSET_URL}/assets`)
 					: undefined,
-			contentPlacement: getUIContentPlacement(c?.contentPlacement),
-			contentType: getUIContentType(c.contentType),
-			mimeType: getUIMimeType(c.mimeType),
-			createdAt: c.createdAt.toISOString(),
-			updatedAt: c.updatedAt.toISOString(),
+			contentPlacement: (c?.contentPlacement ??
+				undefined) as Content.UIContentPlacement,
+			contentType: c.contentType as Content.UIType,
+			mimeType: c.mimeType as Content.UIMimeType,
+			createdAt: getDateTime(c?.createdAt),
+			updatedAt: getDateTime(c?.updatedAt),
 		};
 
 		for (const key of Object.keys(ui) as (keyof typeof ui)[]) {

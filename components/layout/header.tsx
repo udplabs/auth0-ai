@@ -72,13 +72,15 @@ export function Header({
 						</Button>
 					) : (
 						<>
-							<Button
-								className='order-1 h-[34px]'
-								href='/auth/login?screen_hint=signup'
-								variant='outline'
-							>
-								Sign Up
-							</Button>
+							{!hideLogin && (
+								<Button
+									className='order-1 h-[34px]'
+									href='/auth/login?screen_hint=signup'
+									variant='outline'
+								>
+									Sign Up
+								</Button>
+							)}
 							{!hideLogin && showIcons && (
 								<Button
 									className='order-1 h-[34px]'

@@ -1,4 +1,3 @@
-import { createMockAccountsAction } from '@/app/(accounts)/actions';
 import { toast } from '@/components/toast';
 import { APIError } from '@/lib/errors';
 import { useUser } from '@auth0/nextjs-auth0';

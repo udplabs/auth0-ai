@@ -1,27 +1,21 @@
 'use server';
 
+import { sql } from '@/lib/db/drizzle/sql/db';
+import { transaction as dTransaction } from '@/lib/db/drizzle/sql/schema';
+import { UITransactions } from '@/lib/db/models';
 import { getAccountsByUserId } from '@/lib/db/queries/accounts/query-accounts';
-import { convertToUI } from '@/lib/utils/db-converter';
-import {
-	TransactionModel,
-	TransactionWhereInput,
-} from '../../generated/prisma/models';
-import { prisma } from '../../prisma/client';
+import { desc, eq } from 'drizzle-orm';
 
 import type { Transactions } from '@/types/transactions';
 export async function getTransactionsByAccountId(
 	accountId: string
 ): Promise<Transactions.Transaction[]> {
-	const transactions = await prisma.transaction.findMany({
-		where: {
-			accountId,
-		},
-		orderBy: { date: 'desc' },
+	const transactions = await sql.query.transaction.findMany({
+		where: eq(dTransaction.accountId, accountId),
+		orderBy: desc(dTransaction.date),
 	});
 
-	return convertToUI<TransactionModel[], Transactions.Transaction[]>(
-		transactions
-	);
+	return UITransactions(transactions);
 }
 
 export async function getTransactionsByUserId(
@@ -30,19 +24,4 @@ export async function getTransactionsByUserId(
 	const accounts = await getAccountsByUserId(userId, true);
 
 	return accounts.flatMap(({ transactions = [] }) => transactions);
-}
-
-// THIS IS AN INTERNAL FUNCTION USED ONLY TO GENERATE THE VECTOR DB
-// DO NOT USE THIS IN ANY API ROUTES
-export async function getAllTransactions(
-	where?: TransactionWhereInput
-): Promise<Transactions.Transaction[]> {
-	const transactions = await prisma.transaction.findMany({
-		orderBy: { date: 'desc' },
-		where,
-	});
-
-	return convertToUI<TransactionModel[], Transactions.Transaction[]>(
-		transactions
-	);
 }

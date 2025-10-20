@@ -85,7 +85,7 @@ export const ChatThinkingMessage = ({
 		return () => {
 			clearAll();
 		};
-	}, [isThinking, intervalMs, animateOnceBeforeCycle, jitterRatio]);
+	}, [isThinking, intervalMs, animateOnceBeforeCycle, jitterRatio, nextDelay]);
 
 	const current = THINKING_MESSAGES[idx] ?? 'Thinking...';
 
