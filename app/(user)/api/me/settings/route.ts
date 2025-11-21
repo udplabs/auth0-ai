@@ -1,5 +1,4 @@
 import { getUser } from '@/lib/auth0/client';
-import { syncContent } from '@/lib/db/queries/content';
 import { upsertSettings } from '@/lib/db/queries/settings';
 import { APIError, handleApiError } from '@/lib/errors';
 import type { UICreateSettingsInput } from '@/types/settings';
@@ -7,17 +6,16 @@ import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 
-// Helper to sync user content with the database
+// Helper to mark content as synced (no-op since we're using local DB only)
 // Sets a cookie so we know whether we have already synced.
 export async function POST() {
 	try {
 		// Set a sync cookie
 		const cookieStore = await cookies();
 
-		console.info('syncing remote content...');
+		console.info('content sync skipped - using local database only');
 
-		await syncContent();
-
+		// No sync needed for local DB - just set the cookie
 		cookieStore.set('db:synced', 'true', {
 			path: '/',
 			expires: new Date(Date.now() + 1000 * 60 * 30),

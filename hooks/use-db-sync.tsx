@@ -4,6 +4,8 @@ import { useEffect, useRef } from 'react';
 const SYNC_KEY = 'db:synced';
 const SYNC_TTL = 30 * 60 * 1000; // 30m
 
+// Check if database initialization is needed
+// Note: No longer syncs remote content - using local SQLite only
 function dbNeedsSync(now = Date.now()) {
 	try {
 		const raw = localStorage.getItem(SYNC_KEY);

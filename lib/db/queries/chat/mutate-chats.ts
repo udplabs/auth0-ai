@@ -6,19 +6,14 @@ import {
 	ChatModelCreate,
 	chat as dChat,
 } from '@/lib/db/drizzle/sql/schema';
-import { db as drizzle } from '@/lib/db/drizzle/supabase/db';
-import { remoteChat } from '@/lib/db/drizzle/supabase/schema';
 import { APIError } from '@/lib/errors';
 import { convertToDB } from '@/lib/utils/db-converter';
 
-import { saveAppInstance } from '../settings';
 import { deleteMessagesByChatId, saveMessages } from './mutate-messages';
 import { getChatById } from './query-chats';
 
 import type { Chat } from '@/types/chat';
 import { and, eq } from 'drizzle-orm';
-
-import { isDev } from '@/lib/constants';
 
 export async function saveChat(input: Chat.CreateChatInput) {
 	const { messages = [], ...chat } = input;
@@ -33,18 +28,8 @@ export async function saveChat(input: Chat.CreateChatInput) {
 		.values(convertedChat)
 		.onConflictDoUpdate({ target: dChat.id, set: convertedChat })
 		.returning();
-	// const dbChat = await prisma.chat.upsert({
-	// 	where: { id: chat?.id },
-	// 	update: prismaChat,
-	// 	create: prismaChat,
-	// });
-
-	// Remote write
-	// Internal mechanism to keep Supabase in sync with main
-	await upsertRemoteChat(dbChat);
 
 	// Upsert messages separately
-	// Will also update remote db so must be run after remote chat write
 	await saveMessages(messages);
 
 	return (await getChatById(dbChat.id, {
@@ -52,29 +37,6 @@ export async function saveChat(input: Chat.CreateChatInput) {
 	})) as Chat.UIChat;
 }
 
-async function upsertRemoteChat(chat: ChatModel) {
-	if (!isDev) {
-		const { id: appInstanceId } = await saveAppInstance();
-
-		await drizzle
-			.insert(remoteChat)
-			.values({
-				appInstanceId,
-				...chat,
-				createdAt: chat?.createdAt?.toISOString(),
-				updatedAt: chat?.updatedAt?.toISOString(),
-			})
-			.onConflictDoUpdate({
-				target: remoteChat.id,
-				set: {
-					appInstanceId,
-					...chat,
-					createdAt: chat?.createdAt?.toISOString(),
-					updatedAt: chat?.updatedAt?.toISOString(),
-				},
-			});
-	}
-}
 /**
  * Deletes a chat and all it's relations by its ID.
  */

@@ -5,15 +5,12 @@ import { convertToDB, convertToUI } from '@/lib/utils/db-converter';
 
 import { getMessageById } from './query-messages';
 
-import { isDev } from '@/lib/constants';
 import { sql } from '@/lib/db/drizzle/sql/db';
 import {
 	message as dMessage,
 	MessageModel,
 	MessageModelCreate,
 } from '@/lib/db/drizzle/sql/schema';
-import { db as drizzle } from '@/lib/db/drizzle/supabase/db';
-import { remoteMessage } from '@/lib/db/drizzle/supabase/schema';
 import type { Chat } from '@/types/chat';
 import { and, eq } from 'drizzle-orm';
 
@@ -58,17 +55,6 @@ export async function updateMessage(
 		.where(eq(dMessage.id, message.id))
 		.returning();
 
-	if (!isDev) {
-		// Remote write
-		// Internal mechanism to keep Supabase in sync with main
-		await drizzle
-			.update(remoteMessage)
-			.set({
-				...message,
-			})
-			.where(eq(remoteMessage.id, message.id));
-	}
-
 	return convertToUI<MessageModel, Chat.UIMessage>(result);
 }
 export async function saveMessages(messages: Chat.UIMessage[]): Promise<void> {
@@ -86,45 +72,6 @@ export async function saveMessages(messages: Chat.UIMessage[]): Promise<void> {
 			})
 		);
 	});
-
-	if (!isDev) {
-		// Remote write
-		// Internal mechanism to keep Supabase in sync with main
-		await drizzle.transaction(async (tx) => {
-			await Promise.all(
-				dbMessages.map((m) => {
-					const { id, createdAt, updatedAt, ...msg } = m;
-
-					return tx
-						.insert(remoteMessage)
-						.values({
-							// We know id exists
-							id: id!,
-							...msg,
-							createdAt: createdAt?.toISOString(),
-							updatedAt: updatedAt?.toISOString(),
-						})
-						.onConflictDoUpdate({
-							target: remoteMessage.id,
-							set: msg,
-						});
-				})
-			);
-		});
-		// await prisma.$transaction([
-		// 	...dbMessages.map((m) => {
-		// 		return supabase.remoteMessage.upsert({
-		// 			where: { id: m?.id },
-		// 			update: {
-		// 				...(m as RemoteMessageUpdateInput),
-		// 			},
-		// 			create: {
-		// 				...(m as RemoteMessageCreateInput),
-		// 			},
-		// 		});
-		// 	}),
-		// ]);
-	}
 }
 
 export async function deleteMessagesByChatId(chatId: string): Promise<void> {

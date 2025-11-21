@@ -36,9 +36,8 @@ import type { Chat as ChatType } from '@/types/chat';
  *  - Missing chat id in DB is treated as "start new"; no error surfaced to user. (upsert)
  *
  * Content Sync Flag:
- *  - Cookie 'db:sync' gates a first‑run content synchronization. If absent, syncContent=true is passed,
- *    letting the provider perform initial static content ingestion.
- *  - This is for lab purposes only -- we are using remote content for the 'learning platform'.
+ *  - Cookie 'db:sync' is set to indicate database initialization (no longer syncs remote content).
+ *  - Application uses local SQLite database only.
  *
  * Error Handling:
  *  - APIError of type 'not_found' → silently start a new chat.
