@@ -373,14 +373,28 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 
 2. ~~Guard against a missing Auth0AI client (*defensive coding*)~~ _<span style='color: green; font-variant: small-caps'>← Done for you</span>_
 
-3. **Add the Required Imports**: At the top of the file, add:
+3. Add the custom scope (aka 'permission') we created earlier to the existing scopes array.
+
+	> [!TIP]
+	> **Scope Configuration Best Practices:**
+	> 
+	> - Always include baseline OIDC scopes: `openid`, `profile`, `email`
+	> - Add custom API scopes like `create:transfer` for specific permissions
+	> - In production, consider loading scopes from environment variables:
+	>   ```typescript
+	>   const scopes = process.env.AUTH0_API_SCOPES?.split(',') || ['openid', 'profile', 'email'];
+	>   ```
+	> - Scopes should match exactly what you configured in the Auth0 API
+
+====== Move to 1. (line 371) and adjust numbering accordingly. =====
+1. Ensure the necessary imports have been added to the file: 
    ```typescript
    import type { AuthorizerToolParameter, TokenSet } from '@auth0/ai';
    import {
    	AccessDeniedInterrupt,
+   	CIBAInterrupt,
    	UserDoesNotHavePushNotificationsInterrupt,
    } from '@auth0/ai/interrupts';
-   ```
 
 4. **Update the Guard Condition**: Change the return statement in the guard to return the tool instead of nothing:
    ```typescript
