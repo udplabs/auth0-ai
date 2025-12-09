@@ -446,47 +446,6 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 
 <br>
 
-7. **Implement Error Handling**: In the `onUnauthorized` callback, handle different interrupt types:
-
-   ```typescript
-   onUnauthorized: (e) => {
-   	if (e instanceof AccessDeniedInterrupt) {
-   		return {
-   			status: 'denied',
-   			dataCount: 0,
-   			message: '🚫 **Berechtigung verweigert**\n\nDie angeforderte Aktion wurde von Ihnen abgelehnt...',
-   			error: e,
-   			reason: 'user_denied_authorization',
-   			canRetry: true,
-   			nextSteps: [
-   				'Stellen Sie sicher, dass Sie die Aktion wirklich durchführen möchten',
-   				'Versuchen Sie es erneut mit dem gleichen Befehl',
-   				'Kontaktieren Sie den Support, falls Sie Probleme haben',
-   			],
-   		};
-   	}
-
-   	if (e instanceof UserDoesNotHavePushNotificationsInterrupt) {
-   		return {
-   			status: 'error',
-   			dataCount: 0,
-   			message: 'MFA Push-Benachrichtigungen sind nicht eingerichtet. Ich starte das Enrollment für Sie...',
-   			error: e,
-   			requiresMFAEnrollment: true,
-   			forceAction: 'enroll-mfa-push',
-   			autoExecute: true,
-   		};
-   	}
-
-   	// Default error handling
-   	return {
-   		status: 'error',
-   		dataCount: 0,
-   		message: e.message,
-   		error: e,
-   	};
-   }
-   ```
 
 	<br>
 
