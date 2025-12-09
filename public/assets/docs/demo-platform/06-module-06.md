@@ -517,13 +517,7 @@ This will be accomplished by requiring Aiya to fetch a *fresh and ephemeral* acc
 	> 
 	> **Why this pattern?** It allows the same tool to be used with or without streaming capabilities while maintaining type safety.
 
-3. **Add Authorization Parameters**: At the end of the `withAsyncAuthorization` call, add:
-   ```typescript
-   		}),
-   		writer,
-   		bindingMessage: 'Please approve the transfer',
-   	});
-   ```
+3. Be sure to pass <kbd>bindingMessage</kbd> to <kbd>withAsyncAuthorization</kbd>: 
 
 	> [!NOTE]
 	>
