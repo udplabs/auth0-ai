@@ -579,7 +579,9 @@ This will be accomplished by requiring Aiya to fetch a *fresh and ephemeral* acc
    ```
 
 	> [!TIP]
-	> When instructing <abbr title='large language models'>LLMs</abbr> be explicit but concise. The push notification will handle user confirmation automatically.
+	> Instructing an <abbr title='large language models'>LLM</abbr> is like training someone to perform the task. Sometimes adding an explanation as to *why* the model should do/not do something can be helpful (i.e. *the user will be getting a push notification instead*).
+	>
+	> When instructing <abbr title='large language models'>LLMs</abbr> be explicit but concise. 
 
 ---
 #### <span style="font-variant: small-caps">Congrats!</span>
