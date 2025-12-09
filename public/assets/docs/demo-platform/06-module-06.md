@@ -739,7 +739,7 @@ In the previous task we transformed <kbd>transfer-funds</kbd> into a higher-orde
 
 1. Open `lib/ai/tool-registry.ts`.
 2. Find the line with `transferFunds` and update it to call the function:
-	```diff
+	```ts
 	- transferFunds /* ⚠️ TASK 9: Modify to call higher-order function (see `transfer-funds.ts`) */,
 	+ transferFunds: transferFunds(), // call the higher-order function to obtain the tool
 	```
