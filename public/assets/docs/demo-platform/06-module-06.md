@@ -775,7 +775,7 @@ Nifty trick, *right*? 🤓
 
 5. Now find the section where tools are re-initialized with the dataStream writer (around line 110). **Uncomment** the line with `dataStream` and **comment out** the line above it:
 
-	```diff
+	```ts
 	- transferFunds,
 	- // transferFunds: transferFunds(dataStream), /* ⚠️ TASK 9 */
 	+ // transferFunds,
