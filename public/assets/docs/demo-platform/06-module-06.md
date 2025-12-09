@@ -411,16 +411,7 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 
 	<br>
 
-	> [!TIP]
-	> **Scope Configuration Best Practices:**
-	> 
-	> - Always include baseline OIDC scopes: `openid`, `profile`, `email`
-	> - Add custom API scopes like `create:transfer` for specific permissions
-	> - In production, consider loading scopes from environment variables:
-	>   ```typescript
-	>   const scopes = process.env.AUTH0_API_SCOPES?.split(',') || ['openid', 'profile', 'email'];
-	>   ```
-	> - Scopes should match exactly what you configured in the Auth0 API
+6. Enhance <kbd>onAuthorizationRequest</kbd> by plugging in our custom <kbd>handleOnAuthorize</kbd> helper function.
 
 6. **Implement the Full Configuration**: Replace the commented-out implementation with the complete `withAsyncUserConfirmation` call:
    ```typescript
