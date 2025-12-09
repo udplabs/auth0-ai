@@ -759,7 +759,7 @@ In the previous task we transformed <kbd>transfer-funds</kbd> into a higher-orde
 
 3. Open `app/(chat)/api/chat/[id]/_handlers/post.ts`
 4. Find the commented line in the initial tools setup and **remove** the comment:
-	```diff
+	```ts
 	- // transferFunds: transferFunds(), /* ⚠️ TASK 9 */
 	+ transferFunds: transferFunds(), /* ⚠️ TASK 9 */
 	```
