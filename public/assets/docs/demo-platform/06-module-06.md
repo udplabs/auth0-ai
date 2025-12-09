@@ -538,7 +538,7 @@ This will be accomplished by requiring Aiya to fetch a *fresh and ephemeral* acc
 	> - Always use optional chaining (`?.`) when accessing token properties for safety
 
 5. **Update the Tool Description**: Change the description to remove the manual confirmation requirement:
-   Change the text from:
+   Change the following text to explicitly **not** require confirmation. There is no "right" way to word this -- you decide. 
    ```
    Always confirm the details of the transfer with the user before continuing.
    ```
