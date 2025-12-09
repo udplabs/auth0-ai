@@ -458,20 +458,19 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 	>
 	> How does the *tool* handle/return errors? 🤔
 	>
-	> **Error Response Structure:**
-	> ```typescript
-	> {
-	>   status: 'error' | 'denied' | 'interrupted',
-	>   dataCount: 0,
-	>   message: 'User-facing error message',
-	>   error: e, // Original error object
-	>   reason?: 'error_code_for_logging',
-	>   canRetry?: boolean,
-	>   forceAction?: 'tool_name_to_execute',
-	>   autoExecute?: boolean,
-	>   nextSteps?: string[]
-	> }
-	> ```
+	> Refer to **Step 4**: try passing an *async function* that returns an error object.
+	> 	- The goal is to ensure that an error is returned *gracefully* if it occurs and does not 'throw' or *halt* the current action entirely.
+	> 	- If the function halts processing the Agent will not be able to properly triage and find alternatives solutions.
+
+	<br>
+
+8. Now, spread the incoming options so they are passed along to <kbd>withAsyncUserConfirmation</kbd>.
+
+	Not sure what a "spread" is? *Ask Aiya*!
+
+	```diff
+	- // 	...options, /** 👀 ✅ Step 8: The Auth0AI wrapper spreads the same options as our wrapper! TypeScript interface to the rescue? 🧐 */
+	+ ...options,
 
 ---
 #### <span style="font-variant: small-caps">Congrats!</span>
