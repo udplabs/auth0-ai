@@ -409,7 +409,7 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
    const scopes = ['openid', 'profile', 'email', 'create:transfer'];
    ```
 
-	<br>
+5. Insert the <kbd>audience</kbd> value we created earlier.
 
 6. Enhance <kbd>onAuthorizationRequest</kbd> by plugging in our custom <kbd>handleOnAuthorize</kbd> helper function.
 
