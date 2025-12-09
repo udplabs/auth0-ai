@@ -452,11 +452,11 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 	> [!TIP]
 	> **Advanced Error Handling Options:**
 	>
-	> - **Custom Error Messages**: You can customize messages based on the specific error or user context
-	> - **Retry Logic**: Add `canRetry: true` with custom retry mechanisms
-	> - **Conditional Actions**: Use different `forceAction` values based on error type
-	> - **User Guidance**: Provide `nextSteps` arrays with actionable instructions
-	> - **Streaming Updates**: Use the `writer` to stream real-time error explanations to the UI
+    > *Not sure what to do here?*
+	>
+	> This wrapper returns to a *tool*, which then returns to the *streaming function*.
+	>
+	> How does the *tool* handle/return errors? 🤔
 	>
 	> **Error Response Structure:**
 	> ```typescript
