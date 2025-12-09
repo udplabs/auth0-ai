@@ -507,11 +507,12 @@ This will be accomplished by requiring Aiya to fetch a *fresh and ephemeral* acc
 
 <span style="font-variant: small-caps; font-weight: 700">Steps</span>
 
-1. **Add Required Imports**: At the top of the file, add the necessary imports:
-   ```typescript
-   import { withAsyncAuthorization } from '@/lib/auth0/ai/with-async-authorization';
-   import { getCIBACredentials } from '@auth0/ai-vercel';
-   ```
+  1. Ensure the necessary imports have been added to the file:
+     ```typescript
+     import { withAsyncAuthorization } from '@/lib/auth0/ai/with-async-authorization';
+     import { getCIBACredentials } from '@auth0/ai-vercel';
+     import { tool, type UIMessageStreamWriter } from 'ai';
+     ```
 
 2. **Transform the Tool Export**: Currently, `transferFunds` is exported as a simple tool. You need to wrap it with `withAsyncAuthorization`. Replace the entire export from:
    ```typescript
