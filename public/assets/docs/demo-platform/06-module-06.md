@@ -413,22 +413,6 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 
 6. Enhance <kbd>onAuthorizationRequest</kbd> by plugging in our custom <kbd>handleOnAuthorize</kbd> helper function.
 
-6. **Implement the Full Configuration**: Replace the commented-out implementation with the complete `withAsyncUserConfirmation` call:
-   ```typescript
-   return auth0AI.withAsyncUserConfirmation({
-   	scopes,
-   	userID: async () => {
-   		const user = await getUser();
-   		return user.sub;
-   	},
-   	audience: 'http://localhost:3000/api/accounts/transfers',
-   	onAuthorizationRequest: handleOnAuthorize(writer),
-   	onUnauthorized: (e) => {
-   		// Handle different interrupt types...
-   	},
-   	...options,
-   })(tool);
-   ```
 
 	<br>
 
