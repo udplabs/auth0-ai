@@ -375,13 +375,44 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 
 3. Add the custom scope (aka 'permission') we created earlier to the existing scopes array.
 
-4. Ensure the <kbd>userID</kbd> parameter is a <mark>promise</mark> that returns the user’s ID.
+	> [!TIP]
+	> **Scope Configuration Best Practices:**
+	> 
+	> - Always include baseline OIDC scopes: `openid`, `profile`, `email`
+	> - Add custom API scopes like `create:transfer` for specific permissions
+	> - In production, consider loading scopes from environment variables:
+	>   ```typescript
+	>   const scopes = process.env.AUTH0_API_SCOPES?.split(',') || ['openid', 'profile', 'email'];
+	>   ```
+	> - Scopes should match exactly what you configured in the Auth0 API
 
-	i.e. <kbd>getUser</kbd> → <kbd>user.sub</kbd>
+====== Move to 1. (line 371) and adjust numbering accordingly. =====
+1. Ensure the necessary imports have been added to the file: 
+   ```typescript
+   import type { AuthorizerToolParameter, TokenSet } from '@auth0/ai';
+   import {
+   	AccessDeniedInterrupt,
+   	CIBAInterrupt,
+   	UserDoesNotHavePushNotificationsInterrupt,
+   } from '@auth0/ai/interrupts';
+
+4. **Update the Guard Condition**: Change the return statement in the guard to return the tool instead of nothing:
+   ```typescript
+   if (!auth0AI) {
+   	console.warn('Auth0AI client not initialized!');
+   	return tool; // Instead of just 'return;'
+   }
+   ```
+
+5. **Add the Custom Scope**: Update the scopes array to include the transfer permission:
+   ```typescript
+   const scopes = ['openid', 'profile', 'email', 'create:transfer'];
+   ```
 
 5. Insert the <kbd>audience</kbd> value we created earlier.
 
 6. Enhance <kbd>onAuthorizationRequest</kbd> by plugging in our custom <kbd>handleOnAuthorize</kbd> helper function.
+
 
 	<br>
 
@@ -399,23 +430,13 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 
 <br>
 
-7. Ensure any errors (i.e. from `onUnauthorized`) are *normalized*.
-
-  	This callback provides a lot of opportunity to improve the UX even further. This is where you *could* handle cases such as where the user *denies* authorization.
-
-	The <kbd>handleOnAuthorize</kbd> is meant to provide you with a *pattern* you can use to differentiate between denial, missing enrollment, or generic errors.
-
-	The SDK provides normalized error codes to make this easier. For example:
-      - <kbd>AccessDeniedInterrupt</kbd>
-      - <kbd>UserDoesNotHavePushNotificationsInterrupt</kbd>
-
-		*Check out the SDK types (`node_modules/@auth0/ai/dist/esm/interrupts/CIBAInterrupts.d.ts`) for more.*
 
 	<br>
 
 	> [!TIP]
+	> **Advanced Error Handling Options:**
 	>
-	> *Not sure what to do here?*
+    > *Not sure what to do here?*
 	>
 	> This wrapper returns to a *tool*, which then returns to the *streaming function*.
 	>
@@ -434,12 +455,6 @@ Return an instance of `auth0AI.withAsyncUserConfirmation` that:
 	```diff
 	- // 	...options, /** 👀 ✅ Step 8: The Auth0AI wrapper spreads the same options as our wrapper! TypeScript interface to the rescue? 🧐 */
 	+ ...options,
-
-9.  Lastly, make sure the tool being wrapped is *actually injected*!
-	```diff
-	- // })(tool) /** ✅ Step 9: Don't forget to inject the `tool` being wrapped! */;
-	+ })(tool);
-	```
 
 ---
 #### <span style="font-variant: small-caps">Congrats!</span>
@@ -472,12 +487,18 @@ This will be accomplished by requiring Aiya to fetch a *fresh and ephemeral* acc
 
 <span style="font-variant: small-caps; font-weight: 700">Setup</span>
 
-- From your code editor, open `lib/auth0/ai/transfer-funds.ts`.
+- From your code editor, open `lib/ai/tools/transfer-funds.ts`.
 
 <span style="font-variant: small-caps; font-weight: 700">Steps</span>
 
-1. Wrap <kbd>transferFunds</kbd> with <kbd>withAsyncAuthorization</kbd>.
+  1. Ensure the necessary imports have been added to the file:
+     ```typescript
+     import { withAsyncAuthorization } from '@/lib/auth0/ai/with-async-authorization';
+     import { getCIBACredentials } from '@auth0/ai-vercel';
+     import { tool, type UIMessageStreamWriter } from 'ai';
+     ```
 
+2. Wrap <kbd>transferFunds</kbd> with <kbd>withAsyncAuthorization</kbd>.
 	You will need to:
       - import the function from the `lib/auth0/ai` directory.
       - *wrap the tool* -- instead of simply returning it, pass it as the <kbd>tool</kbd> parameter of <kbd>withAsyncAuthorization</kbd>.
@@ -486,26 +507,46 @@ This will be accomplished by requiring Aiya to fetch a *fresh and ephemeral* acc
 
 	<br>
 
+	> [!TIP]
+	> **Higher-Order Function Pattern:**
+	> 
+	> This creates a "factory function" that:
+	> - Accepts an optional `writer` parameter for streaming updates
+	> - Returns a wrapped tool with authorization capabilities
+	> - Maintains the original tool's TypeScript interface
+	> 
+	> **Why this pattern?** It allows the same tool to be used with or without streaming capabilities while maintaining type safety.
+
+3. Be sure to pass <kbd>bindingMessage</kbd> to <kbd>withAsyncAuthorization</kbd>: 
+
 	> [!NOTE]
 	>
 	> ***What is <kbd>bindingMessage</kbd>?***
 	>
 	> When using the Auth0 Guardian SDK this message can be displayed to the user in order to provide context about the request. It is *not* used in our demo but still required.
 
+4. In **step one** you imported <kbd>getCIBACredentials</kbd>. Now use it to retrieve an <kbd>accessToken</kbd>. Ensure the token is sent in the tool's <kbd>fetch</kbd> call as the <kbd>Authorization</kbd> header
+
 	<br>
 
-2. Import <kbd>getCIBACredentials</kbd> and use it to retrieve an <kbd>accessToken</kbd> to be sent in the <kbd>Authorization</kbd> header of the API call.
+	> [!TIP]
+	> **Understanding CIBA Credentials:**
+	> 
+	> - `getCIBACredentials()` returns the fresh access token obtained through the CIBA flow
+	> - This token contains the `create:transfer` scope we configured earlier
+	> - The token is ephemeral and specific to this authorization request
+	> - Always use optional chaining (`?.`) when accessing token properties for safety
 
-3. Update the tool <kbd>description</kbd>.
-	- Right now the tool states to always require confirmation. However, we are implementing confirmation via push notification so having Aiya confirm first would be very annoying.
-	- Read the <kbd>description</kbd> and modify the instructions so Aiya *never* asks for confirmation.
+5. **Update the Tool Description**: Change the description to remove the manual confirmation requirement:
+   Change the following text to explicitly **not** require confirmation. There is no "right" way to word this -- you decide. 
+   ```
+   Always confirm the details of the transfer with the user before continuing.
+   ```
 
-		<br>
-
-		> [!TIP]
-		> When instructing <abbr title='large language models'>LLMs</abbr> be explicit but concise.
-
-		<br>
+	> [!TIP]
+	> Instructing an <abbr title='large language models'>LLM</abbr> is like training someone to perform the task. Sometimes adding an explanation as to *why* the model should do/not do something can be helpful (i.e. *the user will be getting a push notification instead*).
+	>
+	> When instructing <abbr title='large language models'>LLMs</abbr> be explicit but concise. 
 
 ---
 #### <span style="font-variant: small-caps">Congrats!</span>
@@ -523,14 +564,12 @@ Feel free to give it a try, just know you'll be missing out on a better UX! ***W
 
 <br>
 
-## Task 8: Enhance the UX
+## Task 8: Enhance the UX (Higher-Order Function)
 
 #### <span style="font-variant: small-caps">Goal</span>
-To enhance the user's experience we need a way to *inject* the streaming writer into `withAsyncAuthorization` so the authorization portion of the flow (where the push notification gets sent) can stream *status messages* to the chat UI.
+In Task 7, you already transformed `transferFunds` into a higher-order function that accepts a `writer` parameter. This allows us to inject the streaming writer into `withAsyncAuthorization` so the authorization flow can stream status messages to the chat UI.
 
-*The plain exported tool has no place to accept that writer.*
-
-Although this is *not* a *requirement* to enable the core feature functionality, it sure does make for a better user experience!
+*This pattern enables real-time progress updates during the authorization process.*
 
 #### <span style="font-variant: small-caps"><em>What</em> are we doing?</span>
 
@@ -626,23 +665,12 @@ Without being able to stream message updates, the user is left with a loading in
 
 	***How?***
 
-	A “higher-order factory function” (*of course*)! We need to “wrap the wrapper”.
+	This was already accomplished in Task 7! By transforming the export to:
+	```typescript
+	export const transferFunds = (writer?: UIMessageStreamWriter) => withAsyncAuthorization({...
+	```
 
-  	It's easy. Just create a function that *returns* the wrapped tool.
-
-	<br>
-
-	> [!TIP]
-	>
-	> We will give you a hint...
-	>
-	>
-	> ```diff
-	> - export const transferFunds = /* ✅ TASK 7 - STEP 1: */ withAsyncAuthorization({
-	> + export const transferFunds = /* ✅ TASK 8 */ () => withAsyncAuthorization({...
-	> ```
-
-	<br>
+	You created a higher-order function that accepts a `writer` parameter and returns the authorized tool.
 
 ---
 #### <span style="font-variant: small-caps">Congrats!</span>
@@ -675,20 +703,32 @@ In the previous task we transformed <kbd>transfer-funds</kbd> into a higher-orde
 <span style="font-variant: small-caps; font-weight: 700">Steps</span>
 
 1. Open `lib/ai/tool-registry.ts`.
-2. Simply change <kbd>transferFunds</kbd> → <kbd>transferFunds()</kbd>. 🙌
-	```diff
-	- transferFunds
-	+ transferFunds()
+2. Find the line with `transferFunds` and update it to call the function:
+	```ts
+	- transferFunds /* ⚠️ TASK 9: Modify to call higher-order function (see `transfer-funds.ts`) */,
+	+ transferFunds: transferFunds(), // call the higher-order function to obtain the tool
 	```
+
+	<br>
+
+	> [!TIP]
+	> **Tool Registry Patterns:**
+	> 
+	> - **Simple tools**: `toolName` (direct reference)
+	> - **Factory functions**: `toolName()` (function call)
+	> - **Parameterized tools**: `toolName(config)` (with configuration)
+	> 
+	> The registry calls `transferFunds()` without arguments, using the optional writer parameter pattern.
 
 ***But wait, there's more!***
 
-3. Open ```app/(chat)/api/chat/[id]/_handlers/post.ts```
-4. Scroll to **line 81** and ***uncomment*** ```transferFunds()```. You *might* see a red squiggly, *this can be ignored* (for now). ```transferFunds()``` does not require an arg to compile and run. The writer arg is *optional*
-	```diff
-	- // transferFunds: transferFunds(),
-	+ transferFunds: transferFunds(),
+3. Open `app/(chat)/api/chat/[id]/_handlers/post.ts`
+4. Find the commented line in the initial tools setup and **remove** the comment:
+	```ts
+	- // transferFunds: transferFunds(), /* ⚠️ TASK 9 */
+	+ transferFunds: transferFunds(), /* ⚠️ TASK 9 */
 	```
+   **Note:** This registers the tool without a writer initially, which is fine since the writer parameter is optional.
 
 ***But, where is the datastream writer? I thought we were injecting it?***
 
@@ -698,13 +738,33 @@ Once the datastream writer is available, in the actual <kbd>createUIMessageStrea
 
 Nifty trick, *right*? 🤓
 
-5. Speaking of that, let's do it now! Scroll to **line 110** and ***uncomment*** ```transferFunds: transferFunds(dataStream)```, and remove the line above it.
+5. Now find the section where tools are re-initialized with the dataStream writer (around line 110). **Uncomment** the line with `dataStream` and **comment out** the line above it:
 
-	```diff
+	```ts
 	- transferFunds,
-	- // transferFunds: transferFunds(dataStream),
-	+ transferFunds: transferFunds(dataStream),
+	- // transferFunds: transferFunds(dataStream), /* ⚠️ TASK 9 */
+	+ // transferFunds,
+	+ transferFunds: transferFunds(dataStream), /* ⚠️ TASK 9 */
 	```
+
+   **Why both registrations?** 
+   - First registration: Makes the tool available to the AI system initially (without writer)
+   - Second registration: Re-initializes the tool with the dataStream writer for real-time updates
+
+	<br>
+
+	> [!TIP]
+	> **Dual Registration Pattern:**
+	> 
+	> This pattern is useful for tools that need streaming capabilities:
+	> 
+	> 1. **Initial registration**: `toolName()` - Basic tool availability
+	> 2. **Enhanced registration**: `toolName(writer)` - With streaming capabilities
+	> 
+	> **Alternative approaches:**
+	> - Use dependency injection patterns
+	> - Implement lazy initialization within the tool
+	> - Create separate streaming and non-streaming variants
 
 > [!NOTE]
 >
@@ -726,25 +786,47 @@ Only one more to go...
 
 <br>
 
-## Task 10: Try **it**
+## Task 10: Test the Implementation
 
 #### <span style="font-variant: small-caps">Steps</span>
 
-1. Stop the application and restart it again with:
+1. **Restart the Application**: If the application is running, restart it to pick up all changes:
 
 	```bash
 	npm run dev
 	```
 
-2. Navigate to [http://localhost:3000](http://localhost:3000)
+2. **Navigate to the Application**: Open [http://localhost:3000](http://localhost:3000)
 
-3. Ask the Aiya to transfer funds from your checking to savings, (*or whichever accounts you would like*).
+3. **Start a New Chat**: Click the "+" button to create a new chat session.
 
+4. **Test the Transfer**: Ask Aiya to transfer funds, for example:
    ```
-   Transfer $25 from checking to savings.
+   Transfer $25 from checking to savings
    ```
 
 	![Aiya Init Transfer](./assets/Module06/images/init-transfer.png)
+
+	<br>
+
+	> [!TIP]
+	> **Troubleshooting Common Issues:**
+	> 
+	> **If transfers fail:**
+	> - Check browser console for error messages
+	> - Verify Auth0 API configuration matches your audience URL
+	> - Ensure CIBA is enabled in your Auth0 application
+	> - Confirm push notifications are enabled in Auth0 Dashboard
+	> 
+	> **If push notifications don't arrive:**
+	> - Check Guardian app enrollment status
+	> - Verify device has internet connectivity
+	> - Look for notifications in Auth0 Dashboard logs
+	> 
+	> **If authorization hangs:**
+	> - Check network connectivity
+	> - Verify Auth0 API audience configuration
+	> - Ensure correct scopes are configured
 
 4. If you are ***NOT*** already enrolled in push notifications, you will be prompted to enroll.
 
