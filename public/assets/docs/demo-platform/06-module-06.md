@@ -498,16 +498,12 @@ This will be accomplished by requiring Aiya to fetch a *fresh and ephemeral* acc
      import { tool, type UIMessageStreamWriter } from 'ai';
      ```
 
-2. **Transform the Tool Export**: Currently, `transferFunds` is exported as a simple tool. You need to wrap it with `withAsyncAuthorization`. Replace the entire export from:
-   ```typescript
-   export const transferFunds = tool<...>({
-   ```
-   to:
-   ```typescript
-   export const transferFunds = (writer?: UIMessageStreamWriter) =>
-   	withAsyncAuthorization({
-   		tool: tool<...>({
-   ```
+2. Wrap <kbd>transferFunds</kbd> with <kbd>withAsyncAuthorization</kbd>.
+	You will need to:
+      - import the function from the `lib/auth0/ai` directory.
+      - *wrap the tool* -- instead of simply returning it, pass it as the <kbd>tool</kbd> parameter of <kbd>withAsyncAuthorization</kbd>.
+      - <kbd>transferFunds</kbd> should ultimately *still return* the original tool.
+      - <kbd>bindingMessage</kbd> can be a simple string like `Please approve the transfer.`
 
 	<br>
 
