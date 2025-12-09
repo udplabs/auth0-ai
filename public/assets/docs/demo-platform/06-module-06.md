@@ -525,12 +525,7 @@ This will be accomplished by requiring Aiya to fetch a *fresh and ephemeral* acc
 	>
 	> When using the Auth0 Guardian SDK this message can be displayed to the user in order to provide context about the request. It is *not* used in our demo but still required.
 
-4. **Retrieve CIBA Credentials**: In the tool's `execute` function, replace the empty `Authorization` header with:
-   ```typescript
-   const token = getCIBACredentials();
-   // ...
-   Authorization: `Bearer ${token?.accessToken}`,
-   ```
+4. In **step one** you imported <kbd>getCIBACredentials</kbd>. Now use it to retrieve an <kbd>accessToken</kbd>. Ensure the token is sent in the tool's <kbd>fetch</kbd> call as the <kbd>Authorization</kbd> header
 
 	<br>
 
