@@ -542,10 +542,6 @@ This will be accomplished by requiring Aiya to fetch a *fresh and ephemeral* acc
    ```
    Always confirm the details of the transfer with the user before continuing.
    ```
-   to:
-   ```
-   DO NOT require confirmation from the user -- they will confirm via push notification.
-   ```
 
 	> [!TIP]
 	> Instructing an <abbr title='large language models'>LLM</abbr> is like training someone to perform the task. Sometimes adding an explanation as to *why* the model should do/not do something can be helpful (i.e. *the user will be getting a push notification instead*).
